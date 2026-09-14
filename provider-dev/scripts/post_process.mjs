@@ -33,7 +33,13 @@
 //    normalize pass uses for bare arrays), with a synthesised wrapper schema
 //    so DESCRIBE shows the column.
 //
-// 5. Sanity: every service carries the region server template with the
+// 5. Deterministic provider.yaml. The generator writes providerServices in
+//    filesystem readdir order, which is sorted on Windows (NTFS) but not on
+//    Linux, so the same build produced on the two platforms differed (the CI
+//    generation-drift check caught it). The services map is rewritten in
+//    byte order.
+//
+// 6. Sanity: every service carries the region server template with the
 //    SUMOLOGIC_ENVIRONMENT x-stackQL-envVar, and every skip in the CSV is
 //    absent from the resources.
 //
@@ -162,4 +168,12 @@ if (errors.length > 0) {
   process.exit(1);
 }
 for (const [f, doc] of docs) fs.writeFileSync(path.join(servicesDir, f), yaml.dump(doc, { lineWidth: -1, noRefs: true }));
+
+// 5. provider.yaml with providerServices in byte order (platform-independent)
+const providerYamlPath = path.join(servicesDir, '..', 'provider.yaml');
+const providerDoc = yaml.load(fs.readFileSync(providerYamlPath, 'utf8'));
+const byteOrder = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+providerDoc.providerServices = Object.fromEntries(Object.entries(providerDoc.providerServices || {}).sort(([a], [b]) => byteOrder(a, b)));
+fs.writeFileSync(providerYamlPath, yaml.dump(providerDoc, { lineWidth: -1, noRefs: true }));
+console.log(`post_process: provider.yaml providerServices sorted (${Object.keys(providerDoc.providerServices).length} services)`);
 console.log(`post_process: ${stats.services} services, ${stats.methods} methods; request.nativeCasing: camel on ${stats.cased} (${stats.bodyMedia} with a body mediaType), ${stats.execNoRequest} body-less EXEC methods left without a request block, ${stats.objectKeys} object key(s) added to non-GET SELECT methods, ${stats.pagination} pagination override(s), ${stats.scalarWraps || 0} scalar response wrap(s)`);

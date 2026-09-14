@@ -10,9 +10,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/access_keys.yaml
     title: Sumo Logic Access Keys API
     version: v00.00.00000
-    description: >-
-      Access keys of the calling user and of the organization, their scopes,
-      CORS headers and secret rotation.
+    description: Access keys of the calling user and of the organization, their scopes, CORS headers and secret rotation.
   account:
     id: account:v00.00.00000
     name: account
@@ -21,9 +19,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/account.yaml
     title: Sumo Logic Account API
     version: v00.00.00000
-    description: >-
-      Account status, owner, subdomain, plan update requests, usage reports and
-      usage forecasts.
+    description: Account status, owner, subdomain, plan update requests, usage reports and usage forecasts.
   apps:
     id: apps:v00.00.00000
     name: apps
@@ -32,9 +28,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/apps.yaml
     title: Sumo Logic Apps API
     version: v00.00.00000
-    description: >-
-      The Sumo Logic app catalog (v1 and v2) - browse, install, upgrade,
-      uninstall apps and follow the asynchronous install jobs.
+    description: The Sumo Logic app catalog (v1 and v2) - browse, install, upgrade, uninstall apps and follow the asynchronous install jobs.
   archive:
     id: archive:v00.00.00000
     name: archive
@@ -43,9 +37,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/archive.yaml
     title: Sumo Logic Archive API
     version: v00.00.00000
-    description: >-
-      Archive ingestion jobs that replay archived logs from an AWS S3 archive
-      source.
+    description: Archive ingestion jobs that replay archived logs from an AWS S3 archive source.
   budgets:
     id: budgets:v00.00.00000
     name: budgets
@@ -72,9 +64,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/connections.yaml
     title: Sumo Logic Connections API
     version: v00.00.00000
-    description: >-
-      Webhook, ServiceNow, PagerDuty and other outbound connections used by
-      monitors and scheduled searches.
+    description: Webhook, ServiceNow, PagerDuty and other outbound connections used by monitors and scheduled searches.
   content:
     id: content:v00.00.00000
     name: content
@@ -83,10 +73,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/content.yaml
     title: Sumo Logic Content API
     version: v00.00.00000
-    description: >-
-      The content library - folders (personal, global, admin recommended,
-      installed apps), content permissions, paths, and the asynchronous export,
-      import, copy, move and delete jobs.
+    description: The content library - folders (personal, global, admin recommended, installed apps), content permissions, paths, and the asynchronous export, import, copy, move and delete jobs.
   content_sync:
     id: content_sync:v00.00.00000
     name: content_sync
@@ -104,9 +91,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/dashboards.yaml
     title: Sumo Logic Dashboards API
     version: v00.00.00000
-    description: >-
-      Dashboards (New), dashboard report schedules, report generation jobs and
-      legacy report migration.
+    description: Dashboards (New), dashboard report schedules, report generation jobs and legacy report migration.
   data_archiving:
     id: data_archiving:v00.00.00000
     name: data_archiving
@@ -197,17 +182,6 @@ providerServices:
     title: Sumo Logic Ingest Budgets API
     version: v00.00.00000
     description: Ingest budgets (v2) and their usage reset.
-  logs_data_forwarding:
-    id: logs_data_forwarding:v00.00.00000
-    name: logs_data_forwarding
-    preferred: true
-    service:
-      $ref: sumologic/v00.00.00000/services/logs_data_forwarding.yaml
-    title: Sumo Logic Logs Data Forwarding API
-    version: v00.00.00000
-    description: >-
-      Log data forwarding destinations (AWS S3) and forwarding rules per
-      partition.
   log_searches:
     id: log_searches:v00.00.00000
     name: log_searches
@@ -216,9 +190,16 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/log_searches.yaml
     title: Sumo Logic Log Searches API
     version: v00.00.00000
-    description: >-
-      Saved and scheduled log searches, and estimated usage of a log search
-      across data tiers.
+    description: Saved and scheduled log searches, and estimated usage of a log search across data tiers.
+  logs_data_forwarding:
+    id: logs_data_forwarding:v00.00.00000
+    name: logs_data_forwarding
+    preferred: true
+    service:
+      $ref: sumologic/v00.00.00000/services/logs_data_forwarding.yaml
+    title: Sumo Logic Logs Data Forwarding API
+    version: v00.00.00000
+    description: Log data forwarding destinations (AWS S3) and forwarding rules per partition.
   lookup_tables:
     id: lookup_tables:v00.00.00000
     name: lookup_tables
@@ -263,9 +244,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/monitors.yaml
     title: Sumo Logic Monitors API
     version: v00.00.00000
-    description: >-
-      Monitors and monitor folders in the monitors library - search, path, copy,
-      move, import, export, permissions, playbooks and usage.
+    description: Monitors and monitor folders in the monitors library - search, path, copy, move, import, export, permissions, playbooks and usage.
   muting_schedules:
     id: muting_schedules:v00.00.00000
     name: muting_schedules
@@ -319,9 +298,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/partitions.yaml
     title: Sumo Logic Partitions API
     version: v00.00.00000
-    description: >-
-      Partitions (indexes), their retention and decommissioning, and the
-      partition quota.
+    description: Partitions (indexes), their retention and decommissioning, and the partition quota.
   password_policy:
     id: password_policy:v00.00.00000
     name: password_policy
@@ -339,10 +316,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/policies.yaml
     title: Sumo Logic Policies API
     version: v00.00.00000
-    description: >-
-      Organization security and behaviour policies - audit, search audit, data
-      access level, data deletion, session limits, dashboard sharing, timestamp
-      format, OAuth CIMD and access key lifetime.
+    description: Organization security and behaviour policies - audit, search audit, data access level, data deletion, session limits, dashboard sharing, timestamp format, OAuth CIMD and access key lifetime.
   roles:
     id: roles:v00.00.00000
     name: roles
@@ -396,9 +370,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/search_jobs.yaml
     title: Sumo Logic Search Jobs API
     version: v00.00.00000
-    description: >-
-      Search jobs (v2) - create a log search job, poll its status and page
-      through its messages and records.
+    description: Search jobs (v2) - create a log search job, poll its status and page through its messages and records.
   service_accounts:
     id: service_accounts:v00.00.00000
     name: service_accounts
@@ -425,9 +397,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/slos.yaml
     title: Sumo Logic Slos API
     version: v00.00.00000
-    description: >-
-      SLOs and SLO folders in the SLO library, service level indicators and
-      usage.
+    description: SLOs and SLO folders in the SLO library, service level indicators and usage.
   source_templates:
     id: source_templates:v00.00.00000
     name: source_templates
@@ -445,9 +415,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/threat_intel.yaml
     title: Sumo Logic Threat Intel API
     version: v00.00.00000
-    description: >-
-      Threat intelligence datastore, data sources, retention and indicator
-      ingestion.
+    description: Threat intelligence datastore, data sources, retention and indicator ingestion.
   tokens:
     id: tokens:v00.00.00000
     name: tokens
@@ -465,9 +433,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/tracing.yaml
     title: Sumo Logic Tracing API
     version: v00.00.00000
-    description: >-
-      Traces, spans, trace and span queries, tracing metrics and the service
-      map.
+    description: Traces, spans, trace and span queries, tracing metrics and the service map.
   transformation_rules:
     id: transformation_rules:v00.00.00000
     name: transformation_rules
@@ -485,9 +451,7 @@ providerServices:
       $ref: sumologic/v00.00.00000/services/users.yaml
     title: Sumo Logic Users API
     version: v00.00.00000
-    description: >-
-      Users and their lifecycle actions - unlock, password reset, email change,
-      welcome email, MFA.
+    description: Users and their lifecycle actions - unlock, password reset, email change, welcome email, MFA.
 config:
   auth:
     type: basic
