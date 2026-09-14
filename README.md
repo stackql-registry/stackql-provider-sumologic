@@ -135,7 +135,7 @@ Every method of the previous release (267 methods across 32 services) is disposi
 
 ## Prerequisites
 
-- Node.js >= 20, GNU make, bash (Linux, macOS or WSL)
+- Node.js >= 20 for the provider pipeline, Node.js >= 22.12 for the docs site (Docusaurus 3.10 pulls in `mermaid` 12), GNU make, bash (Linux, macOS or WSL)
 - A `stackql` binary for testing (`$STACKQL`, `./stackql`, or on `PATH`) - [install](https://stackql.io/docs/installing-stackql)
 - yarn for the docs site
 - A Sumo Logic access key pair for the live smoke tests - Administration -> Security -> Access Keys in the console

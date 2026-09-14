@@ -16,7 +16,7 @@ Every pipeline step is a `make` target (GNU make, bash; run from WSL, Linux or m
 - `make mappings` - fills mappings for NEW operations only and prunes retired ones; `make mappings-rebuild` re-derives every row (deliberate renames only); `make mappings-check` reports rule drift without writing
 - `make test` - `test-offline` (SHOW/DESCRIBE against the file registry), `test-integration` (mock Sumo Logic API, row-level), `test-meta` (SHOW/DESCRIBE gate over every resource through a local `stackql srv`)
 - `make smoke-test` / `make smoke-test-live` / `make smoke-cleanup` - live suite against the local or the published provider; sources `.env` (`SUMOLOGIC_ACCESSID`, `SUMOLOGIC_ACCESSKEY`, `SUMOLOGIC_ENVIRONMENT`). Nothing it creates is billable and everything is named `stackql-smoke-*` and swept
-- `make docs` / `make docs-build` / `make docs-serve` - generate `website/docs` (snake_case surface, then `website/scripts/sanitize-docs.mjs`), build, serve
+- `make docs` / `make docs-build` / `make docs-serve` - generate `website/docs` (snake_case surface, then `website/scripts/sanitize-docs.mjs`), build, serve. The site needs Node >= 22.12 (`mermaid` 12 via Docusaurus 3.10); the web workflows run Node 22, the provider pipeline works on Node >= 20
 - `make compare` - regenerate the README Breaking Changes section from `provider-dev/config/predecessor_methods.csv`
 
 A stackql binary is needed for the tests: `$STACKQL`, `./stackql`, or `stackql` on PATH (on this machine the WSL binary is `/home/javen/.local/bin/stackql`; `STACKQL=/home/javen/.local/bin/stackql make test`).
