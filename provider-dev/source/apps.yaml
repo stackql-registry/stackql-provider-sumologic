@@ -1,0 +1,999 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Apps API
+  description: The Sumo Logic app catalog (v1 and v2) - browse, install, upgrade, uninstall apps and follow the asynchronous install jobs.
+  version: 1.0.0
+paths:
+  /v1/apps:
+    get:
+      tags:
+        - appManagement
+      summary: List available apps.
+      description: Lists all available apps from the App Catalog.
+      operationId: listApps
+      responses:
+        '200':
+          description: List of all available apps.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAppsResult'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/apps/{uuid}:
+    get:
+      tags:
+        - appManagement
+      summary: Get an app by UUID.
+      description: Gets the app with the given universally unique identifier (UUID).
+      operationId: getApp
+      parameters:
+        - name: uuid
+          in: path
+          description: The identifier of the app to retrieve.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The retrieved app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/apps/{uuid}/install:
+    post:
+      tags:
+        - appManagement
+      summary: Install an app by UUID.
+      description: Installs the app with given UUID in the folder specified using destinationFolderId.
+      operationId: installApp
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to install.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInstallRequest'
+        required: true
+      responses:
+        '200':
+          description: App install job has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponse'
+        default:
+          description: App installation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/apps/install/{jobId}/status:
+    get:
+      tags:
+        - appManagement
+      summary: App install job status.
+      description: Get the status of an asynchronous app install request for the given job identifier.
+      operationId: getAsyncInstallStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: The identifier of the asynchronous install job.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The status of the app install job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncJobStatus'
+        default:
+          description: App installation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/{uuid}/install:
+    post:
+      tags:
+        - appManagementV2
+      summary: Start app install job
+      description: |-
+        Schedule an asynchronous job to install the app with the given UUID and version from the App Catalog. The app will be installed in 'Installed Apps' folder in the Content Library.
+
+        _You get back an identifier of asynchronous job in response to this endpoint. You can then use the app install status API to get the status of the installation request. See Asynchronous-Request section for more details on how to work with asynchronous request._
+      operationId: asyncInstallApp
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to install.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      requestBody:
+        description: Information about the app to install.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsyncInstallAppRequest'
+        required: true
+      responses:
+        '200':
+          description: App installation job has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/install/{jobId}/status:
+    get:
+      tags:
+        - appManagementV2
+      summary: App install job status
+      description: Get the status of an asynchronous app install request for the given job identifier.
+      operationId: getAsyncInstallAppStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: Identifier of the asynchronous job for installing the app.
+          required: true
+          schema:
+            type: string
+          example: C03E086C137F38B4
+      responses:
+        '200':
+          description: Status of the app installation job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncInstallAppJobStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/{uuid}/uninstall:
+    post:
+      tags:
+        - appManagementV2
+      summary: Start app uninstall job
+      description: |-
+        Schedule an asynchronous job to uninstall app with the given UUID.
+
+        _You get back an identifier of asynchronous job in response to this endpoint. You can then use the app uninstall status API to get the status of the uninstallation request. See Asynchronous-Request section for more details on how to work with asynchronous request._
+      operationId: asyncUninstallApp
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to uninstall.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      responses:
+        '200':
+          description: App uninstall job has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/uninstall/{jobId}/status:
+    get:
+      tags:
+        - appManagementV2
+      summary: App uninstall job status
+      description: Get the status of an asynchronous app uninstall request for the given job identifier.
+      operationId: getAsyncUninstallAppStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: Identifier of the asynchronous job for uninstalling the app.
+          required: true
+          schema:
+            type: string
+          example: C03E086C137F38B4
+      responses:
+        '200':
+          description: Status of the app uninstall job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncUninstallAppJobStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/{uuid}/upgrade:
+    post:
+      tags:
+        - appManagementV2
+      summary: Start app upgrade job
+      description: |-
+        Schedule an asynchronous job to upgrade the app with the given UUID and version from the App Catalog. The app will be installed in 'Installed Apps' folder in the Content Library.
+
+        _You get back an identifier of asynchronous job in response to this endpoint. You can then use the app upgrade status API to get the status of the upgrade request. See Asynchronous-Request section for more details on how to work with asynchronous request._
+      operationId: asyncUpgradeApp
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to upgrade.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      requestBody:
+        description: Information about the app to upgrade.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsyncUpgradeAppRequest'
+        required: true
+      responses:
+        '200':
+          description: App upgrade job has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/upgrade/{jobId}/status:
+    get:
+      tags:
+        - appManagementV2
+      summary: App upgrade job status
+      description: Get the status of an asynchronous app upgrade request for the given job identifier.
+      operationId: getAsyncUpgradeAppStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: Identifier of the asynchronous job for upgrading the app.
+          required: true
+          schema:
+            type: string
+          example: C03E086C137F38B4
+      responses:
+        '200':
+          description: Status of the app upgrade job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncUpgradeAppJobStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps:
+    get:
+      tags:
+        - appManagementV2
+      summary: List apps
+      description: List all apps from the App Catalog.
+      operationId: listAppsV2
+      parameters:
+        - name: name
+          in: query
+          description: Name of the app.
+          required: false
+          schema:
+            type: string
+          example: AWS%20CloudTrail
+        - name: author
+          in: query
+          description: Author of the app.
+          required: false
+          schema:
+            type: string
+          example: Sumo%20Logic
+      responses:
+        '200':
+          description: List of apps.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAppsV2Response'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/{uuid}/details:
+    get:
+      tags:
+        - appManagementV2
+      summary: Get details of an app version.
+      description: |-
+        Get details about an app with the given UUID and version. The details include:
+
+          1. The base URL for all the resource for the app.
+          2. The app manifest
+      operationId: getAppDetails
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+        - name: version
+          in: query
+          description: Version of the app. The latest version is used if this is omitted or specified as "latest".
+          required: false
+          schema:
+            type: string
+          example: 1.0.0
+      responses:
+        '200':
+          description: Information about the requested app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAppDetailsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/apps/{uuid}/subscription:
+    get:
+      tags:
+        - appManagementV2
+      summary: Get subscription status for the user
+      description: Get Subscription status for the user for a specific app.  This will indicate whether the user has subscribed to the app or not.
+      operationId: getAppNotificationSubscriptionStatus
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      responses:
+        '200':
+          description: Information about user's subscription status for the app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionStatusResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - appManagementV2
+      summary: Subscribe to an app upgrade notification
+      description: Subscribe to an app upgrade notification. This will allow the user to receive notifications for the app updates.
+      operationId: subscribeToAppNotification
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to subscribe to.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      responses:
+        '204':
+          description: Successfully subscribed to the app notification.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - appManagementV2
+      summary: Unsubscribe from an app upgrade notification
+      description: Unsubscribe from an app. This will remove the user's subscription to notifications for the app.
+      operationId: unsubscribeFromAppNotification
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the app to unsubscribe from.
+          required: true
+          schema:
+            type: string
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+      responses:
+        '204':
+          description: App Notification unsubscription was successful.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListAppsResult:
+      required:
+        - apps
+      type: object
+      properties:
+        apps:
+          type: array
+          description: An array of Apps
+          items:
+            $ref: '#/components/schemas/App'
+      description: List of all available apps from the App Catalog.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    App:
+      required:
+        - appDefinition
+        - appManifest
+      type: object
+      properties:
+        appDefinition:
+          $ref: '#/components/schemas/AppDefinition'
+        appManifest:
+          $ref: '#/components/schemas/AppManifest'
+    AppInstallRequest:
+      required:
+        - description
+        - destinationFolderId
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Preferred name of the app to be installed. This will be the name of the app in the selected installation folder.
+          example: Sumo Logic Configuration App
+        description:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Preferred description of the app to be installed. This will be displayed as the app description in the selected installation folder.
+          example: Sumo Logic Configuration App to configure collectors and data sources
+        destinationFolderId:
+          type: string
+          description: Identifier of the folder in which the app will be installed in hexadecimal format.
+          example: 00000000000001C8
+        dataSourceValues:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: Dictionary of properties specifying log-source name and value.
+          example:
+            logsrc: _sourceCategory = api
+      description: JSON object containing name, description, destinationFolderId, and dataSourceType.
+    BeginAsyncJobResponse:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier to get the status of an asynchronous job.
+          example: C03E086C137F38B4
+    AsyncJobStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).
+        statusMessage:
+          type: string
+          description: Additional status message generated if the status is not `Failed`.
+        error:
+          $ref: '#/components/schemas/ErrorDescription'
+      example:
+        status: Success
+        statusMessage: ''
+    AsyncInstallAppRequest:
+      type: object
+      properties:
+        version:
+          type: string
+          description: |
+            Version of the app to install. You can either specify a specific version of the app or use `latest` to install the latest version of the app. _If version is not specified, the latest version of the app will be installed_.
+          example: 1.0.1
+          default: latest
+        parameters:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of additional parameters for the app installation.
+          example:
+            db_system: redis
+      description: Install app request.
+    BeginAsyncJobResponseV2:
+      required:
+        - jobId
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: Identifier of the asynchronous job. Use it to get status of the job.
+          example: C03E086C137F38B4
+    AsyncInstallAppJobStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).
+          example: Success
+        instanceId:
+          type: string
+          description: Instance identifier of the installed app. This field is not set yet but is a placeholder for future use.
+          example: 0000000001578BE8
+        path:
+          type: string
+          description: Path of the folder in which the app was installed.
+          example: /Library/Installed Apps/AWS CloudTrail
+        folderId:
+          type: string
+          description: Identifier of the folder in which the app was installed.
+          example: 0000000001578BE8
+        error:
+          $ref: '#/components/schemas/ErrorDescription'
+      description: Status of the install app async job.
+    AsyncUninstallAppJobStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).
+          example: Success
+        errors:
+          type: array
+          description: More information about the failure if the status is `Failed`.
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+      description: Status of an uninstall app job.
+    AsyncUpgradeAppRequest:
+      type: object
+      properties:
+        version:
+          type: string
+          description: |
+            Version of the app to upgrade. You can either specify a specific version of the app or use `latest` to install the latest version of the app. _If version is not specified, the latest version of the app will be installed_.
+          example: 1.0.1
+          default: latest
+        parameters:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of additional parameters for the app installation.
+          example:
+            db_system: redis
+      description: Upgrade app request.
+    AsyncUpgradeAppJobStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).
+          example: Success
+        instanceId:
+          type: string
+          description: Instance identifier of the upgraded app. This field is not set yet but is a placeholder for future use.
+          example: 0000000001578BE8
+        path:
+          type: string
+          description: Path of the folder in which the app was upgraded.
+          example: /Library/Installed Apps/AWS CloudTrail
+        folderId:
+          type: string
+          description: Identifier of the folder in which the app was upgraded.
+          example: 0000000001578BE8
+        error:
+          $ref: '#/components/schemas/ErrorDescription'
+      description: Status of the upgrade app async job.
+    ListAppsV2Response:
+      required:
+        - apps
+      type: object
+      properties:
+        apps:
+          type: array
+          description: An array of apps.
+          items:
+            $ref: '#/components/schemas/AppV2'
+      description: List of all apps from the apps
+    GetAppDetailsResponse:
+      required:
+        - baseUrl
+        - manifest
+        - uuid
+        - version
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the app.
+          format: uuid
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+        version:
+          type: string
+          description: Version of the app.
+          example: 1.0.0
+        baseUrl:
+          type: string
+          description: URL prefix for where the app is stored.
+          format: url
+          example: https://some_bucket.s3.amazonaws.com/path/to/app/version/
+        manifest:
+          type: string
+          description: Content of the manifest YAML file, as Base64-encoded string.
+          format: byte
+        config:
+          type: string
+          description: Content of the config YAML file, as Base64-encoded string.
+          format: byte
+        readme:
+          type: string
+          description: Content of the README markdown file, as Base64-encoded string.
+          format: byte
+        files:
+          maxProperties: 100
+          type: object
+          additionalProperties:
+            type: string
+            format: byte
+          description: Content of various files part of app package, as Base64-encoded string.
+          example:
+            config: ICAtIGNvbXBvbmVudFR5cGU6IHNjb3BlCiAgICBsYWJlbDog4oCYQXBhY2hlIEVycm9yIExvZyBT b3VyY2XigJkKICAgIHRmVmFyOiBlcnJMb2dTY29wZQogICAgCiAgLSBjb21wb25lbnRUeXBlOiBz Y29wZQogICAgbGFiZWw6IOKAmEFwYWNoZSBBY2Nlc3MgTG9nIFNvdXJjZeKAmQogICAgdGZWYXI6 IGFjY2Vzc0xvZ1Njb3BlCgogIC0gY29tcG9uZW50VHlwZTogY3VzdG9tCiAgICBkYXRhVHlwZTog U3RyaW5nCiAgICBsYWJlbDog4oCYQXBhY2hlIEVuZ2luZSBUeXBl4oCYCiAgICBoZWxwVGV4dDog 4oCYVGhlIGVuZ2luZSB0eXBlIG9mIHlvdXIgQXBhY2hlIEluc3RhbmNl4oCYCiAgICByZXF1aXJl ZDogRmFsc2UKICAgIGRlZmF1bHQ6IOKAmHYxLjDigJkKICAgIHRmVmFyOiBlbmdpbmVUeXBlCg==
+            readme: IyBPdmVydmlldwoKVGhlIEFwYWNoZSBhcHAgaXMgYSB1bmlmaWVkIGxvZ3MgYW5kIG1ldHJpY3Mg YXBwIHRoYXQgaGVscHMgeW91IG1vbml0b3IgdGhlIGF2YWlsYWJpbGl0eSwgcGVyZm9ybWFuY2Us IGhlYWx0aCBhbmQgcmVzb3VyY2UgdXRpbGl6YXRpb24gb2YgQXBhY2hlIHdlYiBzZXJ2ZXIgZmFy bXMuICBQcmVjb25maWd1cmVkIGRhc2hib2FyZHMgYW5kIHNlYXJjaGVzIHByb3ZpZGUgaW5zaWdo dCBpbnRvIHZpc2l0b3IgbG9jYXRpb25zLCB2aXNpdG9yIGFjY2VzcyB0eXBlcywgdHJhZmZpYyBw YXR0ZXJucywgZXJyb3JzLCB3ZWIgc2VydmVyIG9wZXJhdGlvbnMsIHJlc291cmNlIHV0aWxpemF0 aW9uIGFuZCBhY2Nlc3MgZnJvbSBrbm93biBtYWxpY2lvdXMgc291cmNlcy4KCiMgU2V0dXAKVGhp cyBpcyB0aGUgc2VjdGlvbiBmb3IgQXBhY2hlIC0gT3BlblRlbGVtZXRyeSBjb2xsZWN0aW9uIHNl dHVwLgo=
+            manifest: CnNjaGVtYVZlcnNpb246ICIxLjAiCgpuYW1lOiBBcGFjaGUKCmRlc2NyaXB0aW9u OiA+LQogIFRoZSBBcGFjaGUgYXBwIGlzIGEgdW5pZmllZCBsb2dzIGFuZCBtZXRy aWNzIGFwcCB0aGF0IGhlbHBzIHlvdSBtb25pdG9yIHRoZSBhdmFpbGFiaWxpdHks IHBlcmZvcm1hbmNlLAogIGhlYWx0aCBhbmQgcmVzb3VyY2UgdXRpbGl6YXRpb24g b2YgQXBhY2hlIHdlYiBzZXJ2ZXIgZmFybXMuICBQcmVjb25maWd1cmVkIGRhc2hi b2FyZHMgYW5kIHNlYXJjaGVzCiAgcHJvdmlkZSBpbnNpZ2h0IGludG8gdmlzaXRv ciBsb2NhdGlvbnMsIHZpc2l0b3IgYWNjZXNzIHR5cGVzLCB0cmFmZmljIHBhdHRl cm5zLCBlcnJvcnMsIHdlYiBzZXJ2ZXIKICBvcGVyYXRpb25zLCByZXNvdXJjZSB1 dGlsaXphdGlvbiBhbmQgYWNjZXNzIGZyb20ga25vd24gbWFsaWNpb3VzIHNvdXJj ZXMuCmF1dGhvcjogU3VtbyBMb2dpYwoKdmVyc2lvbjogMS4wLjAKCgo=
+      description: Information about an app.
+    SubscriptionStatusResponse:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: Show if the user has subscribed to the app or not. value is true, if the user has subscribed to the app
+          example: true
+      description: Subscription Status
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    AppDefinition:
+      required:
+        - appVersion
+        - contentId
+        - name
+        - uuid
+      type: object
+      properties:
+        contentId:
+          type: string
+          description: Content identifier of the app in hexadecimal format.
+          example: 00000000000011AE
+        uuid:
+          type: string
+          description: Unique identifier for the app.
+          format: uuid
+          example: 1c57fbc3-3141-4b12-aab3-5f40152bc3d9
+        name:
+          type: string
+          description: Name of the app.
+          example: Sumo Config
+        appVersion:
+          type: string
+          description: Version of the app.
+          example: '1.0'
+        preview:
+          type: boolean
+          description: Indicates whether the app is in preview or not.
+          example: true
+        manifestVersion:
+          type: string
+          description: Manifest version of the app
+          example: '0.1'
+    AppManifest:
+      required:
+        - description
+        - hoverText
+        - iconURL
+      type: object
+      properties:
+        family:
+          type: string
+          description: The app family
+          example: IIS
+        description:
+          type: string
+          description: Description of the app.
+          example: A description for Sumo Logic Config App.
+        categories:
+          type: array
+          description: Categories that the app belongs to.
+          example:
+            - Sumo Logic
+            - Configuration
+          items:
+            type: string
+        hoverText:
+          type: string
+          description: Text to be displayed when hovered over in UI.
+          example: Sumo Config App
+        iconURL:
+          type: string
+          description: App icon URL.
+          example: https://sumologic-app-data.sumologic.com/icons/sumoconfig.png
+        screenshotURLs:
+          type: array
+          description: App screenshot URLs.
+          example:
+            - https://sumologic-app-data.sumologic.com/icons/sumoconfig/overview.png
+            - https://sumologic-app-data.sumologic.com/screenshots/sumoconfig/details.png
+          items:
+            type: string
+        helpURL:
+          type: string
+          description: App help page URL.
+          example: https://help.sumologic.com/
+        helpDocIdMap:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: the IDs of the docs pages for this app
+        communityURL:
+          type: string
+          description: App community page URL.
+          example: https://support.sumologic.com/hc/en-us/community/topics/200263058-Applications-and-Integrations
+        requirements:
+          type: array
+          description: Requirements for the app.
+          example: []
+          items:
+            type: string
+        accountTypes:
+          type: array
+          description: Account types that are allowed to install the app
+          example:
+            - free
+          items:
+            type: string
+        requiresInstallationInstructions:
+          type: boolean
+          description: Indicates whether installation instructions are required or not.
+          example: false
+        installationInstructions:
+          type: string
+          description: Installation instructions for the app.
+          example: ''
+        parameters:
+          type: array
+          description: Content identifier of the app.
+          items:
+            $ref: '#/components/schemas/ServiceManifestDataSourceParameter'
+        author:
+          type: string
+          description: App author.
+          example: Sumo Logic
+        authorWebsite:
+          type: string
+          description: App author website URL.
+          example: https://www.sumologic.com
+    AppV2:
+      required:
+        - accountTypes
+        - attributes
+        - author
+        - beta
+        - description
+        - family
+        - icon
+        - installable
+        - latestVersion
+        - name
+        - showOnMarketplace
+        - uuid
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the app.
+          example: ceb7fac5-1127-4a04-a5b8-2e49190be3d5
+        name:
+          type: string
+          description: Name of the app.
+          example: AWS CloudTrail
+        description:
+          type: string
+          description: Description of the app.
+          example: AWS CloudTrail app description
+        latestVersion:
+          type: string
+          description: Latest version of the app.
+          example: 1.1.0
+        icon:
+          type: string
+          description: URL of the icon for the app.
+          example: https://some-bucket.s3.amazonaws.com/AWSCloudTrail.png
+        author:
+          type: string
+          description: Author of the app.
+          example: Sumo Logic
+        accountTypes:
+          type: array
+          description: Account types of which the app is available to.
+          example:
+            - All
+          items:
+            type: string
+        beta:
+          type: boolean
+          description: Whether the app is in beta.
+          example: false
+        installs:
+          type: integer
+          description: Number of times the app was installed.
+          format: int32
+          example: 3452
+        attributes:
+          maxProperties: 3
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: A map of attributes for this app. Attributes allow to group apps based on different criteria.
+          example:
+            category:
+              - Web Server
+              - IT Infrastructure
+              - Amazon Web Services
+            useCase:
+              - security
+              - observability
+            collection:
+              - OpenTelemetry
+        installable:
+          type: boolean
+          description: Whether the app is installable or not as not all apps are installable.
+          example: true
+        showOnMarketplace:
+          type: boolean
+          description: Whether the app should show up on sumologic.com/applications webpage.
+          example: true
+        modifiedAt:
+          type: string
+          description: The timestamp in UTC of the most recent modification of the app.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+      description: An app object.
+    ServiceManifestDataSourceParameter:
+      required:
+        - parameterId
+        - parameterType
+      type: object
+      properties:
+        parameterType:
+          pattern: ^DATA_SOURCE$
+          type: string
+          description: Parameter type.
+          example: DATA_SOURCE
+          x-pattern-message: 'Supported parameter types include: DATA_SOURCE'
+        parameterId:
+          type: string
+          description: Parameter identifier.
+          example: paramId1
+        dataSourceType:
+          pattern: ^(LOG|METRICS)$
+          type: string
+          description: Data source type.
+          example: LOG
+          x-pattern-message: 'Supported data source types include: LOG, METRICS'
+        label:
+          type: string
+          description: Label.
+          example: Log label
+        description:
+          type: string
+          description: Description.
+          example: Log data source
+        example:
+          type: string
+          description: Example.
+          example: ''
+        hidden:
+          type: boolean
+          description: Should the UI display?
+          default: false

@@ -1,0 +1,238 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Health Events API
+  description: Health events for collectors, sources, ingest budgets and other resources.
+  version: 1.0.0
+paths:
+  /v1/healthEvents:
+    get:
+      tags:
+        - healthEvents
+      summary: Get a list of health events.
+      description: Get a list of all the unresolved health events in your account.
+      operationId: listAllHealthEvents
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of health events returned in the response. The number of health events returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of all the health events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHealthEventResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/healthEvents/resources:
+    post:
+      tags:
+        - healthEvents
+      summary: Health events for specific resources.
+      description: Get a list of all the unresolved events in your account that belong to the supplied resource identifiers.
+      operationId: listAllHealthEventsForResources
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of health events returned in the response. The number of health events returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Resource identifiers to request health events from.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceIdentities'
+        required: true
+      responses:
+        '200':
+          description: List of all the health events for the specified resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHealthEventResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListHealthEventResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of health events.
+          items:
+            $ref: '#/components/schemas/HealthEvent'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    ResourceIdentities:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: A list of the resources.
+          items:
+            $ref: '#/components/schemas/ResourceIdentity'
+    HealthEvent:
+      required:
+        - details
+        - eventId
+        - eventName
+        - eventTime
+        - resourceIdentity
+        - severityLevel
+        - subsystem
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: The unique identifier of the event.
+          example: e801dc7d-f483-46e9-bcc9-410f08f96497
+        eventName:
+          type: string
+          description: The name of the event.
+          example: InstalledCollectorOffline
+        details:
+          $ref: '#/components/schemas/TrackerIdentity'
+        resourceIdentity:
+          $ref: '#/components/schemas/ResourceIdentity'
+        eventTime:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        subsystem:
+          type: string
+          description: The product area of the event.
+        severityLevel:
+          type: string
+          description: The criticality of the event. It is either `Error` or `Warning`
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    ResourceIdentity:
+      required:
+        - id
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the resource.
+          example: C03E086C137F38B4
+        name:
+          type: string
+          description: The name of the resource.
+          example: S3 Source, Scheduled View name.
+          default: Unknown
+        type:
+          type: string
+          description: '-> Resource type. Supported types are - `Collector`, `Source`, `IngestBudget` and `Organisation`.'
+          example: Collector
+      discriminator:
+        propertyName: type
+        mapping:
+          Collector: '#/components/schemas/CollectorResourceIdentity'
+          Source: '#/components/schemas/SourceResourceIdentity'
+          IngestBudget: '#/components/schemas/IngestBudgetResourceIdentity'
+          Organisation: '#/components/schemas/OrgIdentity'
+          LogsToMetricsRule: '#/components/schemas/LogsToMetricsRuleIdentity'
+          ScheduledView: '#/components/schemas/ScheduledViewResourceIdentity'
+    TrackerIdentity:
+      required:
+        - description
+        - error
+        - trackerId
+      type: object
+      properties:
+        trackerId:
+          type: string
+          description: Name that uniquely identifies the health event. It focuses on what happened rather than why.
+        error:
+          type: string
+          description: Description of the underlying reason for the event change.
+          example: Access denied to Amazon S3 bucket
+        description:
+          type: string
+          description: A more elaborate description of why the event occurred.
+          example: S3 collection is not working as expected because of access issues.
+      discriminator:
+        propertyName: description

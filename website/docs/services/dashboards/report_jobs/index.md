@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>report_jobs</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>report_jobs</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="report_jobs" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.dashboards.report_jobs" /></td></tr>
 </tbody></table>
@@ -31,8 +32,44 @@ Creates, updates, deletes, gets or lists a <code>report_jobs</code> resource.
 
 The following fields are returned by `SELECT` queries:
 
-`SELECT` not supported for this resource, use `SHOW METHODS` to view available operations for the resource.
+<Tabs
+    defaultValue="get"
+    values={[
+        { label: 'get', value: 'get' }
+    ]}
+>
+<TabItem value="get">
 
+The status of the report generation job.
+
+<table>
+<thead>
+    <tr>
+    <th>Name</th>
+    <th>Datatype</th>
+    <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td><CopyableCode code="error" /></td>
+    <td><code>object</code></td>
+    <td></td>
+</tr>
+<tr>
+    <td><CopyableCode code="status" /></td>
+    <td><code>string</code></td>
+    <td>Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="status_message" /></td>
+    <td><code>string</code></td>
+    <td>Additional status message generated if the status is not `Failed`. (wire: statusMessage)</td>
+</tr>
+</tbody>
+</table>
+</TabItem>
+</Tabs>
 
 ## Methods
 
@@ -50,11 +87,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#generateDashboardReport"><CopyableCode code="generateDashboardReport" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-action"><code>action</code></a>, <a href="#parameter-exportFormat"><code>exportFormat</code></a>, <a href="#parameter-template"><code>template</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
+    <td><CopyableCode code="select" /></td>
+    <td><a href="#parameter-job_id"><code>job_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Schedule an asynchronous job to generate a report from a template. All items in the template will be included unless specified. See template section for more details on individual templates. Reports can be generated in Pdf or Png format and exported in various methods (ex. direct download). You will get back an asynchronous job identifier on success. Use the [getAsyncReportGenerationStatus] endpoint and the job identifier you got back in the response to track the status of an asynchronous report generation job.<br /></td>
+    <td>Get the status of an asynchronous report generation request for the given job identifier. On success, use the getReportGenerationResult endpoint to get the result of the report generation job.</td>
+</tr>
+<tr>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
+    <td><CopyableCode code="insert" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-action"><code>action</code></a>, <a href="#parameter-export_format"><code>export_format</code></a>, <a href="#parameter-template"><code>template</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
+    <td></td>
+    <td>Schedule an asynchronous job to generate a report from a template. All items in the template will be included unless specified. See template section for more details on individual templates. Reports can be generated in Pdf or Png format and exported in various methods (ex. direct download). You will get back an asynchronous job identifier on success. Use the getAsyncReportGenerationStatus endpoint and the job identifier you got back in the response to track the status of an asynchronous report generation job.&lt;br /&gt;</td>
 </tr>
 </tbody>
 </table>
@@ -72,37 +116,114 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
+<tr id="parameter-job_id">
+    <td><CopyableCode code="job_id" /></td>
+    <td><code>string</code></td>
+    <td>The identifier of the asynchronous report generation job. (wire: jobId)</td>
+</tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
 
-## Lifecycle Methods
+## `SELECT` examples
 
 <Tabs
-    defaultValue="generateDashboardReport"
+    defaultValue="get"
     values={[
-        { label: 'generateDashboardReport', value: 'generateDashboardReport' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="generateDashboardReport">
+<TabItem value="get">
 
-Schedule an asynchronous job to generate a report from a template. All items in the template will be included unless specified. See template section for more details on individual templates. Reports can be generated in Pdf or Png format and exported in various methods (ex. direct download). You will get back an asynchronous job identifier on success. Use the [getAsyncReportGenerationStatus] endpoint and the job identifier you got back in the response to track the status of an asynchronous report generation job.<br />
+Get the status of an asynchronous report generation request for the given job identifier. On success, use the getReportGenerationResult endpoint to get the result of the report generation job.
 
 ```sql
-EXEC sumologic.dashboards.report_jobs.generateDashboardReport 
-@region='{{ region }}' --required 
-@@json=
-'{
-"action": "{{ action }}", 
-"exportFormat": "{{ exportFormat }}", 
-"timezone": "{{ timezone }}", 
-"template": "{{ template }}"
-}'
+SELECT
+error,
+status,
+status_message
+FROM sumologic.dashboards.report_jobs
+WHERE job_id = '{{ job_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
+</TabItem>
+</Tabs>
+
+
+## `INSERT` examples
+
+<Tabs
+    defaultValue="create"
+    values={[
+        { label: 'create', value: 'create' },
+        { label: 'Manifest', value: 'manifest' }
+    ]}
+>
+<TabItem value="create">
+
+Schedule an asynchronous job to generate a report from a template. All items in the template will be included unless specified. See template section for more details on individual templates. Reports can be generated in Pdf or Png format and exported in various methods (ex. direct download). You will get back an asynchronous job identifier on success. Use the getAsyncReportGenerationStatus endpoint and the job identifier you got back in the response to track the status of an asynchronous report generation job.&lt;br /&gt;
+
+```sql
+INSERT INTO sumologic.dashboards.report_jobs (
+action,
+export_format,
+timezone,
+template,
+theme,
+export_width,
+region
+)
+SELECT 
+'{{ action }}' /* required */,
+'{{ export_format }}' /* required */,
+'{{ timezone }}' /* required */,
+'{{ template }}' /* required */,
+'{{ theme }}',
+{{ export_width }},
+'{{ region }}'
+RETURNING
+id
+;
+```
+</TabItem>
+<TabItem value="manifest">
+
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
+- name: report_jobs
+  props:
+    - name: region
+      value: "{{ region }}"
+      description: Required parameter for the report_jobs resource.
+    - name: action
+      description: |
+        The base class of all report action types. \`DirectDownloadReportAction\` downloads dashboard from browser. New action types may be supported in the future.
+      value:
+        actionType: "{{ actionType }}"
+    - name: export_format
+      value: "{{ export_format }}"
+      description: |
+        File format of the report. Can be \`Pdf\` or \`Png\`. \`Pdf\` is portable document format. \`Png\` is portable graphics image format.
+    - name: timezone
+      value: "{{ timezone }}"
+      description: |
+        Time zone for the query time ranges. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+    - name: template
+      value:
+        templateType: "{{ templateType }}"
+    - name: theme
+      value: "{{ theme }}"
+      description: |
+        Theme for the report rendering. If absent, the default theme of the dashboard is used.
+    - name: export_width
+      value: {{ export_width }}
+      description: |
+        Pixel width of the exported PDF or PNG. If absent, the default width is used.
+`}</CodeBlock>
+
 </TabItem>
 </Tabs>

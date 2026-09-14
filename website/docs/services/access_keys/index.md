@@ -18,16 +18,17 @@ access_keys service documentation.
 
 :::info[Service Summary]
 
-total resources: __2__  
+total resources: __3__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/access_keys/access_keys/">access_keys</a>
+<a href="/services/access_keys/access_keys/">access_keys</a><br />
+<a href="/services/access_keys/personal_access_keys/">personal_access_keys</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/access_keys/personal/">personal</a>
+<a href="/services/access_keys/scopes/">scopes</a>
 </div>
 </div>

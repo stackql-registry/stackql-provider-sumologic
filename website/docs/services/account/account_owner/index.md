@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>account_owner</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>account_owner</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="account_owner" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.account.account_owner" /></td></tr>
 </tbody></table>
@@ -31,8 +32,32 @@ Creates, updates, deletes, gets or lists an <code>account_owner</code> resource.
 
 The following fields are returned by `SELECT` queries:
 
-`SELECT` not supported for this resource, use `SHOW METHODS` to view available operations for the resource.
+<Tabs
+    defaultValue="get"
+    values={[
+        { label: 'get', value: 'get' }
+    ]}
+>
+<TabItem value="get">
 
+<table>
+<thead>
+    <tr>
+    <th>Name</th>
+    <th>Datatype</th>
+    <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td><CopyableCode code="account_owner" /></td>
+    <td><code>string</code></td>
+    <td>Email address of the account owner (the bare JSON string returned by the API, wrapped so it projects as a row). (wire: accountOwner)</td>
+</tr>
+</tbody>
+</table>
+</TabItem>
+</Tabs>
 
 ## Methods
 
@@ -50,8 +75,8 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getAccountOwner"><CopyableCode code="getAccountOwner" /></a></td>
-    <td><CopyableCode code="exec" /></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
+    <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Returns the user identifier of the account owner.</td>
@@ -75,26 +100,28 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
 
-## Lifecycle Methods
+## `SELECT` examples
 
 <Tabs
-    defaultValue="getAccountOwner"
+    defaultValue="get"
     values={[
-        { label: 'getAccountOwner', value: 'getAccountOwner' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getAccountOwner">
+<TabItem value="get">
 
 Returns the user identifier of the account owner.
 
 ```sql
-EXEC sumologic.account.account_owner.getAccountOwner 
-@region='{{ region }}' --required
+SELECT
+account_owner
+FROM sumologic.account.account_owner
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

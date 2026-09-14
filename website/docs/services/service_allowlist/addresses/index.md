@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>addresses</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>addresses</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="addresses" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.service_allowlist.addresses" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists an <code>addresses</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="listAllowlistedCidrs"
+    defaultValue="list"
     values={[
-        { label: 'listAllowlistedCidrs', value: 'listAllowlistedCidrs' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listAllowlistedCidrs">
+<TabItem value="list">
 
 List of all allowlisted CIDR notations and/or IP addresses for the organization.
 
@@ -53,7 +54,7 @@ List of all allowlisted CIDR notations and/or IP addresses for the organization.
 <tr>
     <td><CopyableCode code="cidr" /></td>
     <td><code>string</code></td>
-    <td>The string representation of the CIDR notation or IP address. (pattern: <code>^(([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])\.)&#123;3&#125;([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$</code>, example: 192.35.24.1, x-pattern-message: Invalid CIDR/IP)</td>
+    <td>The string representation of the CIDR notation or IP address. (pattern: &lt;code&gt;^((&#91;0-9&#93;|&#91;1-9&#93;&#91;0-9&#93;|1&#91;0-9&#93;&#123;2&#125;|2&#91;0-4&#93;&#91;0-9&#93;|25&#91;0-5&#93;)\.)&#123;3&#125;(&#91;0-9&#93;|&#91;1-9&#93;&#91;0-9&#93;|1&#91;0-9&#93;&#123;2&#125;|2&#91;0-4&#93;&#91;0-9&#93;|25&#91;0-5&#93;)(\/(&#91;0-9&#93;|&#91;1-2&#93;&#91;0-9&#93;|3&#91;0-2&#93;))?$&lt;/code&gt;, example: 192.35.24.1, x-pattern-message: Invalid CIDR/IP)</td>
 </tr>
 <tr>
     <td><CopyableCode code="description" /></td>
@@ -81,11 +82,25 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#listAllowlistedCidrs"><CopyableCode code="listAllowlistedCidrs" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get a list of all allowlisted CIDR notations and/or IP addresses for the organization.</td>
+</tr>
+<tr>
+    <td><a href="#add"><CopyableCode code="add" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data"><code>data</code></a></td>
+    <td></td>
+    <td>Add CIDR notations and/or IP addresses to the allowlist of the organization if not already there. When service allowlisting functionality is enabled, CIDRs/IP addresses that are allowlisted will have access to Sumo Logic and/or content sharing.</td>
+</tr>
+<tr>
+    <td><a href="#remove"><CopyableCode code="remove" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data"><code>data</code></a></td>
+    <td></td>
+    <td>Remove allowlisted CIDR notations and/or IP addresses from the organization. Removed CIDRs/IPs will immediately lose access to Sumo Logic and content sharing.</td>
 </tr>
 </tbody>
 </table>
@@ -106,7 +121,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -114,12 +129,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="listAllowlistedCidrs"
+    defaultValue="list"
     values={[
-        { label: 'listAllowlistedCidrs', value: 'listAllowlistedCidrs' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listAllowlistedCidrs">
+<TabItem value="list">
 
 Get a list of all allowlisted CIDR notations and/or IP addresses for the organization.
 
@@ -128,7 +143,49 @@ SELECT
 cidr,
 description
 FROM sumologic.service_allowlist.addresses
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+;
+```
+</TabItem>
+</Tabs>
+
+
+## Lifecycle Methods
+
+EXEC variables use wire (API) names.
+
+<Tabs
+    defaultValue="add"
+    values={[
+        { label: 'add', value: 'add' },
+        { label: 'remove', value: 'remove' }
+    ]}
+>
+<TabItem value="add">
+
+Add CIDR notations and/or IP addresses to the allowlist of the organization if not already there. When service allowlisting functionality is enabled, CIDRs/IP addresses that are allowlisted will have access to Sumo Logic and/or content sharing.
+
+```sql
+EXEC sumologic.service_allowlist.addresses.add 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"data": "{{ data }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="remove">
+
+Remove allowlisted CIDR notations and/or IP addresses from the organization. Removed CIDRs/IPs will immediately lose access to Sumo Logic and content sharing.
+
+```sql
+EXEC sumologic.service_allowlist.addresses.remove 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"data": "{{ data }}"
+}'
 ;
 ```
 </TabItem>

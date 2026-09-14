@@ -1,0 +1,730 @@
+# Hand-authored OpenAPI 3.0 description of the Sumo Logic Collector
+# Management API (Collectors, Sources and Collector Upgrades). This surface
+# is documented at https://help.sumologic.com/docs/api/collector-management/
+# but is not part of the vendor's published OpenAPI document
+# (sumologic-api.yaml), so it is maintained here and merged into
+# provider-dev/source/collectors.yaml by bin/split.mjs.
+#
+# Wire shapes (from the vendor documentation):
+#   GET  /v1/collectors                     -> {"collectors": [...]}   limit/offset paging (default limit 1000)
+#   GET  /v1/collectors/offline             -> {"collectors": [...]}
+#   GET  /v1/collectors/overview            -> summary counts
+#   GET  /v1/collectors/{id}                -> {"collector": {...}}    (ETag header on the response)
+#   GET  /v1/collectors/name/{name}         -> {"collector": {...}}
+#   POST /v1/collectors                     <- {"collector": {...}}    hosted collectors only
+#   PUT  /v1/collectors/{id}                <- {"collector": {...}}    If-Match: <ETag> required
+#   DELETE /v1/collectors/{id}
+#   DELETE /v1/collectors/offline?aliveBeforeDays=
+#   GET  /v1/collectors/{collectorId}/sources            -> {"sources": [...]}
+#   GET  /v1/collectors/{collectorId}/sources/{sourceId} -> {"source": {...}}
+#   POST /v1/collectors/{collectorId}/sources            <- {"source": {...}}
+#   PUT  /v1/collectors/{collectorId}/sources/{sourceId} <- {"source": {...}}  If-Match: <ETag> required
+#   DELETE /v1/collectors/{collectorId}/sources/{sourceId}
+#   GET  /v1/collectors/upgrades/targets    -> {"targets": [...]}
+#   GET  /v1/collectors/upgrades/collectors -> {"collectors": [...]}
+#   POST /v1/collectors/upgrades            <- {"collectorId", "toVersion"} -> {"id", "link"}
+#   GET  /v1/collectors/upgrades/{upgradeTaskId} -> {"upgrade": {...}}
+openapi: 3.0.0
+info:
+  title: Sumo Logic Collector Management API
+  description: Collectors, Sources and Collector upgrades (the Collector Management API, documented separately from the main Sumo Logic API reference).
+  version: 1.0.0
+tags:
+  - name: collectorManagement
+    description: Collector Management API - Collectors, Sources and Collector upgrades.
+paths:
+  /v1/collectors:
+    get:
+      tags: [collectorManagement]
+      operationId: listCollectors
+      summary: List Collectors
+      description: Get a list of Collectors with an optional limit and offset.
+      parameters:
+        - name: filter
+          in: query
+          description: 'Filter the Collectors returned using one of the available filter types: installed, hosted, dead, or alive.'
+          schema:
+            type: string
+            enum: [installed, hosted, dead, alive]
+        - name: limit
+          in: query
+          description: Maximum number of Collectors to return (default 1000).
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Offset into the list of Collectors (default 0).
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectorsList'
+    post:
+      tags: [collectorManagement]
+      operationId: createCollector
+      summary: Create Hosted Collector
+      description: Create a Hosted Collector. This method can only be used to create Hosted Collectors; an Installed Collector is created by installing the collector software on a host.
+      requestBody:
+        description: Definition of the new Hosted Collector, wrapped in a collector object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectorDefinition'
+      responses:
+        '200':
+          description: The Collector has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCollector'
+  /v1/collectors/offline:
+    get:
+      tags: [collectorManagement]
+      operationId: listOfflineCollectors
+      summary: List offline Collectors
+      description: Get a list of Installed Collectors last seen alive before a specified number of days with an optional limit and offset.
+      parameters:
+        - name: aliveBeforeDays
+          in: query
+          description: Minimum number of days the Collectors have been offline (default 100, minimum 1).
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of Collectors to return (default 1000).
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Offset into the list of Collectors (default 0).
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectorsList'
+    delete:
+      tags: [collectorManagement]
+      operationId: deleteOfflineCollectors
+      summary: Delete offline Collectors
+      description: Delete Installed Collectors last seen alive before a specified number of days. The delete task is initiated asynchronously.
+      parameters:
+        - name: aliveBeforeDays
+          in: query
+          description: Minimum number of days the Collectors have been offline (default 100, minimum 1).
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The delete task has been initiated.
+  /v1/collectors/overview:
+    get:
+      tags: [collectorManagement]
+      operationId: getCollectorsOverview
+      summary: Collectors overview
+      description: Summary counts of Installed and Hosted Collectors and Sources, offline Collectors, errors and warnings.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectorsOverview'
+  /v1/collectors/{id}:
+    get:
+      tags: [collectorManagement]
+      operationId: getCollector
+      summary: Get Collector by ID
+      description: Get the Collector with the specified identifier. The response carries an ETag header, which must be supplied as If-Match on an update.
+      parameters:
+        - $ref: '#/components/parameters/collectorId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCollector'
+    put:
+      tags: [collectorManagement]
+      operationId: updateCollector
+      summary: Update Collector
+      description: Update a Collector. The Collector Management API requires the If-Match header to carry the ETag returned by a previous GET of the same Collector; the request body is the full Collector object wrapped in collector.
+      parameters:
+        - $ref: '#/components/parameters/collectorId'
+        - $ref: '#/components/parameters/ifMatch'
+      requestBody:
+        description: The updated Collector, wrapped in a collector object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectorDefinition'
+      responses:
+        '200':
+          description: The Collector was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCollector'
+    delete:
+      tags: [collectorManagement]
+      operationId: deleteCollector
+      summary: Delete Collector
+      description: Delete the Collector with the specified identifier.
+      parameters:
+        - $ref: '#/components/parameters/collectorId'
+      responses:
+        '200':
+          description: The Collector was deleted successfully.
+  /v1/collectors/name/{name}:
+    get:
+      tags: [collectorManagement]
+      operationId: getCollectorByName
+      summary: Get Collector by name
+      description: Get the Collector with the specified name.
+      parameters:
+        - name: name
+          in: path
+          description: Name of the Collector.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCollector'
+  /v1/collectors/{collectorId}/sources:
+    get:
+      tags: [collectorManagement]
+      operationId: listSources
+      summary: List Sources
+      description: Get information about all Sources of a specified Collector.
+      parameters:
+        - $ref: '#/components/parameters/parentCollectorId'
+        - $ref: '#/components/parameters/download'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourcesList'
+    post:
+      tags: [collectorManagement]
+      operationId: createSource
+      summary: Create Source
+      description: Create a new Source on a Collector. The request body is the Source definition wrapped in a source object; see the vendor documentation (Use JSON to Configure Sources) for the fields required by each sourceType.
+      parameters:
+        - $ref: '#/components/parameters/parentCollectorId'
+      requestBody:
+        description: Definition of the new Source, wrapped in a source object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceDefinition'
+      responses:
+        '200':
+          description: The Source has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSource'
+  /v1/collectors/{collectorId}/sources/{sourceId}:
+    get:
+      tags: [collectorManagement]
+      operationId: getSource
+      summary: Get Source
+      description: Get information about a specified Source of a Collector. The response carries an ETag header, which must be supplied as If-Match on an update.
+      parameters:
+        - $ref: '#/components/parameters/parentCollectorId'
+        - $ref: '#/components/parameters/sourceId'
+        - $ref: '#/components/parameters/download'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSource'
+    put:
+      tags: [collectorManagement]
+      operationId: updateSource
+      summary: Update Source
+      description: Update a Source. The Collector Management API requires the If-Match header to carry the ETag returned by a previous GET of the same Source; the request body is the full Source object wrapped in source.
+      parameters:
+        - $ref: '#/components/parameters/parentCollectorId'
+        - $ref: '#/components/parameters/sourceId'
+        - $ref: '#/components/parameters/ifMatch'
+      requestBody:
+        description: The updated Source, wrapped in a source object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceDefinition'
+      responses:
+        '200':
+          description: The Source was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSource'
+    delete:
+      tags: [collectorManagement]
+      operationId: deleteSource
+      summary: Delete Source
+      description: Delete the specified Source of a Collector.
+      parameters:
+        - $ref: '#/components/parameters/parentCollectorId'
+        - $ref: '#/components/parameters/sourceId'
+      responses:
+        '200':
+          description: The Source was deleted successfully.
+  /v1/collectors/upgrades/targets:
+    get:
+      tags: [collectorManagement]
+      operationId: listUpgradeTargets
+      summary: List Collector upgrade targets
+      description: Get the Installed Collector versions available as upgrade (or downgrade) targets.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeTargetsList'
+  /v1/collectors/upgrades/collectors:
+    get:
+      tags: [collectorManagement]
+      operationId: listUpgradableCollectors
+      summary: List upgradable Collectors
+      description: Get the Installed Collectors that can be upgraded (or downgraded) to the specified version.
+      parameters:
+        - name: toVersion
+          in: query
+          description: Target Collector version. Defaults to the latest version.
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Offset into the list of Collectors (default 0).
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of Collectors to return (default 50).
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectorsList'
+  /v1/collectors/upgrades:
+    post:
+      tags: [collectorManagement]
+      operationId: createUpgrade
+      summary: Upgrade a Collector
+      description: Start an upgrade (or downgrade) task for an Installed Collector. Poll the returned task with the upgrade status method.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpgradeRequest'
+      responses:
+        '202':
+          description: The upgrade task has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeTask'
+  /v1/collectors/upgrades/{upgradeTaskId}:
+    get:
+      tags: [collectorManagement]
+      operationId: getUpgradeStatus
+      summary: Get Collector upgrade status
+      description: Get the status of a Collector upgrade task.
+      parameters:
+        - name: upgradeTaskId
+          in: path
+          description: Identifier of the upgrade task.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUpgrade'
+components:
+  parameters:
+    collectorId:
+      name: id
+      in: path
+      description: Unique identifier of the Collector.
+      required: true
+      schema:
+        type: string
+    parentCollectorId:
+      name: collectorId
+      in: path
+      description: Unique identifier of the Collector.
+      required: true
+      schema:
+        type: string
+    sourceId:
+      name: sourceId
+      in: path
+      description: Unique identifier of the Source.
+      required: true
+      schema:
+        type: string
+    ifMatch:
+      name: If-Match
+      in: header
+      description: The ETag value returned in the response headers of a previous GET of this object. The Collector Management API requires it on updates.
+      required: false
+      schema:
+        type: string
+    download:
+      name: download
+      in: query
+      description: When true, the response is the JSON configuration of the Source(s), suitable for registering a new Collector or creating a new Source.
+      required: false
+      schema:
+        type: boolean
+  schemas:
+    Collector:
+      type: object
+      description: Collector object.
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the Collector.
+        name:
+          type: string
+          description: Name of the Collector. It must be unique on your account.
+        description:
+          type: string
+          description: Description of the Collector.
+        category:
+          type: string
+          description: The category of the Collector, used as metadata when searching data.
+        collectorType:
+          type: string
+          description: 'The Collector type: Installable or Hosted.'
+        collectorVersion:
+          type: string
+          description: Version of the Collector software installed.
+        alive:
+          type: boolean
+          description: When a Collector is running it sends a heartbeat every 15 seconds. If no heartbeat is received for 30 minutes this becomes false.
+        lastSeenAlive:
+          type: integer
+          format: int64
+          description: The last time the Sumo Logic service received an active heartbeat from the Collector, in milliseconds since epoch.
+        ephemeral:
+          type: boolean
+          description: When true, the Collector is deleted after 12 hours of inactivity.
+        hostName:
+          type: string
+          description: Host name of the Collector.
+        timeZone:
+          type: string
+          description: Time zone of the Collector (TZ database name).
+        sourceSyncMode:
+          type: string
+          description: For Installed Collectors, whether Sources are managed locally from a JSON file (Json) or from the cloud (UI).
+        cutoffTimestamp:
+          type: integer
+          format: int64
+          description: Only collect data from files with a modified date more recent than this timestamp, in milliseconds since epoch (0 collects all data).
+        cutoffRelativeTime:
+          type: string
+          description: Can be specified instead of cutoffTimestamp to provide a relative offset with respect to the current time, for example -1h, -1d or -1w.
+        targetCpu:
+          type: integer
+          description: When CPU utilization exceeds this threshold the Collector slows its rate of ingestion.
+        osName:
+          type: string
+          description: Name of the OS the Collector is installed on (Installed Collectors only).
+        osVersion:
+          type: string
+          description: Version of the OS the Collector is installed on (Installed Collectors only).
+        osArch:
+          type: string
+          description: Architecture of the OS the Collector is installed on (Installed Collectors only).
+        osTime:
+          type: integer
+          format: int64
+          description: Time that the Collector has been running, in milliseconds (Installed Collectors only).
+        fields:
+          type: object
+          description: JSON map of key-value fields (metadata) applied to the Collector.
+        links:
+          type: array
+          description: Related links.
+          items:
+            type: object
+            properties:
+              rel:
+                type: string
+              href:
+                type: string
+    CollectorsList:
+      type: object
+      description: List of Collector objects.
+      properties:
+        collectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Collector'
+    GetCollector:
+      type: object
+      description: A single Collector, wrapped in a collector object.
+      properties:
+        collector:
+          $ref: '#/components/schemas/Collector'
+    CollectorDefinition:
+      type: object
+      description: Collector definition for create and update requests, wrapped in a collector object.
+      required:
+        - collector
+      properties:
+        collector:
+          $ref: '#/components/schemas/Collector'
+    CollectorsOverview:
+      type: object
+      description: Summary counts of Collectors and Sources.
+      properties:
+        installedCollectorsCount:
+          type: integer
+        installedSourcesCount:
+          type: integer
+        hostedCollectorsCount:
+          type: integer
+        hostedSourcesCount:
+          type: integer
+        offlineCollectorsCount:
+          type: integer
+        errors:
+          type: integer
+        warnings:
+          type: integer
+    Source:
+      type: object
+      description: Source object. The set of properties depends on the sourceType; the properties listed here are the common ones.
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the Source.
+        name:
+          type: string
+          description: Name of the Source.
+        description:
+          type: string
+          description: Description of the Source.
+        category:
+          type: string
+          description: Source category (the _sourceCategory metadata field).
+        hostName:
+          type: string
+          description: Host name assigned to data from this Source (the _sourceHost metadata field).
+        sourceType:
+          type: string
+          description: Type of the Source, for example HTTP, LocalFile, RemoteFileV2, Syslog, SystemStats, Polling, Script, and the cloud-to-cloud types.
+        contentType:
+          type: string
+          description: Content type of the data collected (used by some cloud Source types).
+        alive:
+          type: boolean
+          description: Whether the Source is alive.
+        url:
+          type: string
+          description: Unique URL of an HTTP Source endpoint.
+        encoding:
+          type: string
+          description: Character encoding of the data (default UTF-8).
+        timeZone:
+          type: string
+          description: Time zone applied to messages when forceTimeZone is true or the message has no time zone.
+        forceTimeZone:
+          type: boolean
+          description: When true, the timeZone is applied to all messages.
+        automaticDateParsing:
+          type: boolean
+          description: Whether timestamps are parsed automatically.
+        multilineProcessingEnabled:
+          type: boolean
+          description: Whether multiline message processing is enabled.
+        useAutolineMatching:
+          type: boolean
+          description: Whether message boundaries are inferred automatically.
+        manualPrefixRegexp:
+          type: string
+          description: Regular expression that marks the start of a message when useAutolineMatching is false.
+        messagePerRequest:
+          type: boolean
+          description: For HTTP Sources, whether each request is a single message.
+        defaultDateFormats:
+          type: array
+          description: Default date formats used to parse timestamps.
+          items:
+            type: object
+        pathExpression:
+          type: string
+          description: Path expression of the files to collect (file Sources).
+        denylist:
+          type: array
+          description: Path expressions to exclude from collection (file Sources).
+          items:
+            type: string
+        filters:
+          type: array
+          description: Processing rules (Exclude, Include, Hash, Mask, Forward) applied to the Source.
+          items:
+            type: object
+            properties:
+              filterType:
+                type: string
+              name:
+                type: string
+              regexp:
+                type: string
+              mask:
+                type: string
+        fields:
+          type: object
+          description: JSON map of key-value fields (metadata) applied to the Source.
+        cutoffTimestamp:
+          type: integer
+          format: int64
+          description: Only collect data more recent than this timestamp, in milliseconds since epoch.
+        cutoffRelativeTime:
+          type: string
+          description: Relative offset instead of cutoffTimestamp, for example -1h, -1d or -1w.
+        hashAlgorithm:
+          type: string
+          description: Hash algorithm used by Hash processing rules.
+        interval:
+          type: integer
+          description: Collection interval in milliseconds (metrics and script Sources).
+        metrics:
+          type: array
+          description: Metrics to collect (SystemStats Sources).
+          items:
+            type: string
+        thirdPartyRef:
+          type: object
+          description: Cloud-to-cloud Source configuration.
+        status:
+          type: object
+          description: Source status (cloud Sources).
+    SourcesList:
+      type: object
+      description: List of Sources for a Collector.
+      properties:
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+    GetSource:
+      type: object
+      description: A single Source, wrapped in a source object.
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+    SourceDefinition:
+      type: object
+      description: Source definition for create and update requests, wrapped in a source object.
+      required:
+        - source
+      properties:
+        source:
+          $ref: '#/components/schemas/Source'
+    UpgradeTarget:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Collector version.
+        latest:
+          type: boolean
+          description: Whether this is the latest version.
+    UpgradeTargetsList:
+      type: object
+      properties:
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpgradeTarget'
+    UpgradeRequest:
+      type: object
+      required:
+        - collectorId
+      properties:
+        collectorId:
+          type: integer
+          description: Identifier of the Installed Collector to upgrade.
+        toVersion:
+          type: string
+          description: Target version. Defaults to the latest version.
+    UpgradeTask:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the upgrade task.
+        link:
+          type: object
+          description: Link to the upgrade task status.
+          properties:
+            rel:
+              type: string
+            href:
+              type: string
+    Upgrade:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the upgrade task.
+        collectorId:
+          type: integer
+          description: Identifier of the Collector being upgraded.
+        toVersion:
+          type: string
+          description: Target version.
+        requestTime:
+          type: integer
+          format: int64
+          description: Time the upgrade was requested, in milliseconds since epoch.
+        status:
+          type: integer
+          description: 'Upgrade status: 0 not started, 1 running, 2 succeeded, 3 failed, 6 progressing.'
+        message:
+          type: string
+          description: Status message.
+    GetUpgrade:
+      type: object
+      properties:
+        upgrade:
+          $ref: '#/components/schemas/Upgrade'

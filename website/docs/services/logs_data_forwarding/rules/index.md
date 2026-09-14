@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>rules</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>rules</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="rules" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.logs_data_forwarding.rules" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists a <code>rules</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getDataForwardingRule"
+    defaultValue="get"
     values={[
-        { label: 'getDataForwardingRule', value: 'getDataForwardingRule' },
-        { label: 'getRulesAndBuckets', value: 'getRulesAndBuckets' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getDataForwardingRule">
+<TabItem value="get">
 
 Data forwarding rule that was requested.
 
@@ -57,24 +58,29 @@ Data forwarding rule that was requested.
     <td>The unique identifier of the data forwarding rule. (example: 1)</td>
 </tr>
 <tr>
+    <td><CopyableCode code="destination_id" /></td>
+    <td><code>string</code></td>
+    <td>The data forwarding destination id. (example: 1) (wire: destinationId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="index_id" /></td>
+    <td><code>string</code></td>
+    <td>The `id` of the Partition or Scheduled View the rule applies to. (example: 1) (wire: indexId)</td>
+</tr>
+<tr>
     <td><CopyableCode code="bucket" /></td>
-    <td><code>object</code></td>
-    <td></td>
+    <td><code>string</code></td>
+    <td>(opaque JSON object)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00.000Z) (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource. (example: 0000000006743FDD)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="destinationId" /></td>
-    <td><code>string</code></td>
-    <td>The data forwarding destination id. (example: 1)</td>
+    <td>Identifier of the user who created the resource. (example: 0000000006743FDD) (wire: createdBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="enabled" /></td>
@@ -82,39 +88,34 @@ Data forwarding rule that was requested.
     <td>True when the data forwarding rule is enabled.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="fileFormat" /></td>
+    <td><CopyableCode code="file_format" /></td>
     <td><code>string</code></td>
-    <td>Specify the path prefix to a directory in the S3 bucket and how to format the file name. (example: &#123;index&#125;&#95;&#123;day&#125;&#95;&#123;hour&#125;&#95;&#123;minute&#125;&#95;&#123;second&#125;)</td>
+    <td>Specify the path prefix to a directory in the S3 bucket and how to format the file name. (example: &#123;index&#125;&#95;&#123;day&#125;&#95;&#123;hour&#125;&#95;&#123;minute&#125;&#95;&#123;second&#125;) (wire: fileFormat)</td>
 </tr>
 <tr>
     <td><CopyableCode code="format" /></td>
     <td><code>string</code></td>
-    <td>Format of the payload. (pattern: <code>^(csv|raw|json)$</code>, example: csv, default: csv, x-pattern-message: should be one of the following: 'csv', 'raw', or 'json')</td>
+    <td>Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa. (pattern: &lt;code&gt;^(csv|json|text)$&lt;/code&gt;, example: csv, x-pattern-message: should be one of the following: 'csv', 'json' or 'text')</td>
 </tr>
 <tr>
-    <td><CopyableCode code="indexId" /></td>
-    <td><code>string</code></td>
-    <td>The `id` of the Partition or Scheduled View the rule applies to. (example: 1)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00.000Z) (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8)</td>
+    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8) (wire: modifiedBy)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="payloadSchema" /></td>
+    <td><CopyableCode code="payload_schema" /></td>
     <td><code>string</code></td>
-    <td>Schema for the payload. (pattern: <code>^(default|builtInFields|allFields)$</code>, example: default, default: default, x-pattern-message: should be one of the following: 'default', 'builtInFields', or 'allFields')</td>
+    <td>Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa. (pattern: &lt;code&gt;^(builtInFields|allFields|raw)$&lt;/code&gt;, example: builtInFields, x-pattern-message: should be one of the following: 'builtInFields', 'allFields' or 'raw') (wire: payloadSchema)</td>
 </tr>
 </tbody>
 </table>
 </TabItem>
-<TabItem value="getRulesAndBuckets">
+<TabItem value="list">
 
 List of all S3 data forwarding rules.
 
@@ -128,14 +129,64 @@ List of all S3 data forwarding rules.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="data" /></td>
-    <td><code>array</code></td>
-    <td>List of S3 data forwarding rules.</td>
+    <td><CopyableCode code="id" /></td>
+    <td><code>string</code></td>
+    <td>The unique identifier of the data forwarding rule. (example: 1)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="nextToken" /></td>
+    <td><CopyableCode code="destination_id" /></td>
     <td><code>string</code></td>
-    <td>Next continuation token. (example: VEZuRU4veXF2UWFCUURYSDNQUzJxWlpRRUsvTlBieXA)</td>
+    <td>The data forwarding destination id. (example: 1) (wire: destinationId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="index_id" /></td>
+    <td><code>string</code></td>
+    <td>The `id` of the Partition or Scheduled View the rule applies to. (example: 1) (wire: indexId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="bucket" /></td>
+    <td><code>string</code></td>
+    <td>(opaque JSON object)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_at" /></td>
+    <td><code>string (date-time)</code></td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00.000Z) (wire: createdAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who created the resource. (example: 0000000006743FDD) (wire: createdBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="enabled" /></td>
+    <td><code>boolean</code></td>
+    <td>True when the data forwarding rule is enabled.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="file_format" /></td>
+    <td><code>string</code></td>
+    <td>Specify the path prefix to a directory in the S3 bucket and how to format the file name. (example: &#123;index&#125;&#95;&#123;day&#125;&#95;&#123;hour&#125;&#95;&#123;minute&#125;&#95;&#123;second&#125;) (wire: fileFormat)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="format" /></td>
+    <td><code>string</code></td>
+    <td>Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa. (pattern: &lt;code&gt;^(csv|json|text)$&lt;/code&gt;, example: csv, x-pattern-message: should be one of the following: 'csv', 'json' or 'text')</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_at" /></td>
+    <td><code>string (date-time)</code></td>
+    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00.000Z) (wire: modifiedAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8) (wire: modifiedBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="payload_schema" /></td>
+    <td><code>string</code></td>
+    <td>Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa. (pattern: &lt;code&gt;^(builtInFields|allFields|raw)$&lt;/code&gt;, example: builtInFields, x-pattern-message: should be one of the following: 'builtInFields', 'allFields' or 'raw') (wire: payloadSchema)</td>
 </tr>
 </tbody>
 </table>
@@ -158,39 +209,39 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getDataForwardingRule"><CopyableCode code="getDataForwardingRule" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-indexId"><code>indexId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-index_id"><code>index_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get the details of an S3 data forwarding rule by its Partition or Scheduled View identifier.</td>
 </tr>
 <tr>
-    <td><a href="#getRulesAndBuckets"><CopyableCode code="getRulesAndBuckets" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
     <td>Get a list of all S3 data forwarding rules.</td>
 </tr>
 <tr>
-    <td><a href="#createDataForwardingRule"><CopyableCode code="createDataForwardingRule" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__destinationId"><code>data__destinationId</code></a>, <a href="#parameter-data__indexId"><code>data__indexId</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-destination_id"><code>destination_id</code></a>, <a href="#parameter-index_id"><code>index_id</code></a></td>
     <td></td>
     <td>Create a data forwarding rule to send data from a Partition or Scheduled View to an S3 bucket.</td>
 </tr>
 <tr>
-    <td><a href="#deleteDataForwardingRule"><CopyableCode code="deleteDataForwardingRule" /></a></td>
-    <td><CopyableCode code="delete" /></td>
-    <td><a href="#parameter-indexId"><code>indexId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td></td>
-    <td>Delete an S3 data forwarding rule by its Partition or Scheduled View identifier.</td>
-</tr>
-<tr>
-    <td><a href="#updateDataForwardingRule"><CopyableCode code="updateDataForwardingRule" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-indexId"><code>indexId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-index_id"><code>index_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Update an S3 data forwarding rule by its Partition or Scheduled View identifier.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
+    <td><CopyableCode code="delete" /></td>
+    <td><a href="#parameter-index_id"><code>index_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td></td>
+    <td>Delete an S3 data forwarding rule by its Partition or Scheduled View identifier.</td>
 </tr>
 </tbody>
 </table>
@@ -208,15 +259,15 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
-<tr id="parameter-indexId">
-    <td><CopyableCode code="indexId" /></td>
+<tr id="parameter-index_id">
+    <td><CopyableCode code="index_id" /></td>
     <td><code>string</code></td>
-    <td>The `id` of the Partition or Scheduled View with the data forwarding rule to update. (example: 1)</td>
+    <td>The `id` of the Partition or Scheduled View with the data forwarding rule to delete. (example: 1) (wire: indexId)</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
@@ -234,46 +285,56 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getDataForwardingRule"
+    defaultValue="get"
     values={[
-        { label: 'getDataForwardingRule', value: 'getDataForwardingRule' },
-        { label: 'getRulesAndBuckets', value: 'getRulesAndBuckets' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getDataForwardingRule">
+<TabItem value="get">
 
 Get the details of an S3 data forwarding rule by its Partition or Scheduled View identifier.
 
 ```sql
 SELECT
 id,
+destination_id,
+index_id,
 bucket,
-createdAt,
-createdBy,
-destinationId,
+created_at,
+created_by,
 enabled,
-fileFormat,
+file_format,
 format,
-indexId,
-modifiedAt,
-modifiedBy,
-payloadSchema
+modified_at,
+modified_by,
+payload_schema
 FROM sumologic.logs_data_forwarding.rules
-WHERE indexId = '{{ indexId }}' -- required
-AND region = '{{ region }}' -- required
+WHERE index_id = '{{ index_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
-<TabItem value="getRulesAndBuckets">
+<TabItem value="list">
 
 Get a list of all S3 data forwarding rules.
 
 ```sql
 SELECT
-data,
-nextToken
+id,
+destination_id,
+index_id,
+bucket,
+created_at,
+created_by,
+enabled,
+file_format,
+format,
+modified_at,
+modified_by,
+payload_schema
 FROM sumologic.logs_data_forwarding.rules
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 AND limit = '{{ limit }}'
 AND token = '{{ token }}'
 ;
@@ -285,84 +346,122 @@ AND token = '{{ token }}'
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createDataForwardingRule"
+    defaultValue="create"
     values={[
-        { label: 'createDataForwardingRule', value: 'createDataForwardingRule' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createDataForwardingRule">
+<TabItem value="create">
 
 Create a data forwarding rule to send data from a Partition or Scheduled View to an S3 bucket.
 
 ```sql
 INSERT INTO sumologic.logs_data_forwarding.rules (
-data__indexId,
-data__destinationId,
-data__enabled,
-data__fileFormat,
-data__payloadSchema,
-data__format,
+index_id,
+destination_id,
+enabled,
+file_format,
+payload_schema,
+format,
 region
 )
 SELECT 
-'{{ indexId }}' /* required */,
-'{{ destinationId }}' /* required */,
+'{{ index_id }}' /* required */,
+'{{ destination_id }}' /* required */,
 {{ enabled }},
-'{{ fileFormat }}',
-'{{ payloadSchema }}',
+'{{ file_format }}',
+'{{ payload_schema }}',
 '{{ format }}',
 '{{ region }}'
 RETURNING
 id,
-createdAt,
-createdBy,
-destinationId,
+destination_id,
+index_id,
+created_at,
+created_by,
 enabled,
-fileFormat,
+file_format,
 format,
-indexId,
-modifiedAt,
-modifiedBy,
-payloadSchema
+modified_at,
+modified_by,
+payload_schema
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: rules
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the rules resource.
-    - name: indexId
-      value: string
+    - name: index_id
+      value: "{{ index_id }}"
       description: |
-        The `id` of the Partition or Scheduled View the rule applies to.
-    - name: destinationId
-      value: string
+        The \`id\` of the Partition or Scheduled View the rule applies to.
+    - name: destination_id
+      value: "{{ destination_id }}"
       description: |
         The data forwarding destination id.
     - name: enabled
-      value: boolean
+      value: {{ enabled }}
       description: |
         True when the data forwarding rule is enabled.
-    - name: fileFormat
-      value: string
+    - name: file_format
+      value: "{{ file_format }}"
       description: |
         Specify the path prefix to a directory in the S3 bucket and how to format the file name.
-    - name: payloadSchema
-      value: string
+    - name: payload_schema
+      value: "{{ payload_schema }}"
       description: |
-        Schema for the payload.
-      default: default
+        Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa.
     - name: format
-      value: string
+      value: "{{ format }}"
       description: |
-        Format of the payload.
-      default: csv
+        Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa.
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update an S3 data forwarding rule by its Partition or Scheduled View identifier.
+
+```sql
+UPDATE sumologic.logs_data_forwarding.rules
+SET 
+destination_id = '{{ destination_id }}',
+enabled = {{ enabled }},
+file_format = '{{ file_format }}',
+payload_schema = '{{ payload_schema }}',
+format = '{{ format }}'
+WHERE 
+index_id = '{{ index_id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+RETURNING
+id,
+destination_id,
+index_id,
+created_at,
+created_by,
+enabled,
+file_format,
+format,
+modified_at,
+modified_by,
+payload_schema;
 ```
 </TabItem>
 </Tabs>
@@ -371,49 +470,19 @@ payloadSchema
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteDataForwardingRule"
+    defaultValue="delete"
     values={[
-        { label: 'deleteDataForwardingRule', value: 'deleteDataForwardingRule' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteDataForwardingRule">
+<TabItem value="delete">
 
 Delete an S3 data forwarding rule by its Partition or Scheduled View identifier.
 
 ```sql
 DELETE FROM sumologic.logs_data_forwarding.rules
-WHERE indexId = '{{ indexId }}' --required
-AND region = '{{ region }}' --required
-;
-```
-</TabItem>
-</Tabs>
-
-
-## Lifecycle Methods
-
-<Tabs
-    defaultValue="updateDataForwardingRule"
-    values={[
-        { label: 'updateDataForwardingRule', value: 'updateDataForwardingRule' }
-    ]}
->
-<TabItem value="updateDataForwardingRule">
-
-Update an S3 data forwarding rule by its Partition or Scheduled View identifier.
-
-```sql
-EXEC sumologic.logs_data_forwarding.rules.updateDataForwardingRule 
-@indexId='{{ indexId }}' --required, 
-@region='{{ region }}' --required 
-@@json=
-'{
-"destinationId": "{{ destinationId }}", 
-"enabled": {{ enabled }}, 
-"fileFormat": "{{ fileFormat }}", 
-"payloadSchema": "{{ payloadSchema }}", 
-"format": "{{ format }}"
-}'
+WHERE index_id = '{{ index_id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

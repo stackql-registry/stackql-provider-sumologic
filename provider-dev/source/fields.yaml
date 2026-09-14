@@ -1,0 +1,415 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Fields API
+  description: Custom fields, built-in fields, dropped fields and the field quota.
+  version: 1.0.0
+paths:
+  /v1/fields:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get a list of all custom fields.
+      description: Request a list of all the custom fields configured in your account.
+      operationId: listCustomFields
+      responses:
+        '200':
+          description: List of all custom fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomFieldsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - fieldManagementV1
+      summary: Create a new field.
+      description: Adding a field will define it in the Fields schema allowing it to be assigned as metadata to your logs.
+      operationId: createField
+      parameters: []
+      requestBody:
+        description: Name of a field to add. The name is used as the key in the key-value pair.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldName'
+        required: true
+      responses:
+        '200':
+          description: The field was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/{id}:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get a custom field.
+      description: Get the details of a custom field.
+      operationId: getCustomField
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of a field.
+          required: true
+          schema:
+            type: string
+          example: 00000000031D02DA
+      responses:
+        '200':
+          description: The details of the custom field.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - fieldManagementV1
+      summary: Delete a custom field.
+      description: Deleting a field does not delete historical data assigned with that field. If you  delete a field by mistake and one or more of those dependencies break, you can  re-add the field to get things working properly again. You should always disable  a field and ensure things are behaving as expected before deleting a field.
+      operationId: deleteField
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of a field to delete.
+          required: true
+          schema:
+            type: string
+          example: 00000000031D02DA
+      responses:
+        '204':
+          description: The field was successfully deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/{id}/enable:
+    put:
+      tags:
+        - fieldManagementV1
+      summary: Enable custom field with a specified identifier.
+      description: Fields have to be enabled to be assigned to your data. This operation ensures that a specified field is enabled and Sumo Logic will treat it as safe to process. All manually created custom fields are  enabled by default.
+      operationId: enableField
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of a field to enable.
+          required: true
+          schema:
+            type: string
+          example: 00000000031D02DA
+      responses:
+        '204':
+          description: Field has been enabled.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/{id}/disable:
+    delete:
+      tags:
+        - fieldManagementV1
+      summary: Disable a custom field.
+      description: After disabling a field Sumo Logic will start dropping its incoming values at ingest. As a result, they won't be searchable or usable. Historical values are not removed and remain searchable.
+      operationId: disableField
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of a field to disable.
+          required: true
+          schema:
+            type: string
+          example: 00000000031D02DA
+      responses:
+        '204':
+          description: Field has been disabled.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/dropped:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get a list of dropped fields.
+      description: Dropped fields are fields sent to Sumo Logic, but are ignored since they are not defined in your Fields schema. In order to save these values a field must both exist and be enabled.
+      operationId: listDroppedFields
+      responses:
+        '200':
+          description: |
+            List of dropped fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDroppedFieldsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/builtin:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get a list of built-in fields.
+      description: Built-in fields are created automatically by Sumo Logic for standard configuration purposes. They include `_sourceHost` and `_sourceCategory`. Built-in fields can't be deleted or disabled.
+      operationId: listBuiltInFields
+      responses:
+        '200':
+          description: List of all built-in fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBuiltinFieldsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/builtin/{id}:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get a built-in field.
+      description: Get the details of a built-in field.
+      operationId: getBuiltInField
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of a built-in field.
+          required: true
+          schema:
+            type: string
+          example: 000000000000000A
+      responses:
+        '200':
+          description: The details of the built-in field.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuiltinField'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fields/quota:
+    get:
+      tags:
+        - fieldManagementV1
+      summary: Get capacity information.
+      description: Every account has a limited number of fields available. This endpoint returns your account limitations and remaining quota.
+      operationId: getFieldQuota
+      responses:
+        '200':
+          description: Current fields capacity usage (fields count).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldQuotaUsage'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListCustomFieldsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of custom fields.
+          items:
+            $ref: '#/components/schemas/CustomField'
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    FieldName:
+      required:
+        - fieldName
+      type: object
+      properties:
+        fieldName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Field name.
+          example: hostIP
+    CustomField:
+      required:
+        - fieldName
+        - dataType
+        - fieldId
+        - state
+      type: object
+      properties:
+        fieldName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Field name.
+          example: hostIP
+        fieldId:
+          type: string
+          description: Identifier of the field.
+          example: 00000000031D02DA
+        dataType:
+          pattern: ^(String|Long|Int|Double|Boolean)$
+          type: string
+          description: Field type. Possible values are `String`, `Long`, `Int`, `Double`, and `Boolean`.
+          example: String
+          x-pattern-message: Must be `String`, `Long`, `Int`, `Double` or `Boolean`
+        state:
+          pattern: ^(Enabled|Disabled)$
+          type: string
+          description: Indicates whether the field is enabled and its values are being accepted. Possible values are `Enabled` and `Disabled`.
+          example: Enabled
+          x-pattern-message: Must be `Enabled` or `Disabled`
+    ListDroppedFieldsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of dropped fields.
+          items:
+            $ref: '#/components/schemas/DroppedField'
+    ListBuiltinFieldsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of built-in fields.
+          items:
+            $ref: '#/components/schemas/BuiltinField'
+    BuiltinField:
+      required:
+        - fieldName
+        - dataType
+        - fieldId
+        - state
+      type: object
+      properties:
+        fieldName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Field name.
+          example: hostIP
+        fieldId:
+          type: string
+          description: Identifier of the field.
+          example: 00000000031D02DA
+        dataType:
+          pattern: ^(String|Long|Int|Double|Boolean)$
+          type: string
+          description: Field type. Possible values are `String`, `Long`, `Int`, `Double`, and `Boolean`.
+          example: String
+          x-pattern-message: Must be `String`, `Long`, `Int`, `Double` or `Boolean`
+        state:
+          pattern: ^(Enabled|Disabled)$
+          type: string
+          description: Indicates whether the field is enabled and its values are being accepted. Possible values are `Enabled` and `Disabled`.
+          example: Enabled
+          x-pattern-message: Must be `Enabled` or `Disabled`
+    FieldQuotaUsage:
+      required:
+        - quota
+        - remaining
+      type: object
+      properties:
+        quota:
+          type: integer
+          description: Maximum number of fields available.
+          format: int32
+          example: 200
+        remaining:
+          type: integer
+          description: Current number of fields available.
+          format: int32
+          example: 121
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    DroppedField:
+      required:
+        - fieldName
+      type: object
+      properties:
+        fieldName:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Field name.
+          example: hostIP

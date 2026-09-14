@@ -28,6 +28,6 @@ total resources: __2__
 <a href="/services/roles/roles/">roles</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/roles/users/">users</a>
+<a href="/services/roles/roles_v2/">roles_v2</a>
 </div>
 </div>

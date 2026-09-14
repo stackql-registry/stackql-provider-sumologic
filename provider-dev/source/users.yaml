@@ -1,0 +1,565 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Users API
+  description: Users and their lifecycle actions - unlock, password reset, email change, welcome email, MFA.
+  version: 1.0.0
+paths:
+  /v1/users:
+    get:
+      tags:
+        - userManagement
+      summary: Get a list of users.
+      description: Get a list of all users in the organization. The response is paginated with a default limit of 100 users per page.
+      operationId: listUsers
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of users returned in the response. The number of users returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort the list of users by the `firstName`, `lastName`, or `email` field.
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Find user with the given email address.
+          required: false
+          schema:
+            minLength: 1
+            type: string
+        - name: includeServiceAccounts
+          in: query
+          description: Include service accounts while listing users within the organization.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A paginated list of users in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUserModelsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - userManagement
+      summary: Create a new user.
+      description: Create a new user in the organization.
+      operationId: createUser
+      parameters: []
+      requestBody:
+        description: Information about the new user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDefinition'
+        required: true
+      responses:
+        '200':
+          description: The user has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}:
+    get:
+      tags:
+        - userManagement
+      summary: Get a user.
+      description: Get a user with the given identifier from the organization.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of user to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - userManagement
+      summary: Update a user.
+      description: Update an existing user in the organization.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDefinition'
+        required: true
+      responses:
+        '200':
+          description: The user was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - userManagement
+      summary: Delete a user.
+      description: Delete a user with the given identifier from the organization and transfer their content to the user with the identifier specified in "transferTo".
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to delete.
+          required: true
+          schema:
+            type: string
+        - name: transferTo
+          in: query
+          description: Identifier of the user to receive the transfer of content from the deleted user. <br> **Note:** If `deleteContent` is not set to `true`, and no user identifier is specified in `transferTo`, content from the deleted user is transferred to the executing user.
+          required: false
+          schema:
+            type: string
+        - name: deleteContent
+          in: query
+          description: Whether to delete content from the deleted user or not. <br> **Warning:** If `deleteContent` is set to `true`, all of the content for the user being deleted is permanently deleted and cannot be recovered.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '204':
+          description: User was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}/email/requestChange:
+    post:
+      tags:
+        - userManagement
+      summary: Change email address.
+      description: An email with an activation link is sent to the user’s new email address. The user must click the link in the email within seven days to complete the email address change, or the link will expire.
+      operationId: requestChangeEmail
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to change email address.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: New email address of the user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeEmailRequest'
+        required: true
+      responses:
+        '204':
+          description: Email change request was submitted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}/password/reset:
+    post:
+      tags:
+        - userManagement
+      summary: Reset password.
+      description: Reset a user's password.
+      operationId: resetPassword
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to reset password.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User's password was reset successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}/unlock:
+    post:
+      tags:
+        - userManagement
+      summary: Unlock a user.
+      description: Unlock another user's account.
+      operationId: unlockUser
+      parameters:
+        - name: id
+          in: path
+          description: The id of the user that needs to be unlocked.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User's account was unlocked successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}/mfa/disable:
+    put:
+      tags:
+        - userManagement
+      summary: Disable MFA for user.
+      description: Disable multi-factor authentication for given user.
+      operationId: disableMfa
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to disable MFA for.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Email and Password of the user to disable MFA for.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisableMfaRequest'
+        required: true
+      responses:
+        '204':
+          description: User's MFA was disabled successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/users/{id}/resendWelcomeEmail:
+    post:
+      tags:
+        - userManagement
+      summary: Resend verification email.
+      description: Resend the welcome email to a user.
+      operationId: resendWelcomeEmail
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the user to resend the welcome email.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Welcome email was resent successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListUserModelsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of users.
+          items:
+            $ref: '#/components/schemas/UserModel'
+        next:
+          type: string
+          description: Next continuation token.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    CreateUserDefinition:
+      required:
+        - email
+        - firstName
+        - lastName
+        - roleIds
+      type: object
+      properties:
+        firstName:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: First name of the user.
+          example: John
+        lastName:
+          maxLength: 128
+          minLength: 0
+          type: string
+          description: Last name of the user.
+          example: Doe
+        email:
+          maxLength: 255
+          type: string
+          description: Email address of the user.
+          format: email
+          example: johndoe@acme.com
+        roleIds:
+          type: array
+          description: List of roleIds associated with the user.
+          example:
+            - 00000000000001DF
+            - 00000000000002D2
+          items:
+            type: string
+    UserModel:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - roleIds
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        firstName:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: First name of the user.
+          example: John
+        lastName:
+          maxLength: 128
+          minLength: 0
+          type: string
+          description: Last name of the user.
+          example: Doe
+        email:
+          maxLength: 255
+          type: string
+          description: Email address of the user.
+          format: email
+          example: johndoe@acme.com
+        roleIds:
+          type: array
+          description: List of roleIds associated with the user.
+          example:
+            - 00000000000001DF
+            - 00000000000002D2
+          items:
+            type: string
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the user.
+          example: 000000000FE20FE2
+        isActive:
+          type: boolean
+          description: True if the user is active.
+          example: true
+        isLocked:
+          type: boolean
+          description: This has the value `true` if the user's account has been locked. If a user tries to log into their account several times and fails, his or her account will be locked for security reasons.
+          example: false
+        isMfaEnabled:
+          type: boolean
+          description: True if multi factor authentication is enabled for the user.
+          example: false
+        lastLoginTimestamp:
+          type: string
+          description: Timestamp of the last login for the user in UTC. Will be null if the user has never logged in.
+          format: date-time
+    UpdateUserDefinition:
+      required:
+        - firstName
+        - lastName
+      type: object
+      properties:
+        firstName:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: First name of the user. If the caller has `manageUsersAndRoles` capability, this field can be updated for any user. If the caller does NOT have `manageUsersAndRoles` capability, then only the calling user's firstName can be updated.
+          example: John
+        lastName:
+          maxLength: 128
+          minLength: 0
+          type: string
+          description: Last name of the user. If the caller has `manageUsersAndRoles` capability, this field can be updated for any user. If the caller does NOT have `manageUsersAndRoles` capability, then only the calling user's lastName can be updated.
+          example: Doe
+        isActive:
+          type: boolean
+          description: This has the value `true` if the user is active and `false` if they have been deactivated. To modify this field you must have the `manageUserAndRoles` capability.
+          example: true
+        roleIds:
+          type: array
+          description: List of role identifiers associated with the user. To modify this field you must have the `manageUserAndRoles` capability.
+          example:
+            - 00000000000001DF
+            - 00000000000002D2
+          items:
+            type: string
+    ChangeEmailRequest:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          maxLength: 255
+          type: string
+          description: New email address of the user.
+          format: email
+          example: johndoe@acme.com
+    DisableMfaRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 255
+          type: string
+          description: Email of user whose mfa is being disabled.
+          format: email
+          example: johndoe@cme.com
+        password:
+          type: string
+          description: Password of user whose mfa is being disabled.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8

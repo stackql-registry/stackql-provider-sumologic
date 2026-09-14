@@ -1,0 +1,969 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Metrics Searches API
+  description: Saved metrics searches (v1 and v2).
+  version: 1.0.0
+paths:
+  /v1/metricsSearches:
+    post:
+      tags:
+        - metricsSearchesManagement
+      summary: Save a metrics search.
+      description: Saves a metrics search in the content library. Metrics search consists of one or more queries, a time range, a quantization period and a set of chart properties like line width.
+      operationId: createMetricsSearch
+      parameters: []
+      requestBody:
+        description: The definition of the metrics search.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveMetricsSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: Newly created metrics search.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchInstance'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/metricsSearches/{id}:
+    get:
+      tags:
+        - metricsSearchesManagement
+      summary: Get a metrics search.
+      description: Returns a metrics search with the specified identifier.
+      operationId: getMetricsSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the metrics search.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A metrics search object with metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchInstance'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - metricsSearchesManagement
+      summary: Updates a metrics search.
+      description: Updates a metrics search with the specified identifier. Partial updates are not supported, you must provide values for all fields.
+      operationId: updateMetricsSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the metrics search.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: An updated metrics search definition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsSearchV1'
+        required: true
+      responses:
+        '200':
+          description: The metrics saved search that was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchInstance'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - metricsSearchesManagement
+      summary: Deletes a metrics search.
+      description: Deletes a metrics search from the content library.
+      operationId: deleteMetricsSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the metrics search.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The metrics search was successfully deleted.
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/metricsSearches:
+    get:
+      tags:
+        - metricsSearchesManagementV2
+      summary: List all metrics search pages.
+      description: List all metrics search pages under the Personal folder created by the user or under folders viewable by user.
+      operationId: ListMetricsSearches
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of metric searches returned in the response. The number of metric searches returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+        - name: mode
+          in: query
+          description: whether to list all viewable metric searches under the folders
+          required: false
+          schema:
+            pattern: ^(createdByUser|allViewableByUser)$
+            type: string
+            example: createdByUser
+            x-pattern-message: Must be `createdByUser` or `allViewableByUser`
+          example: createdByUser
+      responses:
+        '200':
+          description: Paginated list of metrics search pages under the Personal folder created by the user or viewable by user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMetricsSearches'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - metricsSearchesManagementV2
+      summary: Create a new metrics search page.
+      description: Creates a new metrics search page.
+      operationId: createMetricsSearches
+      requestBody:
+        description: Information to create the new metrics search page.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: The metrics search page has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/metricsSearches/{id}:
+    get:
+      tags:
+        - metricsSearchesManagementV2
+      summary: Get a metrics search page.
+      description: Get a metrics search page by the given identifier.
+      operationId: getMetricsSearches
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the metrics search page to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metrics search page that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - metricsSearchesManagementV2
+      summary: Update a metrics search page.
+      description: Update a metrics search page by the given identifier.
+      operationId: updateMetricsSearches
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the metrics search page to return.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update the metrics search page.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: The metrics search page was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSearchResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - metricsSearchesManagementV2
+      summary: Delete a metrics search page.
+      description: Delete metrics search page by the given identifier.
+      operationId: deleteMetricsSearches
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the metrics search page to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Metrics search page was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    SaveMetricsSearchRequest:
+      type: object
+      description: The definition of the metrics search to save in the content library.
+      required:
+        - description
+        - metricsQueries
+        - timeRange
+        - title
+        - parentId
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()]+$
+          type: string
+          description: Item title in the content library.
+          example: Short title
+        description:
+          maxLength: 8192
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        logQuery:
+          maxLength: 10240
+          type: string
+          description: Log query used to add an overlay to the chart.
+          example: my_metric | timeslice 1m | count by _timeslice
+        metricsQueries:
+          type: array
+          description: Metrics queries, up to the maximum of six.
+          items:
+            $ref: '#/components/schemas/MetricsSearchQuery'
+        desiredQuantizationInSecs:
+          minimum: 0
+          type: integer
+          description: Desired quantization in seconds.
+          format: int32
+          example: 60
+          default: 0
+        properties:
+          type: string
+          description: |
+            Chart properties, like line width, color palette, and the fill missing data method. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ \"key\": \"value\" }'
+        parentId:
+          type: string
+          description: Identifier of a folder to which the metrics search should be added.
+          example: 000000000000001A
+    MetricsSearchInstance:
+      required:
+        - description
+        - metricsQueries
+        - timeRange
+        - title
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()]+$
+          type: string
+          description: Item title in the content library.
+          example: Short title
+        description:
+          maxLength: 8192
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        logQuery:
+          maxLength: 10240
+          type: string
+          description: Log query used to add an overlay to the chart.
+          example: my_metric | timeslice 1m | count by _timeslice
+        metricsQueries:
+          type: array
+          description: Metrics queries, up to the maximum of six.
+          items:
+            $ref: '#/components/schemas/MetricsSearchQuery'
+        desiredQuantizationInSecs:
+          minimum: 0
+          type: integer
+          description: Desired quantization in seconds.
+          format: int32
+          example: 60
+          default: 0
+        properties:
+          type: string
+          description: |
+            Chart properties, like line width, color palette, and the fill missing data method. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ \"key\": \"value\" }'
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Identifier of the metrics search.
+          example: 000000000000001A
+        parentId:
+          type: string
+          description: Identifier of the parent element in the content library, such as folder.
+          example: 0000000000007D2B
+      description: Definition of a metrics search.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    MetricsSearchV1:
+      required:
+        - description
+        - metricsQueries
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()]+$
+          type: string
+          description: Item title in the content library.
+          example: Short title
+        description:
+          maxLength: 8192
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        logQuery:
+          maxLength: 10240
+          type: string
+          description: Log query used to add an overlay to the chart.
+          example: my_metric | timeslice 1m | count by _timeslice
+        metricsQueries:
+          type: array
+          description: Metrics queries, up to the maximum of six.
+          items:
+            $ref: '#/components/schemas/MetricsSearchQuery'
+        desiredQuantizationInSecs:
+          minimum: 0
+          type: integer
+          description: Desired quantization in seconds.
+          format: int32
+          example: 60
+          default: 0
+        properties:
+          type: string
+          description: |
+            Chart properties, like line width, color palette, and the fill missing data method. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ \"key\": \"value\" }'
+      description: Definition of a metrics search.
+    PaginatedMetricsSearches:
+      required:
+        - metricsSearches
+      type: object
+      properties:
+        metricsSearches:
+          type: array
+          description: List of metrics search pages.
+          items:
+            $ref: '#/components/schemas/MetricsSearchResponse'
+        next:
+          type: string
+          description: Next continuation token. `token` is set to null when no more pages are left.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    MetricsSearchRequest:
+      required:
+        - queries
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^\s*\S.*$
+          type: string
+          description: Title of the metrics search page.
+          x-pattern-message: must contain at least 1 non-whitespace character
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        description:
+          type: string
+          description: Description of the metrics search page.
+        queries:
+          type: array
+          description: Queries of the metrics search page.
+          items:
+            $ref: '#/components/schemas/Query'
+        visualSettings:
+          type: string
+          description: Visual settings of the metrics search page.
+        folderId:
+          type: string
+          description: |
+            The identifier of the folder to save the metrics search in. By default it is saved in your personal folder.
+          example: 000000000C1C17C6
+    MetricsSearchResponse:
+      required:
+        - queries
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^\s*\S.*$
+          type: string
+          description: Title of the metrics search page.
+          x-pattern-message: must contain at least 1 non-whitespace character
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        description:
+          type: string
+          description: Description of the metrics search page.
+        queries:
+          type: array
+          description: Queries of the metrics search page.
+          items:
+            $ref: '#/components/schemas/Query'
+        visualSettings:
+          type: string
+          description: Visual settings of the metrics search page.
+        folderId:
+          type: string
+          description: |
+            The identifier of the folder to save the metrics search in. By default it is saved in your personal folder.
+          example: 000000000C1C17C6
+        id:
+          type: string
+          description: Unique identifier for the metrics search page.
+          example: B23OjNs5ZCyn5VdMwOBoLo3PjgRnJSAlNTKEDAcpuDG2CIgRe9KFXMofm2H2
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    ResolvableTimeRange:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the time range. Value must be either `CompleteLiteralTimeRange` or `BeginBoundedTimeRange`.
+      example:
+        type: BeginBoundedTimeRange
+        from:
+          type: RelativeTimeRangeBoundary
+          relativeTime: '-15m'
+      discriminator:
+        propertyName: type
+    MetricsSearchQuery:
+      required:
+        - query
+        - rowId
+      type: object
+      properties:
+        rowId:
+          type: string
+          description: Row identifier. All row IDs are represented by subsequent upper case letters starting with `A`.
+          example: A
+        query:
+          type: string
+          description: Metrics query.
+          example: my_metric | avg
+      description: Definition of a metrics query.
+    MetricsSearch:
+      required:
+        - queries
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          pattern: ^\s*\S.*$
+          type: string
+          description: Title of the metrics search page.
+          x-pattern-message: must contain at least 1 non-whitespace character
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        description:
+          type: string
+          description: Description of the metrics search page.
+        queries:
+          type: array
+          description: Queries of the metrics search page.
+          items:
+            $ref: '#/components/schemas/Query'
+        visualSettings:
+          type: string
+          description: Visual settings of the metrics search page.
+    Query:
+      required:
+        - queryKey
+        - queryString
+        - queryType
+      type: object
+      properties:
+        queryString:
+          type: string
+          description: The metrics, traces or logs query.
+          example: _sourceCategory=cqsplitter metric=CPU_user | count by _sourceHost
+        queryType:
+          pattern: ^(Logs|Metrics|Traces|Spans)$
+          type: string
+          description: The type of the query, either `Metrics`, `Traces`, `Spans` or `Logs`.
+          example: Logs
+          x-pattern-message: Must be `Logs`, `Traces`, `Spans` or `Metrics`
+        queryKey:
+          type: string
+          description: |
+            The key for metric, traces or log queries. Used as an identifier for queries. It is displayed on the panel builder and used for display overrides and query toggling.
+          example: A
+        metricsQueryMode:
+          pattern: ^(Basic|Advanced|basic|advanced)$
+          type: string
+          description: |
+            The mode of the metrics query that the user was editing. Can be `Basic` or `Advanced`. Will ONLY be specified for metrics queries.
+          example: Basic
+          x-pattern-message: Must be `Basic`, or `Advanced`
+        metricsQueryData:
+          $ref: '#/components/schemas/MetricsQueryData'
+        tracesQueryData:
+          $ref: '#/components/schemas/TracesQueryData'
+        spansQueryData:
+          $ref: '#/components/schemas/SpansQueryData'
+        parseMode:
+          pattern: ^(Auto|Manual|Intelliparse)$
+          type: string
+          description: |-
+            This field only applies for queryType of `Logs` but other query types may be supported in the future. Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `Auto`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: Auto
+          default: Auto
+          x-pattern-message: Must be either `Auto`,`Manual` or `Intelliparse`
+        timeSource:
+          pattern: ^(Message|Receipt|Searchable)$
+          type: string
+          description: This field only applies for queryType of `Logs` but other query types may be supported in the future. Define the time source of this query. Possible values are `Message`, `Receipt`. `Message` will use the timeStamp on the message, while `Receipt` will use the timestamp it was received by Sumo.
+          example: Message
+          default: Message
+          x-pattern-message: Must be `Message`, or `Receipt`
+        transient:
+          type: boolean
+          description: This field only applies for queryType of `Metrics` but other query types may be supported in the future. Determines if the row should be returned in the response. Can be used in conjunction with a join, if only the result of the join is needed, and not the intermediate rows. Setting `transient` to `true`  wherever the intermediate results aren't required speeds up the computation and reduces the amount of data  transferred over the network.
+          default: false
+        outputCardinalityLimit:
+          maximum: 3000
+          minimum: 1
+          type: integer
+          description: This field only applies for queryType of `Metrics` but other query types may be supported in the future. Specifies the output cardinality limitations for the query, which is the maximum number of timeseries returned in the result.
+          format: int32
+          example: 1000
+          default: 1000
+    MetricsQueryData:
+      required:
+        - filters
+        - metric
+      type: object
+      properties:
+        metric:
+          type: string
+          description: The metric of the query.
+          example: CPU_user
+        aggregationType:
+          pattern: ^(Count|Minimum|Maximum|Sum|Average|None)$|^$
+          type: string
+          description: The type of aggregation. Can be `Count`, `Minimum`, `Maximum`, `Sum`, `Average` or `None`.
+          example: Count
+          x-pattern-message: Must be `Count`, `Minimum`, `Maximum`, `Sum`, `Average` or `None`
+        groupBy:
+          type: string
+          description: The field to group the results by.
+          example: _sourceHost
+        filters:
+          type: array
+          description: A list of filters for the metrics query.
+          items:
+            $ref: '#/components/schemas/MetricsFilter'
+        operators:
+          type: array
+          description: A list of operator data for the metrics query.
+          items:
+            $ref: '#/components/schemas/OperatorData'
+      description: The data format describing a basic metrics query.
+      example:
+        metric: CPU_user
+        aggregationType: count
+        groupBy: _sourceHost
+        filters:
+          - key: _sourceCategory
+            value: kubernetes
+          - key: _sourceHost
+            value: dep-kubernetes-1
+        operators:
+          operatorName: avg
+          parameters:
+            - key: aggregator
+              value: max
+            - key: operation
+              value: ''
+            - key: value
+              value: 50
+    TracesQueryData:
+      required:
+        - filters
+      type: object
+      properties:
+        filters:
+          type: array
+          description: A list of filters for the traces query.
+          items:
+            $ref: '#/components/schemas/TracesFilter'
+      description: The data format describing a basic traces query.
+    SpansQueryData:
+      required:
+        - filters
+        - groupBy
+        - limit
+        - visualizations
+      type: object
+      properties:
+        filters:
+          type: array
+          description: A list of filters for the spans query.
+          items:
+            $ref: '#/components/schemas/SpansFilter'
+        visualizations:
+          type: array
+          description: A list of used visualization methods for the spans query.
+          items:
+            $ref: '#/components/schemas/SpansVisualization'
+        groupBy:
+          type: array
+          description: A list of group-by clauses for the spans query.
+          items:
+            $ref: '#/components/schemas/SpansGroupBy'
+        limit:
+          type: array
+          description: A list of limits that will be applied to the spans query.
+          items:
+            $ref: '#/components/schemas/SpansLimitItem'
+      description: The data format describing a basic spans query.
+    MetricsFilter:
+      required:
+        - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: The key of the metrics filter.
+          example: _sourceCategory
+        value:
+          type: string
+          description: The value of the metrics filter.
+          example: kubernetes
+        negation:
+          type: boolean
+          description: Whether or not the metrics filter is negated.
+          example: false
+      description: The filter for metrics query.
+      example:
+        key: _sourceCategory
+        value: cqmerger
+        negation: false
+    OperatorData:
+      required:
+        - operatorName
+        - parameters
+      type: object
+      properties:
+        operatorName:
+          type: string
+          description: The name of the metrics operator.
+          example: avg
+        parameters:
+          type: array
+          description: A list of operator parameters for the operator data.
+          items:
+            $ref: '#/components/schemas/OperatorParameter'
+      description: The operator data for metrics query.
+      example:
+        operatorName: avg
+        parameters:
+          - key: aggregator
+            value: max
+          - key: operation
+            value: ''
+          - key: value
+            value: 50
+    TracesFilter:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          pattern: ^(FieldDescriptor|DurationMetricDescriptor|NumericMetricDescriptor|CPCOfFilterDescriptor|MaxCPCOfFilterDescriptor|MaxCPCFilterDescriptor)$|^$
+          type: string
+          description: The type of the filter.
+          example: FieldDescriptor
+          x-pattern-message: Must be `FieldDescriptor`, `DurationMetricDescriptor`, `NumericMetricDescriptor`, `CPCOfFilterDescriptor`, `MaxCPCOfFilterDescriptor` or `MaxCPCFilterDescriptor`
+      description: The filter for traces query.
+      discriminator:
+        propertyName: type
+    SpansFilter:
+      required:
+        - fieldName
+        - type
+      type: object
+      properties:
+        type:
+          pattern: ^(StandaloneKey|KeyValuePair)$
+          type: string
+          description: The spans filter type.
+          example: StandaloneKey
+          x-pattern-message: Must be `StandaloneKey` or `KeyValuePair`.
+        fieldName:
+          type: string
+          description: The name of the filtering field.
+          example: service
+      discriminator:
+        propertyName: type
+        mapping:
+          StandaloneKey: '#/components/schemas/SpansFilterStandaloneKey'
+          KeyValuePair: '#/components/schemas/SpansFilterKeyValuePair'
+    SpansVisualization:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        type:
+          pattern: ^(count|calculation)$
+          type: string
+          description: The visualization type.
+          example: count
+          x-pattern-message: Must be `count` or `calculation`
+        name:
+          type: string
+          description: A unique name of the visualization.
+          example: duration_pct_95
+      discriminator:
+        propertyName: type
+        mapping:
+          count: '#/components/schemas/SpansCountVisualization'
+          calculation: '#/components/schemas/SpansCalculationVisualization'
+    SpansGroupBy:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          pattern: ^(time|field)$
+          type: string
+          description: The type of the group-by clause.
+          example: time
+          x-pattern-message: Must be `time` or `field`
+      discriminator:
+        propertyName: type
+        mapping:
+          time: '#/components/schemas/SpansTimeGroupBy'
+          field: '#/components/schemas/SpansFieldGroupBy'
+    SpansLimitItem:
+      required:
+        - direction
+        - limitValue
+      type: object
+      properties:
+        direction:
+          pattern: ^(asc|desc)$
+          type: string
+          description: Describes whether the results should be sorted in an ascending or a descending order.
+          example: asc
+          x-pattern-message: Must be `asc` or `desc`
+        limitValue:
+          type: integer
+          description: |
+            The number of aggregated results returned, e.g. if 10 is requested, then only the first 10 aggregated results are returned.
+          format: int32
+          example: 10
+      description: |
+        A representation of the limit operator which reduces the number of aggregate results returned:  either the top k results or bottom k results.
+    OperatorParameter:
+      required:
+        - key
+        - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: The key of the operator parameter.
+          example: operation
+        value:
+          type: string
+          description: The value of the operator parameter.
+          example: '>'
+      description: The operator parameter for operator data.
+      example:
+        key: aggregator
+        value: max

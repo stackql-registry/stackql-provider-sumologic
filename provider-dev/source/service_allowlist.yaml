@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Service Allowlist API
+  description: The service allowlist of CIDR addresses for login and content access.
+  version: 1.0.0
+paths:
+  /v1/serviceAllowlist/addresses:
+    get:
+      tags:
+        - serviceAllowlistManagement
+      summary: List all allowlisted CIDRs/IP addresses.
+      description: Get a list of all allowlisted CIDR notations and/or IP addresses for the organization.
+      operationId: listAllowlistedCidrs
+      responses:
+        '200':
+          description: List of all allowlisted CIDR notations and/or IP addresses for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CidrList'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/serviceAllowlist/addresses/add:
+    post:
+      tags:
+        - serviceAllowlistManagement
+      summary: Allowlist CIDRs/IP addresses.
+      description: Add CIDR notations and/or IP addresses to the allowlist of the organization if not already there. When service allowlisting functionality is enabled, CIDRs/IP addresses that are allowlisted will have access to Sumo Logic and/or content sharing.
+      operationId: addAllowlistedCidrs
+      parameters: []
+      requestBody:
+        description: List of all CIDR notations and/or IP addresses to be added to the allowlist of the organization.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CidrList'
+        required: true
+      responses:
+        '200':
+          description: List of all allowlisted CIDR notations and/or IP addresses for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CidrList'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/serviceAllowlist/addresses/remove:
+    post:
+      tags:
+        - serviceAllowlistManagement
+      summary: Remove allowlisted CIDRs/IP addresses.
+      description: Remove allowlisted CIDR notations and/or IP addresses from the organization. Removed CIDRs/IPs will immediately lose access to Sumo Logic and content sharing.
+      operationId: deleteAllowlistedCidrs
+      parameters: []
+      requestBody:
+        description: List of all CIDR notations and/or IP addresses to be removed from the allowlist of the organization.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CidrList'
+        required: true
+      responses:
+        '200':
+          description: List of all allowlisted CIDR notations and/or IP addresses for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CidrList'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/serviceAllowlist/enable:
+    post:
+      tags:
+        - serviceAllowlistManagement
+      summary: Enable service allowlisting.
+      description: 'Enable service allowlisting functionality for the organization. The service allowlisting can be for 1. Login: If enabled, access to Sumo Logic is granted only to CIDRs/IP addresses that are allowlisted. 2. Content: If enabled, dashboards can be shared with users connecting from CIDRs/IP addresses that are allowlisted without logging in.'
+      operationId: enableAllowlisting
+      parameters:
+        - name: allowlistType
+          in: query
+          description: 'The type of allowlisting to be enabled. It can be one of: `Login`, `Content`, or `Both`.'
+          required: true
+          schema:
+            pattern: ^(Login|Content|Both)$
+            type: string
+            description: 'One of: `Login`, `Content`, `Both`.'
+            example: Login
+            x-pattern-message: must be `Login`, `Content`, or `Both`
+      responses:
+        '204':
+          description: Service allowlisting was enabled successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/serviceAllowlist/disable:
+    post:
+      tags:
+        - serviceAllowlistManagement
+      summary: Disable service allowlisting.
+      description: Disable service allowlisting functionality for login/API authentication or content sharing for the organization.
+      operationId: disableAllowlisting
+      parameters:
+        - name: allowlistType
+          in: query
+          description: 'The type of allowlisting to be disabled. It can be one of: `Login`, `Content`, or `Both`.'
+          required: true
+          schema:
+            pattern: ^(Login|Content|Both)$
+            type: string
+            description: 'One of: `Login`, `Content`, `Both`.'
+            example: Login
+            x-pattern-message: must be `Login`, `Content`, or `Both`
+      responses:
+        '204':
+          description: Service allowlisting was disabled successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/serviceAllowlist/status:
+    get:
+      tags:
+        - serviceAllowlistManagement
+      summary: Get the allowlisting status.
+      description: Get the status of the service allowlisting functionality for login/API authentication or content sharing for the organization.
+      operationId: getAllowlistingStatus
+      responses:
+        '200':
+          description: The status of service allowlisting for Content and Login.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllowlistingStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    CidrList:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          maxItems: 50
+          type: array
+          description: An array of CIDR notations and/or IP addresses.
+          items:
+            $ref: '#/components/schemas/Cidr'
+      description: A list of CIDR notations and/or IP addresses.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    AllowlistingStatus:
+      required:
+        - contentEnabled
+        - loginEnabled
+      type: object
+      properties:
+        contentEnabled:
+          type: boolean
+          description: Whether service allowlisting is enabled for Content.
+        loginEnabled:
+          type: boolean
+          description: Whether service allowlisting is enabled for Login.
+      description: The status of service allowlisting for Content and Login.
+    Cidr:
+      required:
+        - cidr
+      type: object
+      properties:
+        cidr:
+          pattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$
+          type: string
+          description: The string representation of the CIDR notation or IP address.
+          example: 192.35.24.1
+          x-pattern-message: Invalid CIDR/IP
+        description:
+          type: string
+          description: Description of the CIDR notation or IP address.
+          example: Accountant
+      description: A CIDR notation or IP address along with its description.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5

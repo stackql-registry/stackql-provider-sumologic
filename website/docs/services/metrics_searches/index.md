@@ -18,7 +18,7 @@ metrics_searches service documentation.
 
 :::info[Service Summary]
 
-total resources: __1__  
+total resources: __2__  
 
 :::
 
@@ -28,6 +28,6 @@ total resources: __1__
 <a href="/services/metrics_searches/metrics_searches/">metrics_searches</a>
 </div>
 <div class="providerDocColumn">
-
+<a href="/services/metrics_searches/metrics_searches_v2/">metrics_searches_v2</a>
 </div>
 </div>

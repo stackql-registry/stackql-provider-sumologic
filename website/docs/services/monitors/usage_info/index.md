@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>usage_info</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>usage_info</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="usage_info" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.monitors.usage_info" /></td></tr>
 </tbody></table>
@@ -32,14 +33,14 @@ Creates, updates, deletes, gets or lists a <code>usage_info</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getMonitorUsageInfo"
+    defaultValue="list"
     values={[
-        { label: 'getMonitorUsageInfo', value: 'getMonitorUsageInfo' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getMonitorUsageInfo">
+<TabItem value="list">
 
-MonitorUsageInfo has been retrieved successfully.
+The usage info of monitors.
 
 <table>
 <thead>
@@ -56,9 +57,9 @@ MonitorUsageInfo has been retrieved successfully.
     <td>The limit of active Logs/Metrics monitors.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="monitorType" /></td>
+    <td><CopyableCode code="monitor_type" /></td>
     <td><code>string</code></td>
-    <td>The type of monitor usage info (Logs or Metrics). (example: Logs)</td>
+    <td>The type of monitor usage info (Logs or Metrics). (Logs, Metrics) (example: Logs) (wire: monitorType)</td>
 </tr>
 <tr>
     <td><CopyableCode code="total" /></td>
@@ -91,7 +92,7 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getMonitorUsageInfo"><CopyableCode code="getMonitorUsageInfo" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
@@ -116,7 +117,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -124,23 +125,23 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getMonitorUsageInfo"
+    defaultValue="list"
     values={[
-        { label: 'getMonitorUsageInfo', value: 'getMonitorUsageInfo' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getMonitorUsageInfo">
+<TabItem value="list">
 
 Get the current number and the allowed number of log and metrics monitors.
 
 ```sql
 SELECT
 limit,
-monitorType,
+monitor_type,
 total,
 usage
 FROM sumologic.monitors.usage_info
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

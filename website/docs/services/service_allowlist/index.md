@@ -18,20 +18,16 @@ service_allowlist service documentation.
 
 :::info[Service Summary]
 
-total resources: __6__  
+total resources: __2__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/service_allowlist/addresses/">addresses</a><br />
-<a href="/services/service_allowlist/addresses_add/">addresses_add</a><br />
-<a href="/services/service_allowlist/addresses_remove/">addresses_remove</a>
+<a href="/services/service_allowlist/addresses/">addresses</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/service_allowlist/disable/">disable</a><br />
-<a href="/services/service_allowlist/enable/">enable</a><br />
 <a href="/services/service_allowlist/status/">status</a>
 </div>
 </div>

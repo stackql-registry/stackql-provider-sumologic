@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>share_dashboards_outside_organi
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>share_dashboards_outside_organization</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="share_dashboards_outside_organization" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.policies.share_dashboards_outside_organization" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>share_dashboards_outside_organi
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getShareDashboardsOutsideOrganizationPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getShareDashboardsOutsideOrganizationPolicy', value: 'getShareDashboardsOutsideOrganizationPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getShareDashboardsOutsideOrganizationPolicy">
+<TabItem value="get">
 
 The Share Dashboards Outside Organization policy.
 
@@ -76,18 +77,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getShareDashboardsOutsideOrganizationPolicy"><CopyableCode code="getShareDashboardsOutsideOrganizationPolicy" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Get the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)</td>
+    <td>Get the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. &#91;Learn More&#93;(https:​//help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)</td>
 </tr>
 <tr>
-    <td><a href="#setShareDashboardsOutsideOrganizationPolicy"><CopyableCode code="setShareDashboardsOutsideOrganizationPolicy" /></a></td>
-    <td><CopyableCode code="exec" /></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-enabled"><code>enabled</code></a></td>
     <td></td>
-    <td>Set the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)</td>
+    <td>Set the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. &#91;Learn More&#93;(https:​//help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)</td>
 </tr>
 </tbody>
 </table>
@@ -108,7 +109,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -116,12 +117,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getShareDashboardsOutsideOrganizationPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getShareDashboardsOutsideOrganizationPolicy', value: 'getShareDashboardsOutsideOrganizationPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getShareDashboardsOutsideOrganizationPolicy">
+<TabItem value="get">
 
 Get the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)
 
@@ -129,33 +130,34 @@ Get the Share Dashboards Outside Organization policy. This policy allows users t
 SELECT
 enabled
 FROM sumologic.policies.share_dashboards_outside_organization
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
 </Tabs>
 
 
-## Lifecycle Methods
+## `UPDATE` examples
 
 <Tabs
-    defaultValue="setShareDashboardsOutsideOrganizationPolicy"
+    defaultValue="update"
     values={[
-        { label: 'setShareDashboardsOutsideOrganizationPolicy', value: 'setShareDashboardsOutsideOrganizationPolicy' }
+        { label: 'update', value: 'update' }
     ]}
 >
-<TabItem value="setShareDashboardsOutsideOrganizationPolicy">
+<TabItem value="update">
 
 Set the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)
 
 ```sql
-EXEC sumologic.policies.share_dashboards_outside_organization.setShareDashboardsOutsideOrganizationPolicy 
-@region='{{ region }}' --required 
-@@json=
-'{
-"enabled": {{ enabled }}
-}'
-;
+UPDATE sumologic.policies.share_dashboards_outside_organization
+SET 
+enabled = {{ enabled }}
+WHERE 
+region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND enabled = {{ enabled }} --required
+RETURNING
+enabled;
 ```
 </TabItem>
 </Tabs>

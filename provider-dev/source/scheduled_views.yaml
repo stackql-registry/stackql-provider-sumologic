@@ -1,0 +1,531 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Scheduled Views API
+  description: Scheduled views and their quota.
+  version: 1.0.0
+paths:
+  /v1/scheduledViews:
+    get:
+      tags:
+        - scheduledViewManagement
+      summary: Get a list of scheduled views.
+      description: Get a list of all scheduled views in the organization. The response is paginated with a default limit of 100 scheduled views per page.
+      operationId: listScheduledViews
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of scheduled views returned in the response. The number of scheduled views returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of scheduled views in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListScheduledViewsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - scheduledViewManagement
+      summary: Create a new scheduled view.
+      description: Creates a new scheduled view in the organization.
+      operationId: createScheduledView
+      parameters: []
+      requestBody:
+        description: Information about the new scheduled view.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduledViewDefinition'
+        required: true
+      responses:
+        '200':
+          description: The scheduled view has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledView'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-create: createScheduledView
+  /v1/scheduledViews/{id}:
+    get:
+      tags:
+        - scheduledViewManagement
+      summary: Get a scheduled view.
+      description: Get a scheduled view with the given identifier.
+      operationId: getScheduledView
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the scheduled view to fetch.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scheduled view object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledView'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-read: getScheduledView
+    put:
+      tags:
+        - scheduledViewManagement
+      summary: Update a scheduled view.
+      description: Update an existing scheduled view.
+      operationId: updateScheduledView
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the scheduled view to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the scheduled view.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduledViewDefinition'
+        required: true
+      responses:
+        '200':
+          description: The scheduled view was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledView'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-update: updateScheduledView
+  /v1/scheduledViews/{id}/disable:
+    delete:
+      tags:
+        - scheduledViewManagement
+      summary: Disable a scheduled view.
+      description: Disable a scheduled view with the given identifier.
+      operationId: disableScheduledView
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the scheduled view to disable.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The scheduled view was disabled successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-delete: deleteScheduledView
+  /v1/scheduledViews/{id}/pause:
+    post:
+      tags:
+        - scheduledViewManagement
+      summary: Pause a scheduled view.
+      description: Pause a scheduled view with the given identifier.
+      operationId: pauseScheduledView
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the scheduled view to pause.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The scheduled view was paused successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledView'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/scheduledViews/{id}/start:
+    post:
+      tags:
+        - scheduledViewManagement
+      summary: Start a scheduled view.
+      description: Start a scheduled view with the given identifier.
+      operationId: startScheduledView
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the scheduled view to start.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The scheduled view was started successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledView'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/scheduledViews/quota:
+    get:
+      tags:
+        - scheduledViewManagement
+      summary: Provides information about scheduled views quota.
+      description: Every customer can use a limited number of scheduled views. This endpoint allows learning about these limitations and remaining quota.
+      operationId: getScheduledViewsQuota
+      responses:
+        '200':
+          description: Current state of scheduled views quota usage (limit and remaining).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledViewsQuotaUsage'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListScheduledViewsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of scheduled views.
+          items:
+            $ref: '#/components/schemas/ScheduledView'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    CreateScheduledViewDefinition:
+      required:
+        - indexName
+        - query
+        - startTime
+      type: object
+      properties:
+        query:
+          maxLength: 16384
+          minLength: 1
+          type: string
+          description: The query that defines the data to be included in the scheduled view.
+          example: _sourceCategory=*/Apache
+        indexName:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Name of the index for the scheduled view.
+          example: TestScheduledView
+        startTime:
+          type: string
+          description: Start timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        retentionPeriod:
+          type: integer
+          description: The number of days to retain data in the scheduled view, or -1 to use the default value for your account. Only relevant if your account has multi-retention enabled.
+          format: int32
+          example: 60
+          default: -1
+        dataForwardingId:
+          type: string
+          description: An optional ID of a data forwarding configuration to be used by the scheduled view.
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+          x-pattern-message: should be either AutoParse or Manual
+        timeZone:
+          type: string
+          description: Time zone for ingesting data in scheduled view. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+          default: UTC
+        description:
+          maxLength: 65535
+          type: string
+          description: Description of the scheduled view.
+          default: ''
+    ScheduledView:
+      type: object
+      x-tf-generated-properties: id,query,indexName,startTime,retentionPeriod,parsingMode
+      x-tf-resource-name: ScheduledView
+      required:
+        - indexName
+        - query
+        - startTime
+        - id
+      properties:
+        query:
+          maxLength: 16384
+          minLength: 1
+          type: string
+          description: The query that defines the data to be included in the scheduled view.
+          example: _sourceCategory=*/Apache
+        indexName:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Name of the index for the scheduled view.
+          example: TestScheduledView
+        startTime:
+          type: string
+          description: Start timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        retentionPeriod:
+          type: integer
+          description: The number of days to retain data in the scheduled view, or -1 to use the default value for your account. Only relevant if your account has multi-retention enabled.
+          format: int32
+          example: 60
+          default: -1
+        dataForwardingId:
+          type: string
+          description: An optional ID of a data forwarding configuration to be used by the scheduled view.
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+          x-pattern-message: should be either AutoParse or Manual
+        timeZone:
+          type: string
+          description: Time zone for ingesting data in scheduled view. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+          default: UTC
+        description:
+          maxLength: 65535
+          type: string
+          description: Description of the scheduled view.
+          default: ''
+        newRetentionPeriod:
+          type: integer
+          description: If the retention period is scheduled to be updated in the future (i.e., if retention period is previously reduced with value of reduceRetentionPeriodImmediately as false), this property gives the future value of retention period while retentionPeriod gives the current value. retentionPeriod will take up the value of newRetentionPeriod after the scheduled time.
+          format: int32
+          example: 300
+        retentionEffectiveAt:
+          type: string
+          description: When the newRetentionPeriod will become effective in UTC format.
+          format: date-time
+        id:
+          type: string
+          description: Identifier for the scheduled view.
+        indexId:
+          type: string
+          description: The `id` of the Index where the output from Scheduled view is stored.
+          example: '1'
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC.
+          format: date-time
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdByOptimizeIt:
+          type: boolean
+          description: If the scheduled view is created by OptimizeIt.
+        error:
+          type: string
+          description: Errors related to the scheduled view.
+        status:
+          type: string
+          description: |-
+            Status of the scheduled view. Possible values are:
+              1. `NOT_STARTED`
+              2. `FILLING`
+              3. `STOPPED`
+              4. `COMPLETE`
+              5. `FAILED`
+              6. `PAUSED`
+        totalBytes:
+          type: integer
+          description: Total storage consumed by the scheduled view.
+          format: int64
+        totalMessageCount:
+          type: integer
+          description: Total number of messages for the scheduled view.
+          format: int64
+        createdBy:
+          type: string
+          description: Identifier of the user who created the scheduled view.
+          example: 0000000006743FE8
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        filledRanges:
+          type: array
+          description: List of the different units of filled ranges since the autoview has been created.
+          items:
+            $ref: '#/components/schemas/FilledRange'
+        lastAccessedAt:
+          type: string
+          description: Last accessed timestamp in UTC
+          format: date-time
+    UpdateScheduledViewDefinition:
+      type: object
+      properties:
+        dataForwardingId:
+          type: string
+          description: An optional ID of a data forwarding configuration to be used by the scheduled view.
+        retentionPeriod:
+          type: integer
+          description: The number of days to retain data in the scheduled view, or -1 to use the default value for your account.  Only relevant if your account has multi-retention. enabled.
+          format: int32
+          example: 365
+          default: -1
+        reduceRetentionPeriodImmediately:
+          type: boolean
+          description: This is required if the newly specified `retentionPeriod` is less than the existing retention period.  In such a situation, a value of `true` says that data between the existing retention period and the new retention period should be deleted immediately; if `false`, such data will be deleted after seven days. This property is optional and ignored if the specified `retentionPeriod` is greater than or equal to the current retention period.
+          default: false
+        timeZone:
+          type: string
+          description: Updates the time zone for ingesting data in scheduled view to the specified timezone ( does nothing if not specified ). Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        description:
+          maxLength: 65535
+          type: string
+          description: Description of the scheduled view.
+    ScheduledViewsQuotaUsage:
+      required:
+        - quota
+        - remaining
+      type: object
+      properties:
+        quota:
+          type: integer
+          description: Maximum number of Scheduled Views allowed.
+          format: int32
+          example: 200
+        remaining:
+          type: integer
+          description: Remaining number of Scheduled Views allowed.
+          format: int32
+          example: 121
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    ViewRetentionProperties:
+      type: object
+      properties:
+        newRetentionPeriod:
+          type: integer
+          description: If the retention period is scheduled to be updated in the future (i.e., if retention period is previously reduced with value of reduceRetentionPeriodImmediately as false), this property gives the future value of retention period while retentionPeriod gives the current value. retentionPeriod will take up the value of newRetentionPeriod after the scheduled time.
+          format: int32
+          example: 300
+        retentionEffectiveAt:
+          type: string
+          description: When the newRetentionPeriod will become effective in UTC format.
+          format: date-time
+    FilledRange:
+      required:
+        - endTime
+        - startTime
+      type: object
+      properties:
+        startTime:
+          type: string
+          description: Start of the timestamp for each unit of filled ranges, expressed in UTC.
+          format: date-time
+        endTime:
+          type: string
+          description: End of the timestamp for each unit of filled ranges, expressed in UTC.
+          format: date-time
+      description: Range of timestamps already filled since the autoview has been created.

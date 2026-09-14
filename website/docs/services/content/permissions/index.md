@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>permissions</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>permissions</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="permissions" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.content.permissions" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>permissions</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getContentPermissions"
+    defaultValue="get"
     values={[
-        { label: 'getContentPermissions', value: 'getContentPermissions' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getContentPermissions">
+<TabItem value="get">
 
 A list of permissions for the requested content item.
 
@@ -51,14 +52,14 @@ A list of permissions for the requested content item.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="explicitPermissions" /></td>
+    <td><CopyableCode code="explicit_permissions" /></td>
     <td><code>array</code></td>
-    <td>Explicitly assigned content permissions.</td>
+    <td>Explicitly assigned content permissions. (wire: explicitPermissions)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="implicitPermissions" /></td>
+    <td><CopyableCode code="implicit_permissions" /></td>
     <td><code>array</code></td>
-    <td>Implicitly inherited content permissions.</td>
+    <td>Implicitly inherited content permissions. (wire: implicitPermissions)</td>
 </tr>
 </tbody>
 </table>
@@ -81,11 +82,25 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getContentPermissions"><CopyableCode code="getContentPermissions" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td><a href="#parameter-explicitOnly"><code>explicitOnly</code></a>, <a href="#parameter-isAdminMode"><code>isAdminMode</code></a></td>
+    <td><a href="#parameter-explicit_only"><code>explicit_only</code></a>, <a href="#parameter-is_admin_mode"><code>is_admin_mode</code></a></td>
     <td>Returns content permissions of a content item with the given identifier.</td>
+</tr>
+<tr>
+    <td><a href="#add"><CopyableCode code="add" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-contentPermissionAssignments"><code>contentPermissionAssignments</code></a>, <a href="#parameter-notificationMessage"><code>notificationMessage</code></a>, <a href="#parameter-notifyRecipients"><code>notifyRecipients</code></a></td>
+    <td><a href="#parameter-isAdminMode"><code>isAdminMode</code></a></td>
+    <td>Add permissions to a content item with the given identifier.</td>
+</tr>
+<tr>
+    <td><a href="#remove"><CopyableCode code="remove" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-contentPermissionAssignments"><code>contentPermissionAssignments</code></a>, <a href="#parameter-notificationMessage"><code>notificationMessage</code></a>, <a href="#parameter-notifyRecipients"><code>notifyRecipients</code></a></td>
+    <td><a href="#parameter-isAdminMode"><code>isAdminMode</code></a></td>
+    <td>Remove permissions from a content item with the given identifier.</td>
 </tr>
 </tbody>
 </table>
@@ -111,17 +126,22 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
-<tr id="parameter-explicitOnly">
-    <td><CopyableCode code="explicitOnly" /></td>
+<tr id="parameter-explicit_only">
+    <td><CopyableCode code="explicit_only" /></td>
     <td><code>boolean</code></td>
-    <td>There are two permission types: explicit and implicit. Permissions specifically assigned to the content item are explicit. Permissions derived from a parent content item, like a folder are implicit. To return only explicit permissions set this to true.</td>
+    <td>There are two permission types: explicit and implicit. Permissions specifically assigned to the content item are explicit. Permissions derived from a parent content item, like a folder are implicit. To return only explicit permissions set this to true. (wire: explicitOnly)</td>
 </tr>
 <tr id="parameter-isAdminMode">
     <td><CopyableCode code="isAdminMode" /></td>
     <td><code>string</code></td>
     <td>Set this to "true" if you want to perform the request as a Content Administrator.</td>
+</tr>
+<tr id="parameter-is_admin_mode">
+    <td><CopyableCode code="is_admin_mode" /></td>
+    <td><code>string</code></td>
+    <td>Set this to "true" if you want to perform the request as a Content Administrator. (wire: isAdminMode)</td>
 </tr>
 </tbody>
 </table>
@@ -129,24 +149,74 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getContentPermissions"
+    defaultValue="get"
     values={[
-        { label: 'getContentPermissions', value: 'getContentPermissions' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getContentPermissions">
+<TabItem value="get">
 
 Returns content permissions of a content item with the given identifier.
 
 ```sql
 SELECT
-explicitPermissions,
-implicitPermissions
+explicit_permissions,
+implicit_permissions
 FROM sumologic.content.permissions
 WHERE id = '{{ id }}' -- required
-AND region = '{{ region }}' -- required
-AND explicitOnly = '{{ explicitOnly }}'
-AND isAdminMode = '{{ isAdminMode }}'
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+AND explicit_only = '{{ explicit_only }}'
+AND is_admin_mode = '{{ is_admin_mode }}'
+;
+```
+</TabItem>
+</Tabs>
+
+
+## Lifecycle Methods
+
+EXEC variables use wire (API) names.
+
+<Tabs
+    defaultValue="add"
+    values={[
+        { label: 'add', value: 'add' },
+        { label: 'remove', value: 'remove' }
+    ]}
+>
+<TabItem value="add">
+
+Add permissions to a content item with the given identifier.
+
+```sql
+EXEC sumologic.content.permissions.add 
+@id='{{ id }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set, 
+@isAdminMode='{{ isAdminMode }}' 
+@@json=
+'{
+"contentPermissionAssignments": "{{ contentPermissionAssignments }}", 
+"notifyRecipients": {{ notifyRecipients }}, 
+"notificationMessage": "{{ notificationMessage }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="remove">
+
+Remove permissions from a content item with the given identifier.
+
+```sql
+EXEC sumologic.content.permissions.remove 
+@id='{{ id }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set, 
+@isAdminMode='{{ isAdminMode }}' 
+@@json=
+'{
+"contentPermissionAssignments": "{{ contentPermissionAssignments }}", 
+"notifyRecipients": {{ notifyRecipients }}, 
+"notificationMessage": "{{ notificationMessage }}"
+}'
 ;
 ```
 </TabItem>

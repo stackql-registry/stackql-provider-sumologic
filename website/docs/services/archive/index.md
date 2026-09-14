@@ -25,9 +25,9 @@ total resources: __2__
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/archive/jobs/">jobs</a>
+<a href="/services/archive/job_counts/">job_counts</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/archive/jobs_count/">jobs_count</a>
+<a href="/services/archive/jobs/">jobs</a>
 </div>
 </div>

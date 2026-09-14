@@ -18,7 +18,7 @@ account service documentation.
 
 :::info[Service Summary]
 
-total resources: __4__  
+total resources: __6__  
 
 :::
 
@@ -26,10 +26,12 @@ total resources: __4__
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/account/account_owner/">account_owner</a><br />
+<a href="/services/account/pending_update_request/">pending_update_request</a><br />
 <a href="/services/account/status/">status</a>
 </div>
 <div class="providerDocColumn">
 <a href="/services/account/subdomain/">subdomain</a><br />
-<a href="/services/account/subdomain_recover/">subdomain_recover</a>
+<a href="/services/account/usage_forecast/">usage_forecast</a><br />
+<a href="/services/account/usage_reports/">usage_reports</a>
 </div>
 </div>

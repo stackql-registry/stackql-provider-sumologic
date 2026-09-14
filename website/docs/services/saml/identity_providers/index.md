@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>identity_providers</code> reso
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>identity_providers</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="identity_providers" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.saml.identity_providers" /></td></tr>
 </tbody></table>
@@ -32,14 +33,12 @@ Creates, updates, deletes, gets or lists an <code>identity_providers</code> reso
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getIdentityProviders"
+    defaultValue="list"
     values={[
-        { label: 'getIdentityProviders', value: 'getIdentityProviders' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getIdentityProviders">
-
-A list of SAML configurations in the organization.
+<TabItem value="list">
 
 <table>
 <thead>
@@ -56,14 +55,24 @@ A list of SAML configurations in the organization.
     <td>Unique identifier of the SAML Identity Provider. (example: 00000000361130F7)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="assertionConsumerUrl" /></td>
+    <td><CopyableCode code="entity_id" /></td>
     <td><code>string</code></td>
-    <td>The URL on Sumo Logic where the IdP will redirect to with its authentication response. (example: https://service.sumologic.com/sumo/saml/consume/9483922, default: )</td>
+    <td>A unique identifier that is the intended audience of the SAML assertion. (example: https:​//service.sumologic.com/sumo/saml/9483922, default: ) (wire: entityId)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="authnRequestUrl" /></td>
+    <td><CopyableCode code="configuration_name" /></td>
     <td><code>string</code></td>
-    <td>The URL that the identity provider has assigned for Sumo Logic to submit SAML authentication requests to the identity provider. (example: https://www.okta.com/app/sumologic/abxcseyuiwelflkdjh/sso/saml, default: )</td>
+    <td>Name of the SSO policy or another name used to describe the policy internally. (example: SumoLogic) (wire: configurationName)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="assertion_consumer_url" /></td>
+    <td><code>string</code></td>
+    <td>The URL on Sumo Logic where the IdP will redirect to with its authentication response. (example: https:​//service.sumologic.com/sumo/saml/consume/9483922, default: ) (wire: assertionConsumerUrl)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="authn_request_url" /></td>
+    <td><code>string</code></td>
+    <td>The URL that the identity provider has assigned for Sumo Logic to submit SAML authentication requests to the identity provider. (example: https:​//www.okta.com/app/sumologic/abxcseyuiwelflkdjh/sso/saml, default: ) (wire: authnRequestUrl)</td>
 </tr>
 <tr>
     <td><CopyableCode code="certificate" /></td>
@@ -71,109 +80,104 @@ A list of SAML configurations in the organization.
     <td>Authentication Request Signing Certificate for the user.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="configurationName" /></td>
-    <td><code>string</code></td>
-    <td>Name of the SSO policy or another name used to describe the policy internally. (example: SumoLogic)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00.000Z) (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource. (example: 0000000006743FDD)</td>
+    <td>Identifier of the user who created the resource. (example: 0000000006743FDD) (wire: createdBy)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="debugMode" /></td>
+    <td><CopyableCode code="debug_mode" /></td>
     <td><code>boolean</code></td>
-    <td>True if additional details are included when a user fails to sign in.</td>
+    <td>True if additional details are included when a user fails to sign in. (wire: debugMode)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="disableRequestedAuthnContext" /></td>
+    <td><CopyableCode code="disable_requested_authn_context" /></td>
     <td><code>boolean</code></td>
-    <td>True if Sumo Logic will include the RequestedAuthnContext element of the SAML AuthnRequests it sends to the identity provider.</td>
+    <td>True if Sumo Logic will include the RequestedAuthnContext element of the SAML AuthnRequests it sends to the identity provider. (wire: disableRequestedAuthnContext)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="emailAttribute" /></td>
+    <td><CopyableCode code="email_attribute" /></td>
     <td><code>string</code></td>
-    <td>The email address of the new user account. (example: attribute/subject, default: )</td>
+    <td>The email address of the new user account. (example: attribute/subject, default: ) (wire: emailAttribute)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="entityId" /></td>
-    <td><code>string</code></td>
-    <td>A unique identifier that is the intended audience of the SAML assertion. (example: https://service.sumologic.com/sumo/saml/9483922, default: )</td>
-</tr>
-<tr>
-    <td><CopyableCode code="isRedirectBinding" /></td>
+    <td><CopyableCode code="is_redirect_binding" /></td>
     <td><code>boolean</code></td>
-    <td>True if the SAML binding is of HTTP Redirect type.</td>
+    <td>True if the SAML binding is of HTTP Redirect type. (wire: isRedirectBinding)</td>
 </tr>
 <tr>
     <td><CopyableCode code="issuer" /></td>
     <td><code>string</code></td>
-    <td>The unique URL assigned to the organization by the SAML Identity Provider. (example: http://www.okta.com/abxcseyuiwelflkdjh)</td>
+    <td>The unique URL assigned to the organization by the SAML Identity Provider. (example: http:​//www.okta.com/abxcseyuiwelflkdjh)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="logoutEnabled" /></td>
+    <td><CopyableCode code="logout_enabled" /></td>
     <td><code>boolean</code></td>
-    <td>True if users are redirected to a URL after signing out of Sumo Logic.</td>
+    <td>True if users are redirected to a URL after signing out of Sumo Logic. (wire: logoutEnabled)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="logoutUrl" /></td>
+    <td><CopyableCode code="logout_url" /></td>
     <td><code>string</code></td>
-    <td>The URL that users will be redirected to after signing out of Sumo Logic. (example: https://www.sumologic.com, default: )</td>
+    <td>The URL that users will be redirected to after signing out of Sumo Logic. (example: https:​//www.sumologic.com, default: ) (wire: logoutUrl)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="metadata_url" /></td>
+    <td><code>string</code></td>
+    <td>The URL to fetch SAML metadata XML. (example: https:​//api.sumologic.com/api/v1/saml/identityProviders/00000000361130F7/metadata, default: ) (wire: metadataUrl)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00.000Z) (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8)</td>
+    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8) (wire: modifiedBy)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="onDemandProvisioningEnabled" /></td>
+    <td><CopyableCode code="on_demand_provisioning_enabled" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: onDemandProvisioningEnabled)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="rolesAttribute" /></td>
+    <td><CopyableCode code="roles_attribute" /></td>
     <td><code>string</code></td>
-    <td>The role that Sumo Logic will assign to users when they sign in. (example: Sumo_Role, default: )</td>
+    <td>The role that Sumo Logic will assign to users when they sign in. (example: Sumo_Role, default: ) (wire: rolesAttribute)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="signAuthnRequest" /></td>
+    <td><CopyableCode code="sign_authn_request" /></td>
     <td><code>boolean</code></td>
-    <td>True if Sumo Logic will send signed Authn requests to the identity provider.</td>
+    <td>True if Sumo Logic will send signed Authn requests to the identity provider. (wire: signAuthnRequest)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="spInitiatedLoginEnabled" /></td>
+    <td><CopyableCode code="sp_initiated_login_enabled" /></td>
     <td><code>boolean</code></td>
-    <td>True if Sumo Logic redirects users to your identity provider with a SAML AuthnRequest when signing in.</td>
+    <td>True if Sumo Logic redirects users to your identity provider with a SAML AuthnRequest when signing in. (wire: spInitiatedLoginEnabled)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="spInitiatedLoginPath" /></td>
+    <td><CopyableCode code="sp_initiated_login_path" /></td>
     <td><code>string</code></td>
-    <td>This property has been deprecated and is no longer used. (example: http://www.okta.com/abxcseyuiwelflkdjh, default: )</td>
+    <td>This property has been deprecated and is no longer used. (example: http:​//www.okta.com/abxcseyuiwelflkdjh, default: ) (wire: spInitiatedLoginPath)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="x509cert1" /></td>
+    <td><CopyableCode code="x_509cert_1" /></td>
     <td><code>string</code></td>
-    <td>The certificate is used to verify the signature in SAML assertions.</td>
+    <td>The certificate is used to verify the signature in SAML assertions. (wire: x509cert1)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="x509cert2" /></td>
+    <td><CopyableCode code="x_509cert_2" /></td>
     <td><code>string</code></td>
-    <td>The backup certificate used to verify the signature in SAML assertions when x509cert1 expires. (default: )</td>
+    <td>The backup certificate used to verify the signature in SAML assertions when x509cert1 expires. (default: ) (wire: x509cert2)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="x509cert3" /></td>
+    <td><CopyableCode code="x_509cert_3" /></td>
     <td><code>string</code></td>
-    <td>The backup certificate used to verify the signature in SAML assertions when x509cert1 expires and x509cert2 is empty. (default: )</td>
+    <td>The backup certificate used to verify the signature in SAML assertions when x509cert1 expires and x509cert2 is empty. (default: ) (wire: x509cert3)</td>
 </tr>
 </tbody>
 </table>
@@ -196,32 +200,32 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getIdentityProviders"><CopyableCode code="getIdentityProviders" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get a list of all SAML configurations in the organization.</td>
 </tr>
 <tr>
-    <td><a href="#createIdentityProvider"><CopyableCode code="createIdentityProvider" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__configurationName"><code>data__configurationName</code></a>, <a href="#parameter-data__issuer"><code>data__issuer</code></a>, <a href="#parameter-data__x509cert1"><code>data__x509cert1</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-configuration_name"><code>configuration_name</code></a>, <a href="#parameter-issuer"><code>issuer</code></a>, <a href="#parameter-x_509cert_1"><code>x_509cert_1</code></a></td>
     <td></td>
     <td>Create a new SAML configuration in the organization.</td>
 </tr>
 <tr>
-    <td><a href="#deleteIdentityProvider"><CopyableCode code="deleteIdentityProvider" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-configuration_name"><code>configuration_name</code></a>, <a href="#parameter-issuer"><code>issuer</code></a>, <a href="#parameter-x_509cert_1"><code>x_509cert_1</code></a></td>
+    <td></td>
+    <td>Update an existing SAML configuration in the organization.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Delete a SAML configuration with the given identifier from the organization.</td>
-</tr>
-<tr>
-    <td><a href="#updateIdentityProvider"><CopyableCode code="updateIdentityProvider" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-configurationName"><code>configurationName</code></a>, <a href="#parameter-issuer"><code>issuer</code></a>, <a href="#parameter-x509cert1"><code>x509cert1</code></a></td>
-    <td></td>
-    <td>Update an existing SAML configuration in the organization.</td>
 </tr>
 </tbody>
 </table>
@@ -242,12 +246,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-id">
     <td><CopyableCode code="id" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the SAML configuration to update.</td>
+    <td>Identifier of the SAML configuration to delete.</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -255,44 +259,45 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getIdentityProviders"
+    defaultValue="list"
     values={[
-        { label: 'getIdentityProviders', value: 'getIdentityProviders' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getIdentityProviders">
+<TabItem value="list">
 
 Get a list of all SAML configurations in the organization.
 
 ```sql
 SELECT
 id,
-assertionConsumerUrl,
-authnRequestUrl,
+entity_id,
+configuration_name,
+assertion_consumer_url,
+authn_request_url,
 certificate,
-configurationName,
-createdAt,
-createdBy,
-debugMode,
-disableRequestedAuthnContext,
-emailAttribute,
-entityId,
-isRedirectBinding,
+created_at,
+created_by,
+debug_mode,
+disable_requested_authn_context,
+email_attribute,
+is_redirect_binding,
 issuer,
-logoutEnabled,
-logoutUrl,
-modifiedAt,
-modifiedBy,
-onDemandProvisioningEnabled,
-rolesAttribute,
-signAuthnRequest,
-spInitiatedLoginEnabled,
-spInitiatedLoginPath,
-x509cert1,
-x509cert2,
-x509cert3
+logout_enabled,
+logout_url,
+metadata_url,
+modified_at,
+modified_by,
+on_demand_provisioning_enabled,
+roles_attribute,
+sign_authn_request,
+sp_initiated_login_enabled,
+sp_initiated_login_path,
+x_509cert_1,
+x_509cert_2,
+x_509cert_3
 FROM sumologic.saml.identity_providers
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -302,173 +307,248 @@ WHERE region = '{{ region }}' -- required
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createIdentityProvider"
+    defaultValue="create"
     values={[
-        { label: 'createIdentityProvider', value: 'createIdentityProvider' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createIdentityProvider">
+<TabItem value="create">
 
 Create a new SAML configuration in the organization.
 
 ```sql
 INSERT INTO sumologic.saml.identity_providers (
-data__spInitiatedLoginPath,
-data__configurationName,
-data__issuer,
-data__spInitiatedLoginEnabled,
-data__authnRequestUrl,
-data__x509cert1,
-data__x509cert2,
-data__x509cert3,
-data__onDemandProvisioningEnabled,
-data__rolesAttribute,
-data__logoutEnabled,
-data__logoutUrl,
-data__emailAttribute,
-data__debugMode,
-data__signAuthnRequest,
-data__disableRequestedAuthnContext,
-data__isRedirectBinding,
+sp_initiated_login_path,
+configuration_name,
+issuer,
+sp_initiated_login_enabled,
+authn_request_url,
+x_509cert_1,
+x_509cert_2,
+x_509cert_3,
+on_demand_provisioning_enabled,
+roles_attribute,
+logout_enabled,
+logout_url,
+email_attribute,
+debug_mode,
+sign_authn_request,
+disable_requested_authn_context,
+is_redirect_binding,
 region
 )
 SELECT 
-'{{ spInitiatedLoginPath }}',
-'{{ configurationName }}' /* required */,
+'{{ sp_initiated_login_path }}',
+'{{ configuration_name }}' /* required */,
 '{{ issuer }}' /* required */,
-{{ spInitiatedLoginEnabled }},
-'{{ authnRequestUrl }}',
-'{{ x509cert1 }}' /* required */,
-'{{ x509cert2 }}',
-'{{ x509cert3 }}',
-'{{ onDemandProvisioningEnabled }}',
-'{{ rolesAttribute }}',
-{{ logoutEnabled }},
-'{{ logoutUrl }}',
-'{{ emailAttribute }}',
-{{ debugMode }},
-{{ signAuthnRequest }},
-{{ disableRequestedAuthnContext }},
-{{ isRedirectBinding }},
+{{ sp_initiated_login_enabled }},
+'{{ authn_request_url }}',
+'{{ x_509cert_1 }}' /* required */,
+'{{ x_509cert_2 }}',
+'{{ x_509cert_3 }}',
+'{{ on_demand_provisioning_enabled }}',
+'{{ roles_attribute }}',
+{{ logout_enabled }},
+'{{ logout_url }}',
+'{{ email_attribute }}',
+{{ debug_mode }},
+{{ sign_authn_request }},
+{{ disable_requested_authn_context }},
+{{ is_redirect_binding }},
 '{{ region }}'
 RETURNING
 id,
-assertionConsumerUrl,
-authnRequestUrl,
+entity_id,
+configuration_name,
+assertion_consumer_url,
+authn_request_url,
 certificate,
-configurationName,
-createdAt,
-createdBy,
-debugMode,
-disableRequestedAuthnContext,
-emailAttribute,
-entityId,
-isRedirectBinding,
+created_at,
+created_by,
+debug_mode,
+disable_requested_authn_context,
+email_attribute,
+is_redirect_binding,
 issuer,
-logoutEnabled,
-logoutUrl,
-modifiedAt,
-modifiedBy,
-onDemandProvisioningEnabled,
-rolesAttribute,
-signAuthnRequest,
-spInitiatedLoginEnabled,
-spInitiatedLoginPath,
-x509cert1,
-x509cert2,
-x509cert3
+logout_enabled,
+logout_url,
+metadata_url,
+modified_at,
+modified_by,
+on_demand_provisioning_enabled,
+roles_attribute,
+sign_authn_request,
+sp_initiated_login_enabled,
+sp_initiated_login_path,
+x_509cert_1,
+x_509cert_2,
+x_509cert_3
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: identity_providers
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the identity_providers resource.
-    - name: spInitiatedLoginPath
-      value: string
+    - name: sp_initiated_login_path
+      value: "{{ sp_initiated_login_path }}"
       description: |
         This property has been deprecated and is no longer used.
       default: 
-    - name: configurationName
-      value: string
+    - name: configuration_name
+      value: "{{ configuration_name }}"
       description: |
         Name of the SSO policy or another name used to describe the policy internally.
     - name: issuer
-      value: string
+      value: "{{ issuer }}"
       description: |
         The unique URL assigned to the organization by the SAML Identity Provider.
-    - name: spInitiatedLoginEnabled
-      value: boolean
+    - name: sp_initiated_login_enabled
+      value: {{ sp_initiated_login_enabled }}
       description: |
         True if Sumo Logic redirects users to your identity provider with a SAML AuthnRequest when signing in.
       default: false
-    - name: authnRequestUrl
-      value: string
+    - name: authn_request_url
+      value: "{{ authn_request_url }}"
       description: |
         The URL that the identity provider has assigned for Sumo Logic to submit SAML authentication requests to the identity provider.
       default: 
-    - name: x509cert1
-      value: string
+    - name: x_509cert_1
+      value: "{{ x_509cert_1 }}"
       description: |
         The certificate is used to verify the signature in SAML assertions.
-    - name: x509cert2
-      value: string
+    - name: x_509cert_2
+      value: "{{ x_509cert_2 }}"
       description: |
         The backup certificate used to verify the signature in SAML assertions when x509cert1 expires.
       default: 
-    - name: x509cert3
-      value: string
+    - name: x_509cert_3
+      value: "{{ x_509cert_3 }}"
       description: |
         The backup certificate used to verify the signature in SAML assertions when x509cert1 expires and x509cert2 is empty.
       default: 
-    - name: onDemandProvisioningEnabled
-      value: object
-    - name: rolesAttribute
-      value: string
+    - name: on_demand_provisioning_enabled
+      value:
+        firstNameAttribute: "{{ firstNameAttribute }}"
+        lastNameAttribute: "{{ lastNameAttribute }}"
+        onDemandProvisioningRoles:
+          - "{{ onDemandProvisioningRoles }}"
+    - name: roles_attribute
+      value: "{{ roles_attribute }}"
       description: |
         The role that Sumo Logic will assign to users when they sign in.
       default: 
-    - name: logoutEnabled
-      value: boolean
+    - name: logout_enabled
+      value: {{ logout_enabled }}
       description: |
         True if users are redirected to a URL after signing out of Sumo Logic.
       default: false
-    - name: logoutUrl
-      value: string
+    - name: logout_url
+      value: "{{ logout_url }}"
       description: |
         The URL that users will be redirected to after signing out of Sumo Logic.
       default: 
-    - name: emailAttribute
-      value: string
+    - name: email_attribute
+      value: "{{ email_attribute }}"
       description: |
         The email address of the new user account.
       default: 
-    - name: debugMode
-      value: boolean
+    - name: debug_mode
+      value: {{ debug_mode }}
       description: |
         True if additional details are included when a user fails to sign in.
       default: false
-    - name: signAuthnRequest
-      value: boolean
+    - name: sign_authn_request
+      value: {{ sign_authn_request }}
       description: |
         True if Sumo Logic will send signed Authn requests to the identity provider.
       default: false
-    - name: disableRequestedAuthnContext
-      value: boolean
+    - name: disable_requested_authn_context
+      value: {{ disable_requested_authn_context }}
       description: |
         True if Sumo Logic will include the RequestedAuthnContext element of the SAML AuthnRequests it sends to the identity provider.
       default: false
-    - name: isRedirectBinding
-      value: boolean
+    - name: is_redirect_binding
+      value: {{ is_redirect_binding }}
       description: |
         True if the SAML binding is of HTTP Redirect type.
       default: false
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update an existing SAML configuration in the organization.
+
+```sql
+UPDATE sumologic.saml.identity_providers
+SET 
+sp_initiated_login_path = '{{ sp_initiated_login_path }}',
+configuration_name = '{{ configuration_name }}',
+issuer = '{{ issuer }}',
+sp_initiated_login_enabled = {{ sp_initiated_login_enabled }},
+authn_request_url = '{{ authn_request_url }}',
+x_509cert_1 = '{{ x_509cert_1 }}',
+x_509cert_2 = '{{ x_509cert_2 }}',
+x_509cert_3 = '{{ x_509cert_3 }}',
+on_demand_provisioning_enabled = '{{ on_demand_provisioning_enabled }}',
+roles_attribute = '{{ roles_attribute }}',
+logout_enabled = {{ logout_enabled }},
+logout_url = '{{ logout_url }}',
+email_attribute = '{{ email_attribute }}',
+debug_mode = {{ debug_mode }},
+sign_authn_request = {{ sign_authn_request }},
+disable_requested_authn_context = {{ disable_requested_authn_context }},
+is_redirect_binding = {{ is_redirect_binding }}
+WHERE 
+id = '{{ id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND configuration_name = '{{ configuration_name }}' --required
+AND issuer = '{{ issuer }}' --required
+AND x_509cert_1 = '{{ x_509cert_1 }}' --required
+RETURNING
+id,
+entity_id,
+configuration_name,
+assertion_consumer_url,
+authn_request_url,
+certificate,
+created_at,
+created_by,
+debug_mode,
+disable_requested_authn_context,
+email_attribute,
+is_redirect_binding,
+issuer,
+logout_enabled,
+logout_url,
+metadata_url,
+modified_at,
+modified_by,
+on_demand_provisioning_enabled,
+roles_attribute,
+sign_authn_request,
+sp_initiated_login_enabled,
+sp_initiated_login_path,
+x_509cert_1,
+x_509cert_2,
+x_509cert_3;
 ```
 </TabItem>
 </Tabs>
@@ -477,61 +557,19 @@ x509cert3
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteIdentityProvider"
+    defaultValue="delete"
     values={[
-        { label: 'deleteIdentityProvider', value: 'deleteIdentityProvider' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteIdentityProvider">
+<TabItem value="delete">
 
 Delete a SAML configuration with the given identifier from the organization.
 
 ```sql
 DELETE FROM sumologic.saml.identity_providers
 WHERE id = '{{ id }}' --required
-AND region = '{{ region }}' --required
-;
-```
-</TabItem>
-</Tabs>
-
-
-## Lifecycle Methods
-
-<Tabs
-    defaultValue="updateIdentityProvider"
-    values={[
-        { label: 'updateIdentityProvider', value: 'updateIdentityProvider' }
-    ]}
->
-<TabItem value="updateIdentityProvider">
-
-Update an existing SAML configuration in the organization.
-
-```sql
-EXEC sumologic.saml.identity_providers.updateIdentityProvider 
-@id='{{ id }}' --required, 
-@region='{{ region }}' --required 
-@@json=
-'{
-"spInitiatedLoginPath": "{{ spInitiatedLoginPath }}", 
-"configurationName": "{{ configurationName }}", 
-"issuer": "{{ issuer }}", 
-"spInitiatedLoginEnabled": {{ spInitiatedLoginEnabled }}, 
-"authnRequestUrl": "{{ authnRequestUrl }}", 
-"x509cert1": "{{ x509cert1 }}", 
-"x509cert2": "{{ x509cert2 }}", 
-"x509cert3": "{{ x509cert3 }}", 
-"onDemandProvisioningEnabled": "{{ onDemandProvisioningEnabled }}", 
-"rolesAttribute": "{{ rolesAttribute }}", 
-"logoutEnabled": {{ logoutEnabled }}, 
-"logoutUrl": "{{ logoutUrl }}", 
-"emailAttribute": "{{ emailAttribute }}", 
-"debugMode": {{ debugMode }}, 
-"signAuthnRequest": {{ signAuthnRequest }}, 
-"disableRequestedAuthnContext": {{ disableRequestedAuthnContext }}, 
-"isRedirectBinding": {{ isRedirectBinding }}
-}'
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

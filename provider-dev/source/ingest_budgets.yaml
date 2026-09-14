@@ -1,0 +1,396 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Ingest Budgets API
+  description: Ingest budgets (v2) and their usage reset.
+  version: 1.0.0
+paths:
+  /v2/ingestBudgets:
+    get:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Get a list of ingest budgets.
+      description: Get a list of all ingest budgets. The response is paginated with a default limit of 100 budgets per page.
+      operationId: listIngestBudgetsV2
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of budgets returned in the response. The number of budgets returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of budgets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListIngestBudgetsResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Create a new ingest budget.
+      description: Create a new ingest budget.
+      operationId: createIngestBudgetV2
+      parameters: []
+      requestBody:
+        description: Information about the new ingest budget.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestBudgetDefinitionV2'
+        required: true
+      responses:
+        '200':
+          description: The ingest budget has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestBudgetV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/ingestBudgets/{id}:
+    get:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Get an ingest budget.
+      description: Get an ingest budget by the given identifier.
+      operationId: getIngestBudgetV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of ingest budget to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ingest budget object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestBudgetV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Update an ingest budget.
+      description: Update an existing ingest budget. All properties specified in the request are required.
+      operationId: updateIngestBudgetV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the ingest budget to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the ingest budget.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestBudgetDefinitionV2'
+        required: true
+      responses:
+        '200':
+          description: The ingest budget was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestBudgetV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Delete an ingest budget.
+      description: Delete an ingest budget with the given identifier.
+      operationId: deleteIngestBudgetV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the ingest budget to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The ingest budget was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/ingestBudgets/{id}/usage/reset:
+    post:
+      tags:
+        - ingestBudgetManagementV2
+      summary: Reset usage.
+      description: Reset ingest budget's current usage to 0 before the scheduled reset time. This is only applicable to `dailyVolume` budgetType.
+      operationId: resetUsageV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the ingest budget to reset usage.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ingest budget's usage was reset successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListIngestBudgetsResponseV2:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of ingest budgets.
+          items:
+            $ref: '#/components/schemas/IngestBudgetV2'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    IngestBudgetDefinitionV2:
+      required:
+        - action
+        - capacityBytes
+        - name
+        - scope
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Display name of the ingest budget.
+          example: Developer Budget
+        scope:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: A scope is a constraint that will be used to identify the messages on which budget needs to be applied. A scope is consists of key and value separated by =. The field must be enabled in the fields table. Value supports wildcard. e.g. _sourceCategory=*prod*payment*, cluster=kafka. If the scope is defined _sourceCategory=*nginx* in this budget will be applied on messages having fields _sourceCategory=prod/nginx, _sourceCategory=dev/nginx, or _sourceCategory=dev/nginx/error
+          example: _sourceCategory=*prod*nginx*
+        capacityBytes:
+          minimum: 1
+          type: integer
+          description: Capacity of the ingest budget, in bytes. It takes a few minutes for Collectors to stop collecting when capacity is reached. We recommend setting a soft limit that is lower than your needed hard limit. The capacity bytes unit varies based on the budgetType field. For `dailyVolume` budgetType the capacity specified is in bytes/day whereas for `minuteVolume` budgetType its bytes/min.
+          format: int64
+          example: 1000
+        timezone:
+          type: string
+          description: Time zone of the reset time for the ingest budget. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+          default: Etc/UTC
+        resetTime:
+          maxLength: 5
+          minLength: 5
+          type: string
+          description: Reset time of the ingest budget in HH:MM format.
+          example: '23:30'
+          default: '00:00'
+        description:
+          maxLength: 1024
+          minLength: 0
+          type: string
+          description: Description of the ingest budget.
+        action:
+          pattern: ^(keepCollecting|stopCollecting)$
+          type: string
+          description: |-
+            Action to take when ingest budget's capacity is reached. All actions are audited. Supported values are:
+              * `stopCollecting`
+              * `keepCollecting`
+          example: stopCollecting
+          x-pattern-message: must be either `keepCollecting` or `stopCollecting`
+        auditThreshold:
+          maximum: 99
+          minimum: 1
+          type: integer
+          description: The threshold as a percentage of when an ingest budget's capacity usage is logged in the Audit Index.
+          format: int32
+          example: 85
+    IngestBudgetV2:
+      type: object
+      required:
+        - action
+        - capacityBytes
+        - name
+        - scope
+        - createdAt
+        - createdBy
+        - id
+        - modifiedAt
+        - modifiedBy
+        - version
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Display name of the ingest budget.
+          example: Developer Budget
+        scope:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: A scope is a constraint that will be used to identify the messages on which budget needs to be applied. A scope is consists of key and value separated by =. The field must be enabled in the fields table. Value supports wildcard. e.g. _sourceCategory=*prod*payment*, cluster=kafka. If the scope is defined _sourceCategory=*nginx* in this budget will be applied on messages having fields _sourceCategory=prod/nginx, _sourceCategory=dev/nginx, or _sourceCategory=dev/nginx/error
+          example: _sourceCategory=*prod*nginx*
+        capacityBytes:
+          minimum: 1
+          type: integer
+          description: Capacity of the ingest budget, in bytes. It takes a few minutes for Collectors to stop collecting when capacity is reached. We recommend setting a soft limit that is lower than your needed hard limit. The capacity bytes unit varies based on the budgetType field. For `dailyVolume` budgetType the capacity specified is in bytes/day whereas for `minuteVolume` budgetType its bytes/min.
+          format: int64
+          example: 1000
+        timezone:
+          type: string
+          description: Time zone of the reset time for the ingest budget. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+          default: Etc/UTC
+        resetTime:
+          maxLength: 5
+          minLength: 5
+          type: string
+          description: Reset time of the ingest budget in HH:MM format.
+          example: '23:30'
+          default: '00:00'
+        description:
+          maxLength: 1024
+          minLength: 0
+          type: string
+          description: Description of the ingest budget.
+        action:
+          pattern: ^(keepCollecting|stopCollecting)$
+          type: string
+          description: |-
+            Action to take when ingest budget's capacity is reached. All actions are audited. Supported values are:
+              * `stopCollecting`
+              * `keepCollecting`
+          example: stopCollecting
+          x-pattern-message: must be either `keepCollecting` or `stopCollecting`
+        auditThreshold:
+          maximum: 99
+          minimum: 1
+          type: integer
+          description: The threshold as a percentage of when an ingest budget's capacity usage is logged in the Audit Index.
+          format: int32
+          example: 85
+        id:
+          type: string
+          description: Unique identifier for the ingest budget.
+          example: 0000000003343FDD
+        usageBytes:
+          type: integer
+          description: Current usage since the last reset, in bytes.
+          format: int64
+          example: 900
+        usageStatus:
+          pattern: ^(Normal|Approaching|Exceeded|Unknown)$
+          type: string
+          description: Status of the current usage. Can be `Normal`, `Approaching`, `Exceeded`, or `Unknown` (unable to retrieve usage).
+          example: Approaching
+          x-pattern-message: must be either `Normal`, `Approaching`, `Exceeded`, or `Unknown`
+        createdAt:
+          type: string
+          description: The creation timestamp in UTC of the Ingest Budget.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: The identifier of the user who created the Ingest Budget.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: The modified timestamp in UTC of the Ingest Budget.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: The identifier of the user who modified the Ingest Budget.
+          example: 0000000001243FDD
+        budgetVersion:
+          type: integer
+          description: The version of the Ingest Budget
+          format: int32
+          example: 2
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5

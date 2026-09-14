@@ -26,10 +26,10 @@ total resources: __4__
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/saml/allowlisted_users/">allowlisted_users</a><br />
-<a href="/services/saml/identity_providers/">identity_providers</a>
+<a href="/services/saml/identity_provider_metadata/">identity_provider_metadata</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/saml/lockdown_disable/">lockdown_disable</a><br />
-<a href="/services/saml/lockdown_enable/">lockdown_enable</a>
+<a href="/services/saml/identity_providers/">identity_providers</a><br />
+<a href="/services/saml/lockdown/">lockdown</a>
 </div>
 </div>

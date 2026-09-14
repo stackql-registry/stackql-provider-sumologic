@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>dynamic_parsing_rules</code> re
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>dynamic_parsing_rules</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="dynamic_parsing_rules" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.dynamic_parsing_rules.dynamic_parsing_rules" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists a <code>dynamic_parsing_rules</code> re
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getDynamicParsingRule"
+    defaultValue="get"
     values={[
-        { label: 'getDynamicParsingRule', value: 'getDynamicParsingRule' },
-        { label: 'listDynamicParsingRules', value: 'listDynamicParsingRules' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getDynamicParsingRule">
+<TabItem value="get">
 
 Dynamic parsing rule object that was requested.
 
@@ -62,14 +63,14 @@ Dynamic parsing rule object that was requested.
     <td>Name of the dynamic parsing rule. Use a name that makes it easy to identify the rule. (example: DynamicParsingRule123)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (dateTime)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource.</td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="enabled" /></td>
@@ -77,19 +78,19 @@ Dynamic parsing rule object that was requested.
     <td>Is the dynamic parsing rule enabled.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="isSystemRule" /></td>
+    <td><CopyableCode code="is_system_rule" /></td>
     <td><code>boolean</code></td>
-    <td>Whether the rule has been defined by the system, rather than by a user.</td>
+    <td>Whether the rule has been defined by the system, rather than by a user. (wire: isSystemRule)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (dateTime)</code></td>
-    <td>Last modification timestamp in UTC.</td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource.</td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="scope" /></td>
@@ -99,7 +100,7 @@ Dynamic parsing rule object that was requested.
 </tbody>
 </table>
 </TabItem>
-<TabItem value="listDynamicParsingRules">
+<TabItem value="list">
 
 A paginated list of dynamic parsing rules.
 
@@ -113,14 +114,49 @@ A paginated list of dynamic parsing rules.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="data" /></td>
-    <td><code>array</code></td>
-    <td>List of dynamic parsing rules.</td>
+    <td><CopyableCode code="id" /></td>
+    <td><code>string</code></td>
+    <td>Unique identifier for the dynamic parsing rule. (example: 0000000001C41EE4)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="next" /></td>
+    <td><CopyableCode code="name" /></td>
     <td><code>string</code></td>
-    <td>Next continuation token. (example: 0000000001C51FF7)</td>
+    <td>Name of the dynamic parsing rule. Use a name that makes it easy to identify the rule. (example: DynamicParsingRule123)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_at" /></td>
+    <td><code>string (dateTime)</code></td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (wire: createdAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="enabled" /></td>
+    <td><code>boolean</code></td>
+    <td>Is the dynamic parsing rule enabled.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="is_system_rule" /></td>
+    <td><code>boolean</code></td>
+    <td>Whether the rule has been defined by the system, rather than by a user. (wire: isSystemRule)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_at" /></td>
+    <td><code>string (dateTime)</code></td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="scope" /></td>
+    <td><code>string</code></td>
+    <td>Scope of the dynamic parsing rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule. (example: _sourceHost=127.0.0.1)</td>
 </tr>
 </tbody>
 </table>
@@ -143,39 +179,39 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getDynamicParsingRule"><CopyableCode code="getDynamicParsingRule" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get a dynamic parsing rule with the given identifier.</td>
 </tr>
 <tr>
-    <td><a href="#listDynamicParsingRules"><CopyableCode code="listDynamicParsingRules" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
     <td>Get a list of all dynamic parsing rules. The response is paginated with a default limit of 100 dynamic parsing rules per page.</td>
 </tr>
 <tr>
-    <td><a href="#createDynamicParsingRule"><CopyableCode code="createDynamicParsingRule" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__enabled"><code>data__enabled</code></a>, <a href="#parameter-data__name"><code>data__name</code></a>, <a href="#parameter-data__scope"><code>data__scope</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-enabled"><code>enabled</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-scope"><code>scope</code></a></td>
     <td></td>
     <td>Create a new dynamic parsing rule.</td>
 </tr>
 <tr>
-    <td><a href="#deleteDynamicParsingRule"><CopyableCode code="deleteDynamicParsingRule" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-enabled"><code>enabled</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-scope"><code>scope</code></a></td>
+    <td></td>
+    <td>Update an existing dynamic parsing rule. All properties specified in the request are replaced. Missing properties are set to their default values.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Delete a dynamic parsing rule with the given identifier.</td>
-</tr>
-<tr>
-    <td><a href="#updateDynamicParsingRule"><CopyableCode code="updateDynamicParsingRule" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-enabled"><code>enabled</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-scope"><code>scope</code></a></td>
-    <td></td>
-    <td>Update an existing dynamic parsing rule. All properties specified in the request are replaced. Missing properties are set to their default values.</td>
 </tr>
 </tbody>
 </table>
@@ -196,12 +232,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-id">
     <td><CopyableCode code="id" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the dynamic parsing rule to update.</td>
+    <td>Identifier of the dynamic parsing rule to delete.</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
@@ -219,13 +255,13 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getDynamicParsingRule"
+    defaultValue="get"
     values={[
-        { label: 'getDynamicParsingRule', value: 'getDynamicParsingRule' },
-        { label: 'listDynamicParsingRules', value: 'listDynamicParsingRules' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getDynamicParsingRule">
+<TabItem value="get">
 
 Get a dynamic parsing rule with the given identifier.
 
@@ -233,29 +269,36 @@ Get a dynamic parsing rule with the given identifier.
 SELECT
 id,
 name,
-createdAt,
-createdBy,
+created_at,
+created_by,
 enabled,
-isSystemRule,
-modifiedAt,
-modifiedBy,
+is_system_rule,
+modified_at,
+modified_by,
 scope
 FROM sumologic.dynamic_parsing_rules.dynamic_parsing_rules
 WHERE id = '{{ id }}' -- required
-AND region = '{{ region }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
-<TabItem value="listDynamicParsingRules">
+<TabItem value="list">
 
 Get a list of all dynamic parsing rules. The response is paginated with a default limit of 100 dynamic parsing rules per page.
 
 ```sql
 SELECT
-data,
-next
+id,
+name,
+created_at,
+created_by,
+enabled,
+is_system_rule,
+modified_at,
+modified_by,
+scope
 FROM sumologic.dynamic_parsing_rules.dynamic_parsing_rules
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 AND limit = '{{ limit }}'
 AND token = '{{ token }}'
 ;
@@ -267,21 +310,21 @@ AND token = '{{ token }}'
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createDynamicParsingRule"
+    defaultValue="create"
     values={[
-        { label: 'createDynamicParsingRule', value: 'createDynamicParsingRule' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createDynamicParsingRule">
+<TabItem value="create">
 
 Create a new dynamic parsing rule.
 
 ```sql
 INSERT INTO sumologic.dynamic_parsing_rules.dynamic_parsing_rules (
-data__name,
-data__scope,
-data__enabled,
+name,
+scope,
+enabled,
 region
 )
 SELECT 
@@ -292,38 +335,77 @@ SELECT
 RETURNING
 id,
 name,
-createdAt,
-createdBy,
+created_at,
+created_by,
 enabled,
-isSystemRule,
-modifiedAt,
-modifiedBy,
+is_system_rule,
+modified_at,
+modified_by,
 scope
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: dynamic_parsing_rules
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the dynamic_parsing_rules resource.
     - name: name
-      value: string
+      value: "{{ name }}"
       description: |
         Name of the dynamic parsing rule. Use a name that makes it easy to identify the rule.
     - name: scope
-      value: string
+      value: "{{ scope }}"
       description: |
         Scope of the dynamic parsing rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule.
     - name: enabled
-      value: boolean
+      value: {{ enabled }}
       description: |
         Is the dynamic parsing rule enabled.
       default: true
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update an existing dynamic parsing rule. All properties specified in the request are replaced. Missing properties are set to their default values.
+
+```sql
+UPDATE sumologic.dynamic_parsing_rules.dynamic_parsing_rules
+SET 
+name = '{{ name }}',
+scope = '{{ scope }}',
+enabled = {{ enabled }}
+WHERE 
+id = '{{ id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND enabled = {{ enabled }} --required
+AND name = '{{ name }}' --required
+AND scope = '{{ scope }}' --required
+RETURNING
+id,
+name,
+created_at,
+created_by,
+enabled,
+is_system_rule,
+modified_at,
+modified_by,
+scope;
 ```
 </TabItem>
 </Tabs>
@@ -332,47 +414,19 @@ scope
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteDynamicParsingRule"
+    defaultValue="delete"
     values={[
-        { label: 'deleteDynamicParsingRule', value: 'deleteDynamicParsingRule' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteDynamicParsingRule">
+<TabItem value="delete">
 
 Delete a dynamic parsing rule with the given identifier.
 
 ```sql
 DELETE FROM sumologic.dynamic_parsing_rules.dynamic_parsing_rules
 WHERE id = '{{ id }}' --required
-AND region = '{{ region }}' --required
-;
-```
-</TabItem>
-</Tabs>
-
-
-## Lifecycle Methods
-
-<Tabs
-    defaultValue="updateDynamicParsingRule"
-    values={[
-        { label: 'updateDynamicParsingRule', value: 'updateDynamicParsingRule' }
-    ]}
->
-<TabItem value="updateDynamicParsingRule">
-
-Update an existing dynamic parsing rule. All properties specified in the request are replaced. Missing properties are set to their default values.
-
-```sql
-EXEC sumologic.dynamic_parsing_rules.dynamic_parsing_rules.updateDynamicParsingRule 
-@id='{{ id }}' --required, 
-@region='{{ region }}' --required 
-@@json=
-'{
-"name": "{{ name }}", 
-"scope": "{{ scope }}", 
-"enabled": {{ enabled }}
-}'
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>connections</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>connections</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="connections" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.connections.connections" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists a <code>connections</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getConnection"
+    defaultValue="get"
     values={[
-        { label: 'getConnection', value: 'getConnection' },
-        { label: 'listConnections', value: 'listConnections' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getConnection">
+<TabItem value="get">
 
 Connection object that was requested.
 
@@ -62,14 +63,14 @@ Connection object that was requested.
     <td>Name of the connection.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource.</td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="description" /></td>
@@ -77,14 +78,14 @@ Connection object that was requested.
     <td>Description of the connection.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC.</td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource.</td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="type" /></td>
@@ -94,7 +95,7 @@ Connection object that was requested.
 </tbody>
 </table>
 </TabItem>
-<TabItem value="listConnections">
+<TabItem value="list">
 
 A paginated list of connections in the organization.
 
@@ -108,14 +109,44 @@ A paginated list of connections in the organization.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="data" /></td>
-    <td><code>array</code></td>
-    <td>List of connections.</td>
+    <td><CopyableCode code="id" /></td>
+    <td><code>string</code></td>
+    <td>Unique identifier for the connection.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="next" /></td>
+    <td><CopyableCode code="name" /></td>
     <td><code>string</code></td>
-    <td>Next continuation token.</td>
+    <td>Name of the connection.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_at" /></td>
+    <td><code>string (date-time)</code></td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (wire: createdAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="description" /></td>
+    <td><code>string</code></td>
+    <td>Description of the connection.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_at" /></td>
+    <td><code>string (date-time)</code></td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="modified_by" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="type" /></td>
+    <td><code>string</code></td>
+    <td>Type of connection. Valid values are `WebhookConnection`, `ServiceNowConnection`.</td>
 </tr>
 </tbody>
 </table>
@@ -138,39 +169,53 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getConnection"><CopyableCode code="getConnection" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-type"><code>type</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-type"><code>type</code></a></td>
     <td>Get a connection with the given identifier.</td>
 </tr>
 <tr>
-    <td><a href="#listConnections"><CopyableCode code="listConnections" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
     <td>Get a list of all connections in the organization. The response is paginated with a default limit of 100 connections per page.</td>
 </tr>
 <tr>
-    <td><a href="#createConnection"><CopyableCode code="createConnection" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__name"><code>data__name</code></a>, <a href="#parameter-data__type"><code>data__type</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-type"><code>type</code></a></td>
     <td></td>
     <td>Create a new connection in the organization.</td>
 </tr>
 <tr>
-    <td><a href="#deleteConnection"><CopyableCode code="deleteConnection" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-type"><code>type</code></a></td>
+    <td></td>
+    <td>Update an existing connection.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-type"><code>type</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Delete a connection with the given identifier.</td>
 </tr>
 <tr>
-    <td><a href="#updateConnection"><CopyableCode code="updateConnection" /></a></td>
+    <td><a href="#test"><CopyableCode code="test" /></a></td>
     <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-type"><code>type</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-type"><code>type</code></a></td>
+    <td><a href="#parameter-functionalities"><code>functionalities</code></a>, <a href="#parameter-connectionId"><code>connectionId</code></a></td>
+    <td>Test a new connection url is valid and can connect.</td>
+</tr>
+<tr>
+    <td><a href="#get_incident_templates"><CopyableCode code="get_incident_templates" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Update an existing connection.</td>
+    <td>Get incident templates for CloudSOAR connections.</td>
 </tr>
 </tbody>
 </table>
@@ -191,17 +236,27 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-id">
     <td><CopyableCode code="id" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the connection to update.</td>
+    <td>Identifier of the connection to delete.</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 <tr id="parameter-type">
     <td><CopyableCode code="type" /></td>
     <td><code>string</code></td>
     <td>Type of connection to delete. Valid values are `WebhookConnection`, `ServiceNowConnection`.</td>
+</tr>
+<tr id="parameter-connectionId">
+    <td><CopyableCode code="connectionId" /></td>
+    <td><code>string</code></td>
+    <td>Unique identifier of an existing connection to test. It should be provided when the request body of an existing connection contains masked authorization headers. If not provided, the authorization headers will not be correctly unmasked, and the test may fail due to unauthorized access. (example: 0000000000123ABC)</td>
+</tr>
+<tr id="parameter-functionalities">
+    <td><CopyableCode code="functionalities" /></td>
+    <td><code>array</code></td>
+    <td>A comma-separated functionalities of webhook payload to test. Acceptable values: `alert`, `resolution`. (example: alert,resolution)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
@@ -213,19 +268,24 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.</td>
 </tr>
+<tr id="parameter-type">
+    <td><CopyableCode code="type" /></td>
+    <td><code>string</code></td>
+    <td>Type of connection to return. Valid values are `WebhookConnection`, `ServiceNowConnection`.</td>
+</tr>
 </tbody>
 </table>
 
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getConnection"
+    defaultValue="get"
     values={[
-        { label: 'getConnection', value: 'getConnection' },
-        { label: 'listConnections', value: 'listConnections' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getConnection">
+<TabItem value="get">
 
 Get a connection with the given identifier.
 
@@ -233,29 +293,35 @@ Get a connection with the given identifier.
 SELECT
 id,
 name,
-createdAt,
-createdBy,
+created_at,
+created_by,
 description,
-modifiedAt,
-modifiedBy,
+modified_at,
+modified_by,
 type
 FROM sumologic.connections.connections
 WHERE id = '{{ id }}' -- required
-AND type = '{{ type }}' -- required
-AND region = '{{ region }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+AND type = '{{ type }}'
 ;
 ```
 </TabItem>
-<TabItem value="listConnections">
+<TabItem value="list">
 
 Get a list of all connections in the organization. The response is paginated with a default limit of 100 connections per page.
 
 ```sql
 SELECT
-data,
-next
+id,
+name,
+created_at,
+created_by,
+description,
+modified_at,
+modified_by,
+type
 FROM sumologic.connections.connections
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 AND limit = '{{ limit }}'
 AND token = '{{ token }}'
 ;
@@ -267,21 +333,21 @@ AND token = '{{ token }}'
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createConnection"
+    defaultValue="create"
     values={[
-        { label: 'createConnection', value: 'createConnection' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createConnection">
+<TabItem value="create">
 
 Create a new connection in the organization.
 
 ```sql
 INSERT INTO sumologic.connections.connections (
-data__type,
-data__name,
-data__description,
+type,
+name,
+description,
 region
 )
 SELECT 
@@ -292,37 +358,74 @@ SELECT
 RETURNING
 id,
 name,
-createdAt,
-createdBy,
+created_at,
+created_by,
 description,
-modifiedAt,
-modifiedBy,
+modified_at,
+modified_by,
 type
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: connections
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the connections resource.
     - name: type
-      value: string
+      value: "{{ type }}"
       description: |
-        Type of connection. Valid values are `WebhookDefinition`, `ServiceNowDefinition`.
+        Type of connection. Valid values are \`WebhookDefinition\`, \`ServiceNowDefinition\`.
     - name: name
-      value: string
+      value: "{{ name }}"
       description: |
         Name of the connection.
     - name: description
-      value: string
+      value: "{{ description }}"
       description: |
         Description of the connection.
       default: 
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update an existing connection.
+
+```sql
+UPDATE sumologic.connections.connections
+SET 
+type = '{{ type }}',
+name = '{{ name }}',
+description = '{{ description }}'
+WHERE 
+id = '{{ id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND name = '{{ name }}' --required
+AND type = '{{ type }}' --required
+RETURNING
+id,
+name,
+created_at,
+created_by,
+description,
+modified_at,
+modified_by,
+type;
 ```
 </TabItem>
 </Tabs>
@@ -331,12 +434,12 @@ type
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteConnection"
+    defaultValue="delete"
     values={[
-        { label: 'deleteConnection', value: 'deleteConnection' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteConnection">
+<TabItem value="delete">
 
 Delete a connection with the given identifier.
 
@@ -344,7 +447,7 @@ Delete a connection with the given identifier.
 DELETE FROM sumologic.connections.connections
 WHERE id = '{{ id }}' --required
 AND type = '{{ type }}' --required
-AND region = '{{ region }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -353,25 +456,45 @@ AND region = '{{ region }}' --required
 
 ## Lifecycle Methods
 
+EXEC variables use wire (API) names.
+
 <Tabs
-    defaultValue="updateConnection"
+    defaultValue="test"
     values={[
-        { label: 'updateConnection', value: 'updateConnection' }
+        { label: 'test', value: 'test' },
+        { label: 'get_incident_templates', value: 'get_incident_templates' }
     ]}
 >
-<TabItem value="updateConnection">
+<TabItem value="test">
 
-Update an existing connection.
+Test a new connection url is valid and can connect.
 
 ```sql
-EXEC sumologic.connections.connections.updateConnection 
-@id='{{ id }}' --required, 
-@region='{{ region }}' --required 
+EXEC sumologic.connections.connections.test 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set, 
+@functionalities='{{ functionalities }}', 
+@connectionId='{{ connectionId }}' 
 @@json=
 '{
 "type": "{{ type }}", 
 "name": "{{ name }}", 
 "description": "{{ description }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="get_incident_templates">
+
+Get incident templates for CloudSOAR connections.
+
+```sql
+EXEC sumologic.connections.connections.get_incident_templates 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"url": "{{ url }}", 
+"authHeader": "{{ authHeader }}", 
+"connectionId": "{{ connectionId }}"
 }'
 ;
 ```

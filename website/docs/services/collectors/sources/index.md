@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>sources</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>sources</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="sources" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.collectors.sources" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists a <code>sources</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="get_source_by_id"
+    defaultValue="get"
     values={[
-        { label: 'get_source_by_id', value: 'get_source_by_id' },
-        { label: 'list_sources', value: 'list_sources' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="get_source_by_id">
+<TabItem value="get">
 
 <table>
 <thead>
@@ -52,102 +53,152 @@ The following fields are returned by `SELECT` queries:
 <tr>
     <td><CopyableCode code="id" /></td>
     <td><code>integer</code></td>
-    <td>Source identifer.</td>
+    <td>Unique identifier of the Source.</td>
 </tr>
 <tr>
     <td><CopyableCode code="name" /></td>
     <td><code>string</code></td>
-    <td>Source name.</td>
+    <td>Name of the Source.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="host_name" /></td>
+    <td><code>string</code></td>
+    <td>Host name assigned to data from this Source (the _sourceHost metadata field). (wire: hostName)</td>
 </tr>
 <tr>
     <td><CopyableCode code="alive" /></td>
     <td><code>boolean</code></td>
-    <td>Source alive.</td>
+    <td>Whether the Source is alive.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="automaticDateParsing" /></td>
+    <td><CopyableCode code="automatic_date_parsing" /></td>
     <td><code>boolean</code></td>
-    <td>Source automaticDateParsing.</td>
+    <td>Whether timestamps are parsed automatically. (wire: automaticDateParsing)</td>
 </tr>
 <tr>
     <td><CopyableCode code="category" /></td>
     <td><code>string</code></td>
-    <td>Source category.</td>
+    <td>Source category (the _sourceCategory metadata field).</td>
 </tr>
 <tr>
-    <td><CopyableCode code="cutoffTimestamp" /></td>
-    <td><code>integer</code></td>
-    <td>Source cutoffTimestamp.</td>
+    <td><CopyableCode code="content_type" /></td>
+    <td><code>string</code></td>
+    <td>Content type of the data collected (used by some cloud Source types). (wire: contentType)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="cutoff_relative_time" /></td>
+    <td><code>string</code></td>
+    <td>Relative offset instead of cutoffTimestamp, for example -1h, -1d or -1w. (wire: cutoffRelativeTime)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="cutoff_timestamp" /></td>
+    <td><code>integer (int64)</code></td>
+    <td>Only collect data more recent than this timestamp, in milliseconds since epoch. (wire: cutoffTimestamp)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="default_date_formats" /></td>
+    <td><code>array</code></td>
+    <td>Default date formats used to parse timestamps. (wire: defaultDateFormats)</td>
 </tr>
 <tr>
     <td><CopyableCode code="denylist" /></td>
     <td><code>array</code></td>
-    <td>Source denylist.</td>
+    <td>Path expressions to exclude from collection (file Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="description" /></td>
+    <td><code>string</code></td>
+    <td>Description of the Source.</td>
 </tr>
 <tr>
     <td><CopyableCode code="encoding" /></td>
     <td><code>string</code></td>
-    <td>Source encoding.</td>
+    <td>Character encoding of the data (default UTF-8).</td>
 </tr>
 <tr>
     <td><CopyableCode code="fields" /></td>
-    <td><code>object</code></td>
-    <td>Source fields.</td>
+    <td><code>string</code></td>
+    <td>JSON map of key-value fields (metadata) applied to the Source. (opaque JSON object)</td>
 </tr>
 <tr>
     <td><CopyableCode code="filters" /></td>
     <td><code>array</code></td>
-    <td>Source filters.</td>
+    <td>Processing rules (Exclude, Include, Hash, Mask, Forward) applied to the Source.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="forceTimeZone" /></td>
+    <td><CopyableCode code="force_time_zone" /></td>
     <td><code>boolean</code></td>
-    <td>Source forceTimeZone.</td>
+    <td>When true, the timeZone is applied to all messages. (wire: forceTimeZone)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="hashAlgorithm" /></td>
+    <td><CopyableCode code="hash_algorithm" /></td>
     <td><code>string</code></td>
-    <td>Source hashAlgorithm.</td>
+    <td>Hash algorithm used by Hash processing rules. (wire: hashAlgorithm)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="hostName" /></td>
+    <td><CopyableCode code="interval" /></td>
+    <td><code>integer</code></td>
+    <td>Collection interval in milliseconds (metrics and script Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="manual_prefix_regexp" /></td>
     <td><code>string</code></td>
-    <td>Source hostName.</td>
+    <td>Regular expression that marks the start of a message when useAutolineMatching is false. (wire: manualPrefixRegexp)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="messagePerRequest" /></td>
+    <td><CopyableCode code="message_per_request" /></td>
     <td><code>boolean</code></td>
-    <td>Source messagePerRequest.</td>
+    <td>For HTTP Sources, whether each request is a single message. (wire: messagePerRequest)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="multilineProcessingEnabled" /></td>
+    <td><CopyableCode code="metrics" /></td>
+    <td><code>array</code></td>
+    <td>Metrics to collect (SystemStats Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="multiline_processing_enabled" /></td>
     <td><code>boolean</code></td>
-    <td>Source multilineProcessingEnabled.</td>
+    <td>Whether multiline message processing is enabled. (wire: multilineProcessingEnabled)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="pathExpression" /></td>
+    <td><CopyableCode code="path_expression" /></td>
     <td><code>string</code></td>
-    <td>Source pathExpression.</td>
+    <td>Path expression of the files to collect (file Sources). (wire: pathExpression)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="sourceType" /></td>
+    <td><CopyableCode code="source_type" /></td>
     <td><code>string</code></td>
-    <td>Source sourceType.</td>
+    <td>Type of the Source, for example HTTP, LocalFile, RemoteFileV2, Syslog, SystemStats, Polling, Script, and the cloud-to-cloud types. (wire: sourceType)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="status" /></td>
+    <td><code>string</code></td>
+    <td>Source status (cloud Sources). (opaque JSON object)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="third_party_ref" /></td>
+    <td><code>string</code></td>
+    <td>Cloud-to-cloud Source configuration. (opaque JSON object) (wire: thirdPartyRef)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="time_zone" /></td>
+    <td><code>string</code></td>
+    <td>Time zone applied to messages when forceTimeZone is true or the message has no time zone. (wire: timeZone)</td>
 </tr>
 <tr>
     <td><CopyableCode code="url" /></td>
     <td><code>string</code></td>
-    <td>Source url.</td>
+    <td>Unique URL of an HTTP Source endpoint.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="useAutolineMatching" /></td>
+    <td><CopyableCode code="use_autoline_matching" /></td>
     <td><code>boolean</code></td>
-    <td>Source useAutolineMatching.</td>
+    <td>Whether message boundaries are inferred automatically. (wire: useAutolineMatching)</td>
 </tr>
 </tbody>
 </table>
 </TabItem>
-<TabItem value="list_sources">
+<TabItem value="list">
 
 <table>
 <thead>
@@ -161,97 +212,147 @@ The following fields are returned by `SELECT` queries:
 <tr>
     <td><CopyableCode code="id" /></td>
     <td><code>integer</code></td>
-    <td>Source identifer.</td>
+    <td>Unique identifier of the Source.</td>
 </tr>
 <tr>
     <td><CopyableCode code="name" /></td>
     <td><code>string</code></td>
-    <td>Source name.</td>
+    <td>Name of the Source.</td>
+</tr>
+<tr>
+    <td><CopyableCode code="host_name" /></td>
+    <td><code>string</code></td>
+    <td>Host name assigned to data from this Source (the _sourceHost metadata field). (wire: hostName)</td>
 </tr>
 <tr>
     <td><CopyableCode code="alive" /></td>
     <td><code>boolean</code></td>
-    <td>Source alive.</td>
+    <td>Whether the Source is alive.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="automaticDateParsing" /></td>
+    <td><CopyableCode code="automatic_date_parsing" /></td>
     <td><code>boolean</code></td>
-    <td>Source automaticDateParsing.</td>
+    <td>Whether timestamps are parsed automatically. (wire: automaticDateParsing)</td>
 </tr>
 <tr>
     <td><CopyableCode code="category" /></td>
     <td><code>string</code></td>
-    <td>Source category.</td>
+    <td>Source category (the _sourceCategory metadata field).</td>
 </tr>
 <tr>
-    <td><CopyableCode code="cutoffTimestamp" /></td>
-    <td><code>integer</code></td>
-    <td>Source cutoffTimestamp.</td>
+    <td><CopyableCode code="content_type" /></td>
+    <td><code>string</code></td>
+    <td>Content type of the data collected (used by some cloud Source types). (wire: contentType)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="cutoff_relative_time" /></td>
+    <td><code>string</code></td>
+    <td>Relative offset instead of cutoffTimestamp, for example -1h, -1d or -1w. (wire: cutoffRelativeTime)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="cutoff_timestamp" /></td>
+    <td><code>integer (int64)</code></td>
+    <td>Only collect data more recent than this timestamp, in milliseconds since epoch. (wire: cutoffTimestamp)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="default_date_formats" /></td>
+    <td><code>array</code></td>
+    <td>Default date formats used to parse timestamps. (wire: defaultDateFormats)</td>
 </tr>
 <tr>
     <td><CopyableCode code="denylist" /></td>
     <td><code>array</code></td>
-    <td>Source denylist.</td>
+    <td>Path expressions to exclude from collection (file Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="description" /></td>
+    <td><code>string</code></td>
+    <td>Description of the Source.</td>
 </tr>
 <tr>
     <td><CopyableCode code="encoding" /></td>
     <td><code>string</code></td>
-    <td>Source encoding.</td>
+    <td>Character encoding of the data (default UTF-8).</td>
 </tr>
 <tr>
     <td><CopyableCode code="fields" /></td>
-    <td><code>object</code></td>
-    <td>Source fields.</td>
+    <td><code>string</code></td>
+    <td>JSON map of key-value fields (metadata) applied to the Source. (opaque JSON object)</td>
 </tr>
 <tr>
     <td><CopyableCode code="filters" /></td>
     <td><code>array</code></td>
-    <td>Source filters.</td>
+    <td>Processing rules (Exclude, Include, Hash, Mask, Forward) applied to the Source.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="forceTimeZone" /></td>
+    <td><CopyableCode code="force_time_zone" /></td>
     <td><code>boolean</code></td>
-    <td>Source forceTimeZone.</td>
+    <td>When true, the timeZone is applied to all messages. (wire: forceTimeZone)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="hashAlgorithm" /></td>
+    <td><CopyableCode code="hash_algorithm" /></td>
     <td><code>string</code></td>
-    <td>Source hashAlgorithm.</td>
+    <td>Hash algorithm used by Hash processing rules. (wire: hashAlgorithm)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="hostName" /></td>
+    <td><CopyableCode code="interval" /></td>
+    <td><code>integer</code></td>
+    <td>Collection interval in milliseconds (metrics and script Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="manual_prefix_regexp" /></td>
     <td><code>string</code></td>
-    <td>Source hostName.</td>
+    <td>Regular expression that marks the start of a message when useAutolineMatching is false. (wire: manualPrefixRegexp)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="messagePerRequest" /></td>
+    <td><CopyableCode code="message_per_request" /></td>
     <td><code>boolean</code></td>
-    <td>Source messagePerRequest.</td>
+    <td>For HTTP Sources, whether each request is a single message. (wire: messagePerRequest)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="multilineProcessingEnabled" /></td>
+    <td><CopyableCode code="metrics" /></td>
+    <td><code>array</code></td>
+    <td>Metrics to collect (SystemStats Sources).</td>
+</tr>
+<tr>
+    <td><CopyableCode code="multiline_processing_enabled" /></td>
     <td><code>boolean</code></td>
-    <td>Source multilineProcessingEnabled.</td>
+    <td>Whether multiline message processing is enabled. (wire: multilineProcessingEnabled)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="pathExpression" /></td>
+    <td><CopyableCode code="path_expression" /></td>
     <td><code>string</code></td>
-    <td>Source pathExpression.</td>
+    <td>Path expression of the files to collect (file Sources). (wire: pathExpression)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="sourceType" /></td>
+    <td><CopyableCode code="source_type" /></td>
     <td><code>string</code></td>
-    <td>Source sourceType.</td>
+    <td>Type of the Source, for example HTTP, LocalFile, RemoteFileV2, Syslog, SystemStats, Polling, Script, and the cloud-to-cloud types. (wire: sourceType)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="status" /></td>
+    <td><code>string</code></td>
+    <td>Source status (cloud Sources). (opaque JSON object)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="third_party_ref" /></td>
+    <td><code>string</code></td>
+    <td>Cloud-to-cloud Source configuration. (opaque JSON object) (wire: thirdPartyRef)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="time_zone" /></td>
+    <td><code>string</code></td>
+    <td>Time zone applied to messages when forceTimeZone is true or the message has no time zone. (wire: timeZone)</td>
 </tr>
 <tr>
     <td><CopyableCode code="url" /></td>
     <td><code>string</code></td>
-    <td>Source url.</td>
+    <td>Unique URL of an HTTP Source endpoint.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="useAutolineMatching" /></td>
+    <td><CopyableCode code="use_autoline_matching" /></td>
     <td><code>boolean</code></td>
-    <td>Source useAutolineMatching.</td>
+    <td>Whether message boundaries are inferred automatically. (wire: useAutolineMatching)</td>
 </tr>
 </tbody>
 </table>
@@ -274,39 +375,39 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#get_source_by_id"><CopyableCode code="get_source_by_id" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-collectorId"><code>collectorId</code></a>, <a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td></td>
-    <td>Gets information about a specified Collector and Source.</td>
+    <td><a href="#parameter-collector_id"><code>collector_id</code></a>, <a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-download"><code>download</code></a></td>
+    <td>Get information about a specified Source of a Collector. The response carries an ETag header, which must be supplied as If-Match on an update.</td>
 </tr>
 <tr>
-    <td><a href="#list_sources"><CopyableCode code="list_sources" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-collectorId"><code>collectorId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td></td>
-    <td>Gets information about all Sources for a specified Collector.</td>
+    <td><a href="#parameter-collector_id"><code>collector_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-download"><code>download</code></a></td>
+    <td>Get information about all Sources of a specified Collector.</td>
 </tr>
 <tr>
-    <td><a href="#create_source"><CopyableCode code="create_source" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-collectorId"><code>collectorId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-collector_id"><code>collector_id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-source"><code>source</code></a></td>
     <td></td>
-    <td>Creates a new Source for a Collector. See Use JSON to Configure Sources for required fields for the request JSON file.</td>
+    <td>Create a new Source on a Collector. The request body is the Source definition wrapped in a source object; see the vendor documentation (Use JSON to Configure Sources) for the fields required by each sourceType.</td>
 </tr>
 <tr>
-    <td><a href="#delete_source"><CopyableCode code="delete_source" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-collector_id"><code>collector_id</code></a>, <a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-source"><code>source</code></a></td>
+    <td><a href="#parameter-if-_match"><code>if-_match</code></a></td>
+    <td>Update a Source. The Collector Management API requires the If-Match header to carry the ETag returned by a previous GET of the same Source; the request body is the full Source object wrapped in source.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
-    <td><a href="#parameter-collectorId"><code>collectorId</code></a>, <a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-collector_id"><code>collector_id</code></a>, <a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Delete Source by ID</td>
-</tr>
-<tr>
-    <td><a href="#update_source"><CopyableCode code="update_source" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-collectorId"><code>collectorId</code></a>, <a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
-    <td></td>
-    <td>Update a source</td>
+    <td>Delete the specified Source of a Collector.</td>
 </tr>
 </tbody>
 </table>
@@ -324,20 +425,30 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
-<tr id="parameter-collectorId">
-    <td><CopyableCode code="collectorId" /></td>
+<tr id="parameter-collector_id">
+    <td><CopyableCode code="collector_id" /></td>
     <td><code>string</code></td>
-    <td>Unique Collector identifier.</td>
+    <td>Unique identifier of the Collector. (wire: collectorId)</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
-<tr id="parameter-sourceId">
-    <td><CopyableCode code="sourceId" /></td>
+<tr id="parameter-source_id">
+    <td><CopyableCode code="source_id" /></td>
     <td><code>string</code></td>
-    <td>Unique Source identifier.</td>
+    <td>Unique identifier of the Source. (wire: sourceId)</td>
+</tr>
+<tr id="parameter-download">
+    <td><CopyableCode code="download" /></td>
+    <td><code>boolean</code></td>
+    <td>When true, the response is the JSON configuration of the Source(s), suitable for registering a new Collector or creating a new Source.</td>
+</tr>
+<tr id="parameter-if-_match">
+    <td><CopyableCode code="if-_match" /></td>
+    <td><code>string</code></td>
+    <td>The ETag value returned in the response headers of a previous GET of this object. The Collector Management API requires it on updates. (wire: If-Match)</td>
 </tr>
 </tbody>
 </table>
@@ -345,72 +456,94 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="get_source_by_id"
+    defaultValue="get"
     values={[
-        { label: 'get_source_by_id', value: 'get_source_by_id' },
-        { label: 'list_sources', value: 'list_sources' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="get_source_by_id">
+<TabItem value="get">
 
-Gets information about a specified Collector and Source.
+Get information about a specified Source of a Collector. The response carries an ETag header, which must be supplied as If-Match on an update.
 
 ```sql
 SELECT
 id,
 name,
+host_name,
 alive,
-automaticDateParsing,
+automatic_date_parsing,
 category,
-cutoffTimestamp,
+content_type,
+cutoff_relative_time,
+cutoff_timestamp,
+default_date_formats,
 denylist,
+description,
 encoding,
 fields,
 filters,
-forceTimeZone,
-hashAlgorithm,
-hostName,
-messagePerRequest,
-multilineProcessingEnabled,
-pathExpression,
-sourceType,
+force_time_zone,
+hash_algorithm,
+interval,
+manual_prefix_regexp,
+message_per_request,
+metrics,
+multiline_processing_enabled,
+path_expression,
+source_type,
+status,
+third_party_ref,
+time_zone,
 url,
-useAutolineMatching
+use_autoline_matching
 FROM sumologic.collectors.sources
-WHERE collectorId = '{{ collectorId }}' -- required
-AND sourceId = '{{ sourceId }}' -- required
-AND region = '{{ region }}' -- required
+WHERE collector_id = '{{ collector_id }}' -- required
+AND source_id = '{{ source_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+AND download = '{{ download }}'
 ;
 ```
 </TabItem>
-<TabItem value="list_sources">
+<TabItem value="list">
 
-Gets information about all Sources for a specified Collector.
+Get information about all Sources of a specified Collector.
 
 ```sql
 SELECT
 id,
 name,
+host_name,
 alive,
-automaticDateParsing,
+automatic_date_parsing,
 category,
-cutoffTimestamp,
+content_type,
+cutoff_relative_time,
+cutoff_timestamp,
+default_date_formats,
 denylist,
+description,
 encoding,
 fields,
 filters,
-forceTimeZone,
-hashAlgorithm,
-hostName,
-messagePerRequest,
-multilineProcessingEnabled,
-pathExpression,
-sourceType,
+force_time_zone,
+hash_algorithm,
+interval,
+manual_prefix_regexp,
+message_per_request,
+metrics,
+multiline_processing_enabled,
+path_expression,
+source_type,
+status,
+third_party_ref,
+time_zone,
 url,
-useAutolineMatching
+use_autoline_matching
 FROM sumologic.collectors.sources
-WHERE collectorId = '{{ collectorId }}' -- required
-AND region = '{{ region }}' -- required
+WHERE collector_id = '{{ collector_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+AND download = '{{ download }}'
 ;
 ```
 </TabItem>
@@ -420,63 +553,112 @@ AND region = '{{ region }}' -- required
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="create_source"
+    defaultValue="create"
     values={[
-        { label: 'create_source', value: 'create_source' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="create_source">
+<TabItem value="create">
 
-Creates a new Source for a Collector. See Use JSON to Configure Sources for required fields for the request JSON file.
+Create a new Source on a Collector. The request body is the Source definition wrapped in a source object; see the vendor documentation (Use JSON to Configure Sources) for the fields required by each sourceType.
 
 ```sql
 INSERT INTO sumologic.collectors.sources (
-data__source,
-collectorId,
+source,
+collector_id,
 region
 )
 SELECT 
-'{{ source }}',
-'{{ collectorId }}',
+'{{ source }}' /* required */,
+'{{ collector_id }}',
 '{{ region }}'
 RETURNING
-id,
-name,
-alive,
-automaticDateParsing,
-category,
-cutoffTimestamp,
-denylist,
-encoding,
-fields,
-filters,
-forceTimeZone,
-hashAlgorithm,
-hostName,
-messagePerRequest,
-multilineProcessingEnabled,
-pathExpression,
-sourceType,
-url,
-useAutolineMatching
+source
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: sources
   props:
-    - name: collectorId
-      value: string
+    - name: collector_id
+      value: "{{ collector_id }}"
       description: Required parameter for the sources resource.
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the sources resource.
     - name: source
-      value: object
+      description: |
+        Source object. The set of properties depends on the sourceType; the properties listed here are the common ones.
+      value:
+        id: {{ id }}
+        name: "{{ name }}"
+        description: "{{ description }}"
+        category: "{{ category }}"
+        hostName: "{{ hostName }}"
+        sourceType: "{{ sourceType }}"
+        contentType: "{{ contentType }}"
+        alive: {{ alive }}
+        url: "{{ url }}"
+        encoding: "{{ encoding }}"
+        timeZone: "{{ timeZone }}"
+        forceTimeZone: {{ forceTimeZone }}
+        automaticDateParsing: {{ automaticDateParsing }}
+        multilineProcessingEnabled: {{ multilineProcessingEnabled }}
+        useAutolineMatching: {{ useAutolineMatching }}
+        manualPrefixRegexp: "{{ manualPrefixRegexp }}"
+        messagePerRequest: {{ messagePerRequest }}
+        defaultDateFormats:
+          - "{{ defaultDateFormats }}"
+        pathExpression: "{{ pathExpression }}"
+        denylist:
+          - "{{ denylist }}"
+        filters:
+          - filterType: "{{ filterType }}"
+            name: "{{ name }}"
+            regexp: "{{ regexp }}"
+            mask: "{{ mask }}"
+        fields: "{{ fields }}"
+        cutoffTimestamp: {{ cutoffTimestamp }}
+        cutoffRelativeTime: "{{ cutoffRelativeTime }}"
+        hashAlgorithm: "{{ hashAlgorithm }}"
+        interval: {{ interval }}
+        metrics:
+          - "{{ metrics }}"
+        thirdPartyRef: "{{ thirdPartyRef }}"
+        status: "{{ status }}"
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update a Source. The Collector Management API requires the If-Match header to carry the ETag returned by a previous GET of the same Source; the request body is the full Source object wrapped in source.
+
+```sql
+UPDATE sumologic.collectors.sources
+SET 
+source = '{{ source }}'
+WHERE 
+collector_id = '{{ collector_id }}' --required
+AND source_id = '{{ source_id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND source = '{{ source }}' --required
+AND if-_match = '{{ if-_match}}'
+RETURNING
+source;
 ```
 </TabItem>
 </Tabs>
@@ -485,65 +667,20 @@ useAutolineMatching
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="delete_source"
+    defaultValue="delete"
     values={[
-        { label: 'delete_source', value: 'delete_source' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="delete_source">
+<TabItem value="delete">
 
-Delete Source by ID
+Delete the specified Source of a Collector.
 
 ```sql
 DELETE FROM sumologic.collectors.sources
-WHERE collectorId = '{{ collectorId }}' --required
-AND sourceId = '{{ sourceId }}' --required
-AND region = '{{ region }}' --required
-;
-```
-</TabItem>
-</Tabs>
-
-
-## Lifecycle Methods
-
-<Tabs
-    defaultValue="update_source"
-    values={[
-        { label: 'update_source', value: 'update_source' }
-    ]}
->
-<TabItem value="update_source">
-
-Update a source
-
-```sql
-EXEC sumologic.collectors.sources.update_source 
-@collectorId='{{ collectorId }}' --required, 
-@sourceId='{{ sourceId }}' --required, 
-@region='{{ region }}' --required 
-@@json=
-'{
-"id": {{ id }}, 
-"name": "{{ name }}", 
-"category": "{{ category }}", 
-"hostName": "{{ hostName }}", 
-"automaticDateParsing": {{ automaticDateParsing }}, 
-"multilineProcessingEnabled": {{ multilineProcessingEnabled }}, 
-"useAutolineMatching": {{ useAutolineMatching }}, 
-"alive": {{ alive }}, 
-"forceTimeZone": {{ forceTimeZone }}, 
-"messagePerRequest": {{ messagePerRequest }}, 
-"sourceType": "{{ sourceType }}", 
-"encoding": "{{ encoding }}", 
-"hashAlgorithm": "{{ hashAlgorithm }}", 
-"url": "{{ url }}", 
-"pathExpression": "{{ pathExpression }}", 
-"denylist": "{{ denylist }}", 
-"filters": "{{ filters }}", 
-"fields": "{{ fields }}", 
-"cutoffTimestamp": {{ cutoffTimestamp }}
-}'
+WHERE collector_id = '{{ collector_id }}' --required
+AND source_id = '{{ source_id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

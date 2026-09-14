@@ -28,6 +28,6 @@ total resources: __2__
 <a href="/services/log_searches/estimated_usage/">estimated_usage</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/log_searches/estimated_usage_by_tier/">estimated_usage_by_tier</a>
+<a href="/services/log_searches/log_searches/">log_searches</a>
 </div>
 </div>

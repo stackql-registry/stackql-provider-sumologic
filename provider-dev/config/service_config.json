@@ -1,0 +1,12 @@
+{
+  "pagination": {
+    "requestToken": {
+      "key": "token",
+      "location": "query"
+    },
+    "responseToken": {
+      "key": "next",
+      "location": "body"
+    }
+  }
+}

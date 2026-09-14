@@ -1,0 +1,325 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Archive API
+  description: Archive ingestion jobs that replay archived logs from an AWS S3 archive source.
+  version: 1.0.0
+paths:
+  /v1/archive/{sourceId}/jobs:
+    get:
+      tags:
+        - archiveManagement
+      summary: Get ingestion jobs for an Archive Source.
+      description: Get a list of all the ingestion jobs created on an Archive Source. The response is paginated with a default limit of 10 jobs per page.
+      operationId: listArchiveJobsBySourceId
+      parameters:
+        - name: sourceId
+          in: path
+          description: The identifier of an Archive Source.
+          required: true
+          schema:
+            type: string
+            example: 000000000606C009
+        - name: limit
+          in: query
+          description: Limit the number of jobs returned in the response. The number of jobs returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 10
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of ingestion jobs for an Archive Source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListArchiveJobsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - archiveManagement
+      summary: Create an ingestion job.
+      description: Create an ingestion job to pull data from your S3 bucket.
+      operationId: createArchiveJob
+      parameters:
+        - name: sourceId
+          in: path
+          description: The identifier of the Archive Source for which the job is to be added.
+          required: true
+          schema:
+            type: string
+            example: 000000000606C009
+      requestBody:
+        description: The definition of the ingestion job to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArchiveJobRequest'
+        required: true
+      responses:
+        '200':
+          description: The ingestion job was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveJob'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/archive/{sourceId}/jobs/{id}:
+    delete:
+      tags:
+        - archiveManagement
+      summary: Delete an ingestion job.
+      description: Delete an ingestion job with the given identifier from the organization. The delete operation is only possible for jobs with a Succeeded or Failed status.
+      operationId: deleteArchiveJob
+      parameters:
+        - name: sourceId
+          in: path
+          description: The identifier of the Archive Source.
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: The identifier of the ingestion job to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The ingestion job was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/archive/jobs/count:
+    get:
+      tags:
+        - archiveManagement
+      summary: List ingestion jobs for all Archive Sources.
+      description: Get a list of all Archive Sources with the count and status of ingestion jobs.
+      operationId: listArchiveJobsCountPerSource
+      parameters: []
+      responses:
+        '200':
+          description: A list of Archive Sources with ingestion jobs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListArchiveJobsCount'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListArchiveJobsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of Archive Jobs.
+          items:
+            $ref: '#/components/schemas/ArchiveJob'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    CreateArchiveJobRequest:
+      required:
+        - endTime
+        - name
+        - startTime
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: The name of the ingestion job.
+        startTime:
+          type: string
+          description: The starting timestamp of the ingestion job.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        endTime:
+          type: string
+          description: The ending timestamp of the ingestion job.
+          format: date-time
+          example: '2018-10-16T10:10:00.000Z'
+    ArchiveJob:
+      type: object
+      required:
+        - endTime
+        - name
+        - startTime
+        - createdAt
+        - createdBy
+        - id
+        - status
+        - totalBytesIngested
+        - totalObjectsIngested
+        - totalObjectsScanned
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: The name of the ingestion job.
+        startTime:
+          type: string
+          description: The starting timestamp of the ingestion job.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        endTime:
+          type: string
+          description: The ending timestamp of the ingestion job.
+          format: date-time
+          example: '2018-10-16T10:10:00.000Z'
+        id:
+          type: string
+          description: The unique identifier of the ingestion job.
+          example: 4e214571-cf27-4114-93e6-69a98c017f3
+        totalObjectsScanned:
+          type: integer
+          description: The total number of objects scanned by the ingestion job.
+          format: int64
+          example: 25
+        totalObjectsIngested:
+          type: integer
+          description: The total number of objects ingested by the ingestion job.
+          format: int64
+          example: 10
+        totalBytesIngested:
+          type: integer
+          description: The total bytes ingested by the ingestion job.
+          format: int64
+          example: 100
+        status:
+          type: string
+          description: The status of the ingestion job, either `Pending`,`Scanning`,`Ingesting`,`Failed`, or `Succeeded`.
+          example: Scanning
+        createdAt:
+          type: string
+          description: The creation timestamp in UTC of the ingestion job.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: The identifier of the user who created the ingestion job.
+          example: 0000000006743FDD
+    ListArchiveJobsCount:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of archive sources with count of jobs having various statuses.
+          items:
+            $ref: '#/components/schemas/ArchiveJobsCount'
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    ArchiveJobsCount:
+      required:
+        - failed
+        - ingesting
+        - pending
+        - scanning
+        - sourceId
+        - succeeded
+      type: object
+      properties:
+        sourceId:
+          type: string
+          description: Identifier for the archive source.
+          example: 000000000606C009
+        pending:
+          type: integer
+          description: The total number of archive jobs with pending status for the archive source.
+          format: int64
+          example: 4
+        scanning:
+          type: integer
+          description: The total number of archive jobs with scanning status for the archive source.
+          format: int64
+          example: 1
+        ingesting:
+          type: integer
+          description: The total number of archive jobs with ingesting status for the archive source.
+          format: int64
+          example: 2
+        failed:
+          type: integer
+          description: The total number of archive jobs with failed status for the archive source.
+          format: int64
+          example: 5
+        succeeded:
+          type: integer
+          description: The total number of archive jobs with succeeded status for the archive source.
+          format: int64
+          example: 20

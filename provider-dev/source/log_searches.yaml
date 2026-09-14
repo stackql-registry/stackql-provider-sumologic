@@ -1,0 +1,1335 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Log Searches API
+  description: Saved and scheduled log searches, and estimated usage of a log search across data tiers.
+  version: 1.0.0
+paths:
+  /v1/logSearches:
+    get:
+      tags:
+        - logSearchesManagement
+      summary: List all saved log searches.
+      description: List all saved log searches viewable by the user.
+      operationId: listLogSearches
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of log searches returned in the response. The number of log searches returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+      responses:
+        '200':
+          description: Paginated list of log searches under the Personal folder created by the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLogSearches'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - logSearchesManagement
+      summary: Save a log search.
+      description: Save the log search in the content library.
+      operationId: createLogSearch
+      parameters: []
+      requestBody:
+        description: The definition of the saved log search.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveLogSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: Newly saved log search.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearch'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-create: createLogSearch
+  /v1/logSearches/{id}:
+    get:
+      tags:
+        - logSearchesManagement
+      summary: Get the saved log search.
+      description: Get a saved log search from the content library by identifier.
+      operationId: getLogSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the saved log search.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Saved log search that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearch'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-read: getLogSearch
+    put:
+      tags:
+        - logSearchesManagement
+      summary: Update the saved log Search.
+      description: Update the saved log search with the specified identifier. Partial update is not supported, you must provide values for all fields.
+      operationId: updateLogSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the saved log search.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: An updated saved log search definition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchDefinition'
+        required: true
+      responses:
+        '200':
+          description: The saved log search that was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearch'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-update: updateLogSearch
+    delete:
+      tags:
+        - logSearchesManagement
+      summary: Delete the saved log search.
+      description: Delete the saved log search from the content library.
+      operationId: deleteLogSearch
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the saved log search.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The saved log search was successfully deleted.
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-delete: deleteLogSearch
+  /v1/logSearches/estimatedUsage:
+    post:
+      tags:
+        - logSearchesEstimatedUsage
+      summary: Gets estimated usage details.
+      description: |
+        Gets the estimated volume of data that would be scanned for a given log search in the Infrequent data tier.
+      operationId: getLogSearchEstimatedUsage
+      parameters: []
+      requestBody:
+        description: The definition of the log search estimated usage.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchEstimatedUsageRequest'
+        required: true
+      responses:
+        '200':
+          description: Log search information along with its estimated usage details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchEstimatedUsageDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logSearches/estimatedUsageByTier:
+    post:
+      tags:
+        - logSearchesEstimatedUsage
+      summary: Gets Tier Wise estimated usage details.
+      description: |
+        Gets the estimated volume of data that would be scanned for a given log search per data tier.
+      operationId: getLogSearchEstimatedUsageByTier
+      parameters: []
+      requestBody:
+        description: The definition of the log search estimated usage.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchEstimatedUsageRequestV2'
+        required: true
+      responses:
+        '200':
+          description: Log search information along with its tier wise estimated usage details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchEstimatedUsageByTierDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logSearches/estimatedUsageByMeteringType:
+    post:
+      tags:
+        - logSearchesEstimatedUsage
+      summary: Gets estimated usage details per metering type.
+      description: |
+        Gets the estimated volume of data, per metering type,  that would be scanned for running a given log search for a given timerange.
+      operationId: getLogSearchEstimatedUsageByMeteringType
+      parameters: []
+      requestBody:
+        description: The definition of the log search estimated usage.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchEstimatedUsageRequestV3'
+        required: true
+      responses:
+        '200':
+          description: Log search information along with its metering type wise estimated usage details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchEstimatedUsageByMeteringTypeDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logSearches/estimatedUsageByView:
+    post:
+      tags:
+        - logSearchesEstimatedUsage
+      summary: Gets estimated usage details per view.
+      description: |
+        Gets the estimated volume of data, per view,  that would be scanned for running a given log search for a given timerange.
+      operationId: logSearchesEstimatedUsageByView
+      parameters: []
+      requestBody:
+        description: The definition of the log search estimated usage.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchEstimatedUsageRequestV3'
+        required: true
+      responses:
+        '200':
+          description: Log search information along with its view wise estimated usage details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchEstimatedUsageByViewDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PaginatedLogSearches:
+      required:
+        - logSearches
+      type: object
+      properties:
+        logSearches:
+          type: array
+          description: List of log searches.
+          items:
+            $ref: '#/components/schemas/LogSearch'
+        warnings:
+          type: array
+          description: List of warning messages for invalid log search definitions.
+          items:
+            type: string
+            example: 'Invalid saved search: <saved_search_name>. Please validate your saved search.'
+        token:
+          type: string
+          description: Next continuation token. `token` is set to null when no more pages are left.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    SaveLogSearchRequest:
+      type: object
+      description: The definition of the log search to save in the content library.
+      required:
+        - queryString
+        - timeRange
+        - name
+        - parentId
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+        name:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()\\]+$
+          type: string
+          description: Name of the item in the content library.
+          example: Short title
+        description:
+          maxLength: 255
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        schedule:
+          $ref: '#/components/schemas/LogSearchScheduleSyncDefinition'
+        properties:
+          maxLength: 65536
+          type: string
+          description: |
+            Aggregate Results Settings and View configurations, Legends settings, and different visualisation settings overrides. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ "key": "value" }'
+        parentId:
+          type: string
+          description: Identifier of a folder where to save the log search.
+          example: 000000000000001A
+    LogSearch:
+      x-tf-generated-properties: id,parentId,name,description,schedule,queryString,timeRange,runByReceiptTime,queryParameters,parsingMode,intervalTimeType
+      x-tf-resource-name: LogSearch
+      type: object
+      description: Definition of the saved log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - name
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+        name:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()\\]+$
+          type: string
+          description: Name of the item in the content library.
+          example: Short title
+        description:
+          maxLength: 255
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        schedule:
+          $ref: '#/components/schemas/LogSearchScheduleSyncDefinition'
+        properties:
+          maxLength: 65536
+          type: string
+          description: |
+            Aggregate Results Settings and View configurations, Legends settings, and different visualisation settings overrides. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ "key": "value" }'
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Identifier of the saved log search.
+          example: 000000000000001A
+        parentId:
+          type: string
+          description: Identifier of the parent element in the content library, such as folder.
+          example: 0000000000007D2B
+    LogSearchDefinition:
+      type: object
+      description: Definition of the saved log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - name
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+        name:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 +%-@.,_()\\]+$
+          type: string
+          description: Name of the item in the content library.
+          example: Short title
+        description:
+          maxLength: 255
+          type: string
+          description: Item description in the content library.
+          example: Long and detailed description
+        schedule:
+          $ref: '#/components/schemas/LogSearchScheduleSyncDefinition'
+        properties:
+          maxLength: 65536
+          type: string
+          description: |
+            Aggregate Results Settings and View configurations, Legends settings, and different visualisation settings overrides. Leave this field empty to use the defaults.
+            This property contains JSON object encoded as a string.
+          example: '{ "key": "value" }'
+    LogSearchEstimatedUsageRequest:
+      description: Definition of the saved log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - timezone
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+    LogSearchEstimatedUsageDefinition:
+      description: Definition of the saved log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - timezone
+        - estimatedUsageDetails
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        estimatedUsageDetails:
+          $ref: '#/components/schemas/EstimatedUsageDetails'
+    LogSearchEstimatedUsageRequestV2:
+      required:
+        - queryString
+        - timeRange
+        - timezone
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+      description: Definition of the saved log search with query and timerange.
+    LogSearchEstimatedUsageByTierDefinition:
+      required:
+        - queryString
+        - timeRange
+        - timezone
+        - estimatedUsageDetails
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        estimatedUsageDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimatedUsageDetailsWithTier'
+      description: Definition of the saved log search with query and timerange.
+    LogSearchEstimatedUsageRequestV3:
+      description: Definition of the log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - timezone
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Log search Query to compute the estimated volume of data scanned.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        emulateSearchContext:
+          $ref: '#/components/schemas/EmulateSearchContext'
+    LogSearchEstimatedUsageByMeteringTypeDefinition:
+      description: Definition of the log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - timezone
+        - estimatedUsageDetails
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Log search Query to compute the estimated volume of data scanned.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        emulateSearchContext:
+          $ref: '#/components/schemas/EmulateSearchContext'
+        estimatedUsageDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimatedUsageDetailsWithMeteringType'
+    LogSearchEstimatedUsageByViewDefinition:
+      description: Definition of the log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+        - timezone
+        - estimatedUsageDetails
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Log search Query to compute the estimated volume of data scanned.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        timezone:
+          type: string
+          description: |
+            Time zone to get the estimated usage details. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        emulateSearchContext:
+          $ref: '#/components/schemas/EmulateSearchContext'
+        estimatedUsageDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimatedUsageDetailsPerView'
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    LogSearchQueryTimeRangeBase:
+      description: Definition of the saved log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+    LogSearchScheduleSyncDefinition:
+      required:
+        - parseableTimeRange
+        - scheduleType
+        - timeZone
+      type: object
+      properties:
+        cronExpression:
+          type: string
+          description: Cron-like expression specifying the search's schedule. Field scheduleType must be set to "Custom", otherwise, scheduleType takes precedence over cronExpression.
+          example: 0 0/15 * * * ? *
+        displayableTimeRange:
+          type: string
+          description: A human-friendly text describing the query time range. For e.g. "-2h", "last three days", "team default time". This value can not be set via API.
+          example: '-2h'
+        parseableTimeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        timeZone:
+          type: string
+          description: Time zone identifier for time specification. Either an abbreviation such as "PST", a full name such as "America/Los_Angeles", or a custom ID such as "GMT-8:00". Note that the support of abbreviations is for JDK 1.1.x compatibility only and full names should be used. The GMT time zone is chosen if the given time zone cannot be identified.
+        threshold:
+          $ref: '#/components/schemas/LogSearchNotificationThresholdSyncDefinition'
+        notification:
+          $ref: '#/components/schemas/ScheduleNotificationSyncDefinition'
+        scheduleType:
+          pattern: ^(RealTime|15Minutes|1Hour|2Hours|4Hours|6Hours|8Hours|12Hours|1Day|1Week|Custom)$
+          type: string
+          description: |-
+            Run schedule of the scheduled search. Set to "Custom" to specify the schedule with a CRON expression.Please note that with Custom, 1Day and 1Week schedule types you need to provide the corresponding cron expression to determine when to actually run the search. e.g. Sample Valid Cron for 1Day is "0 0 16 ? * 2-6 *". Possible schedule types are:
+              - `RealTime`
+              - `15Minutes`
+              - `1Hour`
+              - `2Hours`
+              - `4Hours`
+              - `6Hours`
+              - `8Hours`
+              - `12Hours`
+              - `1Day`
+              - `1Week`
+              - `Custom`
+        muteErrorEmails:
+          type: boolean
+          description: If enabled, emails are not sent out in case of errors with the search.
+        parameters:
+          maxLength: 50
+          type: array
+          description: 'A list of scheduled search template parameters to be used while executing the query. This is different from the queryParameters field in parent object as this field will be  used for execution as per the schedule. The parent object field is for search itself, not part of execution. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/ScheduleSearchParameterSyncDefinition'
+        notifications:
+          type: array
+          description: List of notification actions for this schedule. Mutually exclusive with 'notification' — exactly one of these fields must be provided. Sending both or neither returns a 400 error. Supports multiple notification channels (e.g., email and webhook) for a single scheduled search execution.
+          items:
+            $ref: '#/components/schemas/ScheduleNotificationSyncDefinition'
+      description: Schedule definition for a log search. Exactly one of 'notification' (single notification) or 'notifications' (multiple notification actions) must be provided. Sending both or neither will result in a 400 error.
+    EstimatedUsageDetails:
+      type: object
+      properties:
+        dataScannedInBytes:
+          type: integer
+          description: Amount of data scanned in bytes, to run the query.
+          format: int64
+          example: 114086541
+    LogSearchQueryTimeRangeBaseExceptParsingMode:
+      required:
+        - queryString
+        - timeRange
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Query to perform.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+      description: Definition of the saved log search with query and timerange.
+    EstimatedUsageDetailsWithTier:
+      type: object
+      properties:
+        tier:
+          type: string
+          description: Name of the data tier. Supported Values are Continuous, Frequent, Infrequent
+          example: Continuous
+        dataScannedInBytes:
+          type: integer
+          description: Amount of data scanned in bytes, to run the query.
+          format: int64
+          example: 114086541
+    LogSearchQueryEstimationQueryDefinition:
+      description: Definition of the log search with query and timerange.
+      required:
+        - queryString
+        - timeRange
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Log search Query to compute the estimated volume of data scanned.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+        runByReceiptTime:
+          type: boolean
+          description: This has the value `true` if the search is to be run by receipt time and `false` if it is to be run by message time.
+          example: false
+          default: false
+    EmulateSearchContext:
+      type: object
+      properties:
+        roleIds:
+          type: array
+          description: List of role IDs to emulate the search context for.
+          example:
+            - 000000000000000C
+          items:
+            type: string
+        userId:
+          type: string
+          description: User ID to emulate the search context for.
+          example: 000000000000019F
+      description: |
+        Contains keys like "roleIds" with a list of role IDs or "userId" as a string.
+    EstimatedUsageDetailsWithMeteringType:
+      type: object
+      properties:
+        meteringType:
+          type: string
+          description: |
+            Name of the metering type. Metering type indicates how the data scanned within a particular data tier is actually metered and billed. Supported Values are Continuous, Frequent, Infrequent, ContinuousSecurity and FlexSecurity.
+          example: Continuous
+        dataScannedInBytes:
+          type: integer
+          description: Amount of data scanned in bytes, to run the query.
+          format: int64
+          example: 114086541
+        tier:
+          type: string
+          description: Name of the data tier. Supported Values are Continuous, Frequent, Infrequent and Flex.
+          example: Continuous
+        scanCreditAccounted:
+          type: boolean
+          description: |
+            Whether particular metering type is accounted against a customer's credit on a per scan basis.  e.g Data belonging to "Flex" and "Infrequent" metering type is accounted for credits on per scan basis. For other metering types, eg. "Continuous" it's charged upfront during ingestion.
+          example: false
+      description: Estimated Usage details for the given log search query with the above timerange.
+    EstimatedUsageDetailsPerView:
+      required:
+        - usageDetails
+        - viewName
+      type: object
+      properties:
+        viewName:
+          type: string
+          description: Name of the view for which usage is estimated.
+        usageDetails:
+          type: array
+          description: The scanning and data retrieval usages to run the query per view.
+          items:
+            $ref: '#/components/schemas/EstimatedUsageDetailsWithMeteringType'
+    LogSearchQueryParsingMode:
+      type: object
+      properties:
+        parsingMode:
+          pattern: ^(AutoParse|Manual)$
+          type: string
+          description: |-
+            Define the parsing mode to scan the JSON format log messages. Possible values are:
+              1. `AutoParse`
+              2. `Manual`
+            In AutoParse mode, the system automatically figures out fields to parse based on the search query. While in the Manual mode, no fields are parsed out automatically. For more information see [Dynamic Parsing](https://help.sumologic.com/?cid=0011).
+          example: AutoParse
+          default: Manual
+      description: Definition of log search parsing mode
+    ResolvableTimeRange:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the time range. Value must be either `CompleteLiteralTimeRange` or `BeginBoundedTimeRange`.
+      example:
+        type: BeginBoundedTimeRange
+        from:
+          type: RelativeTimeRangeBoundary
+          relativeTime: '-15m'
+      discriminator:
+        propertyName: type
+    LogSearchNotificationThresholdSyncDefinition:
+      required:
+        - count
+        - operator
+      type: object
+      properties:
+        thresholdType:
+          pattern: ^(message|group)$
+          type: string
+          description: |-
+            This property is deprecated. The system will automatically infer the value of this field from the query going forward, so the user-specified value will no longer be honored.
+            Threshold type. Possible values are:
+             1. `message`
+             2. `group`
+
+            Use `group` as threshold type if the search query is of aggregate type. For non-aggregate queries, set it to `message`.
+        operator:
+          pattern: ^(eq|gt|ge|lt|le)$
+          type: string
+          description: |-
+            Criterion to be applied when comparing actual result count with expected count. Possible values are:
+             1. `eq`
+             2. `gt`
+             3. `ge`
+             4. `lt`
+             5. `le`
+        count:
+          type: integer
+          description: Expected result count.
+    ScheduleNotificationSyncDefinition:
+      required:
+        - taskType
+      type: object
+      properties:
+        taskType:
+          type: string
+          description: Delivery channel for notifications.
+      discriminator:
+        propertyName: taskType
+    ScheduleSearchParameterSyncDefinition:
+      required:
+        - name
+        - value
+      type: object
+      properties:
+        name:
+          maxLength: 60
+          type: string
+          description: Name of scheduled search parameter.
+        value:
+          maxLength: 300
+          type: string
+          description: Value of scheduled search parameter.
+    LogSearchQueryParameterSyncDefinitionBase:
+      required:
+        - dataType
+        - name
+        - value
+      type: object
+      properties:
+        autoComplete:
+          $ref: '#/components/schemas/AutoCompleteDefinition'
+        name:
+          maxLength: 50
+          pattern: ^[a-zA-Z0-9_]+$
+          type: string
+          description: The name of the parameter.
+          example: sourceCategory
+          x-pattern-message: Name must be between 1 and 50 Characters. Can only consist alphanumeric and underscore characters.
+        description:
+          maxLength: 256
+          pattern: ^[a-zA-Z0-9@ \-_\.]+$
+          type: string
+          description: A description of the parameter.
+          example: source category for the string
+          x-pattern-message: Description must be between 1 and 256 Characters. Can only consist alphanumeric, @, underscore and dash characters.
+        dataType:
+          pattern: ^(NUMBER|STRING|ANY|KEYWORD)$
+          type: string
+          description: |-
+            The data type of the parameter. Supported values are:
+              1. `NUMBER`
+              2. `STRING`
+              3. `ANY`
+              4. `KEYWORD`
+          example: STRING
+        value:
+          maxLength: 256
+          type: string
+          description: A value for the parameter. Should be compatible with the type set in dataType field.
+          example: apache
+    LogSearchQueryEstimationBaseDefinition:
+      required:
+        - queryString
+        - timeRange
+      type: object
+      properties:
+        queryString:
+          maxLength: 15000
+          type: string
+          description: Log search Query to compute the estimated volume of data scanned.
+          example: error {{sourceCategory}}| count by _sourceCategory
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        queryParameters:
+          maxLength: 50
+          type: array
+          description: 'Values for search template used in the search query. Learn more about the search templates here : https://help.sumologic.com/docs/search/get-started-with-search/build-search/search-templates/'
+          items:
+            $ref: '#/components/schemas/LogSearchQueryParameterSyncDefinitionBase'
+        intervalTimeType:
+          pattern: ^(messageTime|receiptTime|searchableTime)$
+          type: string
+          description: This parameter defines whether you want to run the search by messageTime, receiptTime, or searchableTime.  By default, the search will run by messageTime. If both runByReceiptTime and intervalTimeType parameters are present then  the preference will be given to the intervalTimeType.
+          example: messageTime
+          default: messageTime
+          x-pattern-message: should be either 'messageTime' or 'receiptTime' or 'searchableTime'
+      description: Base definition of the log search with query and timerange (without runByReceiptTime).
+    AutoCompleteDefinition:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: The autocomplete parameter type.
+          example: SKIP_AUTOCOMPLETE
+        autoCompleteKey:
+          type: string
+          description: The autocomplete key to be used to fetch autocomplete values.
+          example: Ephemeral-3644138589235809747-1583470806220-parameter
+        autoCompleteValues:
+          type: array
+          description: The array of label-value pairs for autocomplete.
+          items:
+            $ref: '#/components/schemas/AutoCompleteValueSyncDefinition'
+        lookupMetaData:
+          $ref: '#/components/schemas/AutoCompleteLookupMetaData'
+    AutoCompleteValueSyncDefinition:
+      required:
+        - label
+        - value
+      type: object
+      properties:
+        label:
+          type: string
+          description: The label of the autocomplete value.
+        value:
+          type: string
+          description: The value of the autocomplete value.
+    AutoCompleteLookupMetaData:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The lookup file name to use as a source for autocomplete values.
+          example: users.csv
+        valueColumn:
+          type: string
+          description: The column from the lookup file to use as the value.
+          example: user_id
+        labelColumn:
+          type: string
+          description: The column from the lookup file to use as the label.
+          example: user_name
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)'

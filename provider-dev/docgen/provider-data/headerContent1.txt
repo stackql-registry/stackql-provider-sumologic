@@ -4,11 +4,13 @@ hide_title: false
 hide_table_of_contents: false
 keywords:
   - sumologic
+  - sumo logic
   - stackql
   - infrastructure-as-code
   - configuration-as-data
   - cloud inventory
-description: Query, deploy and manage Sumologic resources using SQL
+  - observability
+description: Query, provision and manage Sumo Logic collectors, sources, users, roles, monitors, dashboards, partitions, fields and the rest of the Sumo Logic platform using SQL
 custom_edit_url: null
 image: /img/stackql-sumologic-provider-featured-image.png
 id: 'provider-intro'
@@ -16,4 +18,4 @@ id: 'provider-intro'
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
 
-Cloud-native, real-time, unified logs and metrics analytics platform.
+Query, provision and operate the Sumo Logic platform using SQL - collectors and sources, users, roles and service accounts, access keys, the content library (folders, dashboards, saved searches), monitors, SLOs and muting schedules, partitions, scheduled views, fields and extraction rules, ingest budgets, connections, lookup tables, apps, security policies, tracing and search jobs. The provider covers the Sumo Logic API reference (every deployment) together with the Collector Management API.

@@ -1,0 +1,1740 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Monitors API
+  description: Monitors and monitor folders in the monitors library - search, path, copy, move, import, export, permissions, playbooks and usage.
+  version: 1.0.0
+paths:
+  /v1/monitors/usageInfo:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Usage info of monitors.
+      description: Get the current number and the allowed number of log and metrics monitors.
+      operationId: getMonitorUsageInfo
+      responses:
+        '200':
+          description: MonitorUsageInfo has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMonitorUsageInfoResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: monitor_usage_info
+        wrapperName: GetMonitorUsageInfoResponse
+        mediaType: application/json
+        scalar: false
+  /v1/monitors/disable:
+    put:
+      tags:
+        - monitorsLibraryManagement
+      summary: Disable monitors.
+      description: Bulk disable monitors by the given identifiers.
+      operationId: disableMonitorByIds
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of identifiers.
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: 0000000000000001,0000000000000002,0000000000000003
+      responses:
+        '200':
+          description: Disabled monitors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisableMonitorResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/playbooks:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: List all playbooks.
+      description: List all playbooks available to run.
+      operationId: getMonitorPlaybooks
+      parameters:
+        - name: playbookType
+          in: query
+          description: A string value for playbook type.
+          required: false
+          schema:
+            type: string
+          example: CSE
+      responses:
+        '200':
+          description: MonitorPlaybooks have been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMonitorPlaybooksResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: monitor_playbooks
+        wrapperName: GetMonitorPlaybooksResponse
+        mediaType: application/json
+        scalar: false
+  /v1/monitors/playbooksDetails:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Get playbook details.
+      description: Get the details of the playbooks with the specified identifiers.
+      operationId: getPlaybooksDetails
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of playbook identifiers.
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: 649074b5b3d402d6e80b0d1d,649074b7b3d402d6e80b0da1,649074b6b3d402d6e80b0d75
+      responses:
+        '200':
+          description: MonitorPlaybooks have been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPlaybooksDetailsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: playbooks_details
+        wrapperName: GetPlaybooksDetailsResponse
+        mediaType: application/json
+        scalar: false
+  /v1/monitors:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Bulk read a monitor or folder.
+      description: Bulk read a monitor or folder by the given identifiers from the monitors library.
+      operationId: monitorsReadByIds
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of identifiers.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: 0000000000000001,0000000000000002,0000000000000003
+        - name: skipChildren
+          in: query
+          description: a boolean parameter to control skipping fetching children of requested folder(s)
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A map between an identifier and its definition (monitor or folder).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdToMonitorsLibraryBaseResponseMap'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Create a monitor or folder.
+      description: Create a monitor or folder in the monitors library.
+      operationId: monitorsCreate
+      parameters:
+        - name: parentId
+          in: query
+          description: Identifier of the parent folder in which to create the monitor or folder.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The monitor or folder to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorsLibraryBase'
+        required: true
+      responses:
+        '200':
+          description: The monitor or folder was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Bulk delete a monitor or folder.
+      description: Bulk delete a monitor or folder by the given identifiers in the monitors library.
+      operationId: monitorsDeleteByIds
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of identifiers.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: 0000000000000001,0000000000000002,0000000000000003
+      responses:
+        '200':
+          description: A map between the deleted identifier and its metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdToMonitorsLibraryBaseResponseMap'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/root:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Get the root monitors folder.
+      description: Get the root folder in the monitors library.
+      operationId: getMonitorsLibraryRoot
+      responses:
+        '200':
+          description: Root folder of the monitors library.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryFolderResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/path:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Read a monitor or folder by its path.
+      description: Read a monitor or folder by its path in the monitors library structure.
+      operationId: monitorsGetByPath
+      parameters:
+        - name: path
+          in: query
+          description: The path of the monitor or folder.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/search:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Search for a monitor or folder.
+      description: Search for a monitor or folder in the monitors library structure.
+      operationId: monitorsSearch
+      parameters:
+        - name: query
+          in: query
+          description: |-
+            The search query to find monitor or folder. Below is the list of different filters with examples:
+              - **createdBy** : Filter by the user's identifier who created the content. Example: `createdBy:000000000000968B`.
+              - **createdBefore** : Filter by the content objects created before the given timestamp(in milliseconds). Example: `createdBefore:1457997222`.
+              - **createdAfter** : Filter by the content objects created after the given timestamp(in milliseconds). Example: `createdAfter:1457997111`.
+              - **modifiedBefore** : Filter by the content objects modified before the given timestamp(in milliseconds). Example: `modifiedBefore:1457997222`.
+              - **modifiedAfter** : Filter by the content objects modified after the given timestamp(in milliseconds). Example: `modifiedAfter:1457997111`.
+              - **type** : Filter by the type of the content object. Example: `type:folder`.
+              - **monitorStatus** : Filter by the status of the monitor: Normal, Critical, Warning, MissingData, Disabled, AllTriggered. Example: `monitorStatus:Normal`.
+
+            You can also use multiple filters in one query. For example to search for all content objects created by user with identifier 000000000000968B with creation timestamp after 1457997222 containing the text Test, the query would look like:
+
+              `createdBy:000000000000968B createdAfter:1457997222 Test`
+          required: true
+          schema:
+            type: string
+          example: createdBy:000000000000968B Test
+        - name: limit
+          in: query
+          description: Maximum number of items you want in the response.
+          required: false
+          schema:
+            maximum: 5000
+            type: integer
+            format: int32
+            default: 1000
+          example: 10
+        - name: offset
+          in: query
+          description: The position or row from where to start the search operation.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+          example: 5
+        - name: skipChildren
+          in: query
+          description: a boolean parameter to control skipping fetching children of requested folder(s)
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of folders and monitors matching the search query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsSearchResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: monitors_search
+        wrapperName: MonitorsSearchResponse
+        mediaType: application/json
+        scalar: false
+  /v1/monitors/{id}:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Get a monitor or folder.
+      description: Get a monitor or folder from the monitors library.
+      operationId: monitorsReadById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to read.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Update a monitor or folder.
+      description: Update a monitor or folder in the monitors library. When making updates to existing monitors via API, all configurations are over-written. Make sure to include all configurations of the monitor (existing with new updates), not just the new configurations you want to apply.
+      operationId: monitorsUpdateById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The monitor or folder to update. The content version must match its latest version number in the monitors library. If the version does not match it will not be updated.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorsLibraryBaseUpdate'
+        required: true
+      responses:
+        '200':
+          description: The monitor or folder was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Delete a monitor or folder.
+      description: Delete a monitor or folder from the monitors library.
+      operationId: monitorsDeleteById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The monitor or folder was successfully deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/path:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Get the path of a monitor or folder.
+      description: Get the full path of the monitor or folder in the monitors library.
+      operationId: getMonitorsFullPath
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full path of the monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Path'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/move:
+    post:
+      tags:
+        - monitorsLibraryManagement
+      summary: Move a monitor or folder.
+      description: Move a monitor or folder to a different location in the monitors library.
+      operationId: monitorsMove
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to move.
+          required: true
+          schema:
+            type: string
+        - name: parentId
+          in: query
+          description: Identifier of the parent folder to move the monitor or folder to.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Moved monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/copy:
+    post:
+      tags:
+        - monitorsLibraryManagement
+      summary: Copy a monitor or folder.
+      description: Copy a monitor or folder in the monitors library.
+      operationId: monitorsCopy
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to copy.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: |-
+          Fields include:
+            1) Identifier of the parent folder to copy to.
+            2) Optionally provide a new name.
+            3) Optionally provide a new description.
+            4) Optionally set to true if you want to copy and preserve the locked status. Requires `LockMonitors` capability.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentCopyParams'
+        required: true
+      responses:
+        '200':
+          description: The monitor or folder was copied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/export:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: Export a monitor or folder.
+      description: Export a monitor or folder. If the given identifier is a folder, everything under the folder is exported recursively with folder as the root.
+      operationId: monitorsExportItem
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to export.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exported monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseExport'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{parentId}/import:
+    post:
+      tags:
+        - monitorsLibraryManagement
+      summary: Import a monitor or folder.
+      description: Import a monitor or folder.
+      operationId: monitorsImportItem
+      parameters:
+        - name: parentId
+          in: path
+          description: Identifier of the parent folder in which to import the monitor or folder.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The monitor or folder to be imported.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorsLibraryBaseExport'
+        required: true
+      responses:
+        '200':
+          description: 'Newly imported monitor or folder. NOTE: Permissions field will not be filled (empty list).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/permissions:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        List explicit permissions on monitor or folder.
+      description: List explicit permissions on monitor or folder in the monitors library.
+      operationId: monitorsReadPermissionsById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to list permissions.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The list of explicit permission statements for the monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPermissionsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/permissions/set:
+    put:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Set permissions on monitor or folder.
+      description: Set permissions on monitor or folder in the monitors library.
+      operationId: monitorsSetPermissions
+      requestBody:
+        description: The permission statement definitions to set.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionStatementDefinitions'
+        required: true
+      responses:
+        '200':
+          description: List of the successfully set `PermissionStatements`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionStatements'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/permissions/revoke:
+    put:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        Revoke all permissions on monitor or folder.
+      description: Revoke all permissions on monitor or folder in the monitors library.
+      operationId: monitorsRevokePermissions
+      requestBody:
+        description: The identifiers of the permissions statements to revoke.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionIdentifiers'
+        required: true
+      responses:
+        '204':
+          description: Permissions were successfully revoked for monitor or folder.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/monitors/{id}/permissionSummariesBySubjects:
+    get:
+      tags:
+        - monitorsLibraryManagement
+      summary: |
+        List permission summaries for a monitor or folder.
+      description: List permission summary meta(s) grouped by subjects on monitor or folder in the monitors library.
+      operationId: monitorsReadPermissionSummariesByIdGroupBySubjects
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the monitor or folder to list permissions.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The list of permission summary meta(s) grouped by subjects for the monitor or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionSummariesBySubjects'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MonitorUsageInfo:
+      type: array
+      description: The usage info of logs and metrics monitors.
+      items:
+        $ref: '#/components/schemas/MonitorUsage'
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    DisableMonitorResponse:
+      type: object
+      properties:
+        monitors:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MonitorsLibraryMonitorResponse'
+          description: A map between an identifier and its monitor.
+        warnings:
+          type: array
+          description: Warnings from the operation.
+          items:
+            $ref: '#/components/schemas/DisableMonitorWarning'
+      description: Response for disabling monitors.
+    MonitorPlaybooksList:
+      type: array
+      description: The list of monitor playbooks.
+      items:
+        $ref: '#/components/schemas/MonitorPlaybook'
+    IdToMonitorsLibraryBaseResponseMap:
+      maxProperties: 1000
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+    MonitorsLibraryBase:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the monitor or folder.
+        description:
+          type: string
+          description: Description of the monitor or folder.
+          default: ''
+        type:
+          type: string
+          description: |-
+            Type of the object model. Valid values:
+              1) MonitorsLibraryMonitor
+              2) MonitorsLibraryFolder
+      discriminator:
+        propertyName: type
+    MonitorsLibraryBaseResponse:
+      required:
+        - contentType
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - isMutable
+        - isSystem
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentId
+        - type
+        - version
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the monitor or folder.
+        name:
+          type: string
+          description: Identifier of the monitor or folder.
+        description:
+          type: string
+          description: Description of the monitor or folder.
+        version:
+          type: integer
+          description: Version of the monitor or folder.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        parentId:
+          type: string
+          description: Identifier of the parent folder.
+        contentType:
+          type: string
+          description: |-
+            Type of the content. Valid values:
+              1) Monitor
+              2) Folder
+        type:
+          type: string
+          description: Type of the object model.
+        isSystem:
+          type: boolean
+          description: System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.
+        isMutable:
+          type: boolean
+          description: Immutable objects are "READ-ONLY".
+        permissions:
+          type: array
+          description: Aggregated permission summary for the calling user. If detailed permission statements are required, please call list permissions endpoint.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+      discriminator:
+        propertyName: type
+    MonitorsLibraryFolderResponse:
+      required:
+        - contentType
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - isMutable
+        - isSystem
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentId
+        - type
+        - version
+        - children
+        - permissions
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the monitor or folder.
+        name:
+          type: string
+          description: Identifier of the monitor or folder.
+        description:
+          type: string
+          description: Description of the monitor or folder.
+        version:
+          type: integer
+          description: Version of the monitor or folder.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        parentId:
+          type: string
+          description: Identifier of the parent folder.
+        contentType:
+          type: string
+          description: |-
+            Type of the content. Valid values:
+              1) Monitor
+              2) Folder
+        type:
+          type: string
+          description: Type of the object model.
+        isSystem:
+          type: boolean
+          description: System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.
+        isMutable:
+          type: boolean
+          description: Immutable objects are "READ-ONLY".
+        permissions:
+          type: array
+          description: Aggregated permission summary for the calling user. If detailed permission statements are required, please call list permissions endpoint.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+        children:
+          type: array
+          description: 'Children of the folder. NOTE: Permissions field will not be filled (empty list) for children.'
+          items:
+            $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+      discriminator:
+        propertyName: type
+    ListMonitorsLibraryItemWithPath:
+      type: array
+      description: Multi-type list of types monitor or folder.
+      items:
+        $ref: '#/components/schemas/MonitorsLibraryItemWithPath'
+    MonitorsLibraryBaseUpdate:
+      required:
+        - name
+        - type
+        - version
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the monitor or folder.
+        description:
+          type: string
+          description: The description of the monitor or folder.
+          default: ''
+        version:
+          type: integer
+          description: The version of the monitor or folder.
+          format: int64
+        type:
+          type: string
+          description: Type of the object model.
+      discriminator:
+        propertyName: type
+    Path:
+      required:
+        - path
+        - pathItems
+      type: object
+      properties:
+        pathItems:
+          type: array
+          description: Elements of the path.
+          items:
+            $ref: '#/components/schemas/PathItem'
+        path:
+          type: string
+          description: String representation of the path.
+    ContentCopyParams:
+      required:
+        - parentId
+      type: object
+      properties:
+        parentId:
+          type: string
+          description: Identifier of the parent folder to copy to.
+        name:
+          type: string
+          description: Optionally provide a new name.
+        description:
+          type: string
+          description: Optionally provide a new description.
+    MonitorsLibraryBaseExport:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the monitor or folder.
+        description:
+          type: string
+          description: Description of the monitor or folder.
+        type:
+          type: string
+          description: Type of the object model.
+      discriminator:
+        propertyName: type
+    ListPermissionsResponse:
+      required:
+        - permissionStatements
+      type: object
+      properties:
+        permissionStatements:
+          type: array
+          description: A list of permission statements.
+          items:
+            $ref: '#/components/schemas/PermissionStatement'
+    PermissionStatementDefinitions:
+      required:
+        - permissionStatementDefinitions
+      type: object
+      properties:
+        permissionStatementDefinitions:
+          maxItems: 1000
+          minItems: 1
+          type: array
+          description: List of permission statement definitions.
+          items:
+            $ref: '#/components/schemas/PermissionStatementDefinition'
+    PermissionStatements:
+      required:
+        - permissionStatements
+      type: object
+      properties:
+        permissionStatements:
+          type: array
+          description: A list of permission statements.
+          items:
+            $ref: '#/components/schemas/PermissionStatement'
+    PermissionIdentifiers:
+      required:
+        - permissionIdentifiers
+      type: object
+      properties:
+        permissionIdentifiers:
+          maxItems: 1000
+          minItems: 1
+          type: array
+          description: List of permission identifiers.
+          items:
+            $ref: '#/components/schemas/PermissionIdentifier'
+    PermissionSummariesBySubjects:
+      required:
+        - permissionSummariesBySubjects
+      type: object
+      properties:
+        permissionSummariesBySubjects:
+          type: array
+          description: A list of PermissionSubjects and PermissionSummaryMeta(s) associated with each subject.
+          items:
+            $ref: '#/components/schemas/PermissionSummaryBySubjects'
+    MonitorUsage:
+      properties:
+        monitorType:
+          type: string
+          description: The type of monitor usage info (Logs or Metrics).
+          example: Logs
+          enum:
+            - Logs
+            - Metrics
+        usage:
+          type: integer
+          description: Current number of active Logs/Metrics monitors.
+          example: 100
+        limit:
+          type: integer
+          description: The limit of active Logs/Metrics monitors.
+          example: 100
+        total:
+          type: integer
+          description: The total number of monitors created. (Including both active and disabled Logs/Metrics monitors)
+          example: 100
+      description: The usage info of monitors.
+      type: object
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    MonitorsLibraryMonitorResponse:
+      required:
+        - contentType
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - isMutable
+        - isSystem
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentId
+        - type
+        - version
+        - monitorType
+        - queries
+        - triggers
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the monitor or folder.
+        name:
+          type: string
+          description: Identifier of the monitor or folder.
+        description:
+          type: string
+          description: Description of the monitor or folder.
+        version:
+          type: integer
+          description: Version of the monitor or folder.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        parentId:
+          type: string
+          description: Identifier of the parent folder.
+        contentType:
+          type: string
+          description: |-
+            Type of the content. Valid values:
+              1) Monitor
+              2) Folder
+        type:
+          type: string
+          description: Type of the object model.
+        isSystem:
+          type: boolean
+          description: System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.
+        isMutable:
+          type: boolean
+          description: Immutable objects are "READ-ONLY".
+        permissions:
+          type: array
+          description: Aggregated permission summary for the calling user. If detailed permission statements are required, please call list permissions endpoint.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+        monitorType:
+          pattern: ^(Logs|Metrics|Slo)$
+          type: string
+          description: |-
+            The type of monitor. Valid values:
+              1. `Logs`: A logs query monitor.
+              2. `Metrics`: A metrics query monitor.
+              3. `Slo`: A SLO based monitor. Currently SLO based monitor is available in closed beta (Notify your Sumo Logic representative in order to get the early access).
+          example: Logs
+          x-pattern-message: should be 'Logs' or 'Metrics' or 'Slo'
+        evaluationDelay:
+          type: string
+          description: The delay duration for evaluating the monitor (relative to current time). The timerange of monitor will be shifted in the past by this delay time.
+          example: 5m
+          default: 0m
+        alertName:
+          type: string
+          description: The name of the alert(s) triggered from this monitor. Monitor name will be used if not specified. All template variables can be used here except {{AlertName}}, {{AlertResponseURL}}, {{ResultsJson}}, and {{Playbook}}.
+        runAs:
+          type: object
+          required:
+            - runAsId
+          properties:
+            runAsId:
+              type: string
+              description: The runAsId indicates the context in which monitors will run. If not provided, then it will run in the context of the monitor author.
+              example: 00000000000001DF
+        notificationGroupFields:
+          type: array
+          description: The set of fields to be used to group alert notifications for a monitor. The value of this field will be considered only when 'groupNotifications' is true. The fields with very high cardinality such as `_blockid`, `_raw`, `_messagetime`, `_receipttime`, and `_messageid` are not allowed for Alert Grouping.
+          example:
+            - service
+            - env
+          items:
+            type: string
+        queries:
+          uniqueItems: true
+          type: array
+          description: All queries from the monitor.
+          items:
+            $ref: '#/components/schemas/MonitorQuery'
+        triggers:
+          type: array
+          description: Defines the conditions of when to send notifications.
+          example:
+            - detectionMethod: LogsStaticCondition
+              timeRange: 15m
+              triggerType: Critical
+              threshold: 50
+              thresholdType: GreaterThanOrEqual
+            - detectionMethod: LogsStaticCondition
+              timeRange: 15m
+              triggerType: ResolvedCritical
+              threshold: 50
+              thresholdType: LessThan
+          items:
+            $ref: '#/components/schemas/TriggerCondition'
+        timeZone:
+          type: string
+          description: Time zone identifier for monitor notifications. Follow the format in [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        notifications:
+          type: array
+          description: The notifications the monitor will send when the respective trigger condition is met.
+          example:
+            - notification:
+                connectionType: Slack
+                connectionId: '0000000000000005'
+              runForTriggerTypes:
+                - Critical
+            - notification:
+                connectionType: Email
+                messageBody: Alert Triggered!
+                recipients:
+                  - john@doe.com
+                subject: 'Monitor Alert: {{TriggerType}} on {{SearchName}}'
+                timeZone: America/Los_Angeles
+              runForTriggerTypes:
+                - Critical
+          items:
+            $ref: '#/components/schemas/MonitorNotification'
+          default: []
+        isDisabled:
+          type: boolean
+          description: Whether or not the monitor is disabled. Disabled monitors will not run, and will not generate or send notifications.
+          example: false
+          default: false
+        status:
+          uniqueItems: true
+          type: array
+          description: |-
+            The current status of the monitor. Each monitor can have one or more status values. Valid values:
+              1. `Normal`: The monitor is running normally and does not have any currently triggered conditions.
+              2. `Critical`: The Critical trigger condition has been met.
+              3. `Warning`: The Warning trigger condition has been met.
+              4. `MissingData`: The MissingData trigger condition has been met.
+              5. `Disabled`: The monitor has been disabled and is not currently running.
+          example: '[Normal]'
+          items:
+            type: string
+        groupNotifications:
+          type: boolean
+          description: Whether or not to group notifications for individual items that meet the trigger condition.
+          example: true
+          default: true
+        warnings:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: Monitor manager warnings
+        playbook:
+          type: string
+          description: Notes such as links and instruction to help you resolve alerts triggered by this monitor. {{Markdown}} supported. It will be enabled only if available for your organization. Please contact your Sumo Logic account team to learn more.
+          example: This issue typically happens when database calls are timing out. Look at ServiceA's dashboard to investigate further
+          default: ''
+        sloId:
+          type: string
+          description: Identifier of the SLO definition for the monitor. This is only applicable for SLO type monitors.
+        automatedPlaybookIds:
+          uniqueItems: true
+          type: array
+          description: The set of automated playbook ids for a monitor.
+          example:
+            - 649dcb922b70c74b5d2110f8
+            - 649dcb912b70c74b5d2110a0
+          items:
+            type: string
+          default: []
+      discriminator:
+        propertyName: type
+    DisableMonitorWarning:
+      type: object
+      properties:
+        code:
+          type: string
+          description: A code for the warning message.
+          example: content:not_found
+        message:
+          type: string
+          description: A short message with details about the warning.
+          example: Monitor id=0000000000000001 not found.
+      description: Warning object from the operation providing details such as when a given monitor to disable does not exist.
+    MonitorPlaybook:
+      required:
+        - description
+        - name
+        - playbookId
+        - type
+        - versionId
+      type: object
+      properties:
+        description:
+          type: string
+          description: The description of the monitor playbook.
+          example: <p>30 Seconds API Will Take To Respond</p>
+        playbookId:
+          type: string
+          description: The id of the playbook.
+          example: '1'
+        name:
+          type: string
+          description: The name of the playbook.
+          example: Test
+        versionId:
+          type: string
+          description: The version id of the playbook.
+          example: '1'
+        type:
+          type: string
+          description: The type of the playbook.
+          example: Analytics
+      description: The single monitor playbook.
+    MonitorsLibraryItemWithPath:
+      required:
+        - item
+        - path
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/MonitorsLibraryBaseResponse'
+        path:
+          type: string
+          description: Path of the monitor or folder.
+          example: /Monitors/SampleFolder/TestMonitor
+    PathItem:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the path element.
+        name:
+          type: string
+          description: Name of the path element.
+        description:
+          type: string
+          description: Description of the path element.
+    PermissionStatement:
+      type: object
+      required:
+        - permissions
+        - subjectId
+        - subjectType
+        - targetId
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      properties:
+        permissions:
+          type: array
+          description: List of permissions.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+        subjectType:
+          pattern: ^(role|org)$
+          type: string
+          description: 'Type of subject for the permission. Valid values are: `role` or `org`.'
+          example: role
+          x-pattern-message: 'must be one of the following: `role` or `org`'
+        subjectId:
+          type: string
+          description: The identifier that belongs to the subject type chosen above. For e.g. if the subjectType is set to `role`, subjectId should be the identifier of a role.  Similarly, if the subjectType is `org`, the subjectId should be the identifier of the same org,  which owns the resource target.
+          example: 0000000006743FDA
+        targetId:
+          type: string
+          description: The identifier that belongs to the resource this permission assignment applies to.
+          example: 0000000006743FE2
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    PermissionStatementDefinition:
+      required:
+        - permissions
+        - subjectId
+        - subjectType
+        - targetId
+      type: object
+      properties:
+        permissions:
+          type: array
+          description: List of permissions.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+        subjectType:
+          pattern: ^(role|org)$
+          type: string
+          description: 'Type of subject for the permission. Valid values are: `role` or `org`.'
+          example: role
+          x-pattern-message: 'must be one of the following: `role` or `org`'
+        subjectId:
+          type: string
+          description: The identifier that belongs to the subject type chosen above. For e.g. if the subjectType is set to `role`, subjectId should be the identifier of a role.  Similarly, if the subjectType is `org`, the subjectId should be the identifier of the same org,  which owns the resource target.
+          example: 0000000006743FDA
+        targetId:
+          type: string
+          description: The identifier that belongs to the resource this permission assignment applies to.
+          example: 0000000006743FE2
+    PermissionIdentifier:
+      required:
+        - subjectId
+        - subjectType
+        - targetId
+      type: object
+      properties:
+        subjectType:
+          pattern: ^(user|role|org)$
+          type: string
+          description: 'Type of subject for the permission. Valid values are: `user` or `role` or `org`.'
+          example: role
+          x-pattern-message: 'must be one of the following: `user`, `role`, `org`'
+        subjectId:
+          type: string
+          description: The identifier that belongs to the subject type chosen above. For e.g. if the subjectType is set to `user`, subjectId should be the identifier of a user (same goes for `role` or `org` subjectType).
+          example: 0000000006743FDA
+        targetId:
+          type: string
+          description: The identifier that belongs to the resource this permission assignment applies to.
+          example: 0000000006743FE2
+      description: Identifier for the entity (subject) that is granted the permission on resource(s).
+    PermissionSummaryBySubjects:
+      description: A list of PermissionSubjects and PermissionSummaryMeta(s) associated with each subject.
+      required:
+        - subjectId
+        - subjectType
+        - permissionSummaries
+      type: object
+      properties:
+        subjectType:
+          pattern: ^(user|role|org)$
+          type: string
+          description: 'Type of subject for the permission. Valid values are: `user` or `role` or `org`.'
+          example: role
+          x-pattern-message: 'must be one of the following: `user`, `role`, `org`'
+        subjectId:
+          type: string
+          description: The identifier that belongs to the subject type chosen above. For e.g. if the subjectType is set to `user`, subjectId should be the identifier of a user (same goes for `role` or `org` subjectType).
+          example: 0000000006743FDA
+        permissionSummaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionSummaryMeta'
+    RunAs:
+      required:
+        - runAsId
+      type: object
+      properties:
+        runAsId:
+          type: string
+          description: The runAsId indicates the context in which monitors will run. If not provided, then it will run in the context of the monitor author.
+          example: 00000000000001DF
+    MonitorQuery:
+      required:
+        - query
+        - rowId
+      type: object
+      properties:
+        rowId:
+          type: string
+          description: The unique identifier of the row. Defaults to sequential capital letters, `A`, `B`, `C`, etc.
+          example: A
+        query:
+          type: string
+          description: The logs or metrics query that defines the stream of data the monitor runs on.
+          example: _sourceCategory=search error
+      description: A search query.
+    TriggerCondition:
+      required:
+        - triggerType
+      type: object
+      properties:
+        detectionMethod:
+          pattern: ^(StaticCondition|LogsStaticCondition|MetricsStaticCondition|LogsOutlierCondition|MetricsOutlierCondition|LogsMissingDataCondition|MetricsMissingDataCondition|SloSliCondition|SloBurnRateCondition|LogsAnomalyCondition|MetricsAnomalyCondition)$
+          type: string
+          description: |-
+            Detection method of the trigger condition. Valid values:
+              1. `StaticCondition`: A condition that triggers based off of a static threshold. This `detectionMethod` is deprecated, it is recommended to use other ones instead.
+              2. `LogsStaticCondition`: A logs condition that triggers based off of a static threshold.
+              3. `MetricsStaticCondition`: A metrics condition that triggers based off of a static threshold.
+              4. `LogsOutlierCondition`: A logs condition that triggers based off of a dynamic outlier threshold.
+              5. `MetricsOutlierCondition`: A metrics condition that triggers based off of a dynamic outlier threshold.
+              6. `LogsMissingDataCondition`: A logs missing data condition that triggers based off of no data available.
+              7. `MetricsMissingDataCondition`: A metrics missing data condition that triggers based off of no data available.
+              8. `SloSliCondition`: An SLO condition that triggers based off of current SLI value.
+              9. `SloBurnRateCondition`: An SLO condition that triggers based off of error budget burn rate.
+              10. `LogsAnomalyCondition`: A log anomaly condition that triggers based off anomalies in the data.
+              11. `MetricsAnomalyCondition`: A metric anomaly condition that triggers based off anomalies in the data.
+          example: StaticCondition
+          default: StaticCondition
+          x-pattern-message: 'should be one of the following: ''StaticCondition'', ''LogsStaticCondition'', ''MetricsStaticCondition'', ''LogsOutlierCondition'', ''MetricsOutlierCondition'', ''LogsMissingDataCondition'', ''MetricsMissingDataCondition'', ''SloSliCondition'', ''SloBurnRateCondition'', ''LogsAnomalyCondition'', ''MetricsAnomalyCondition'' '
+        triggerType:
+          pattern: ^(Critical|Warning|MissingData|ResolvedCritical|ResolvedWarning|ResolvedMissingData)$
+          type: string
+          description: |-
+            The type of trigger condition. Valid values:
+              1. `Critical`: A critical condition to trigger on.
+              2. `Warning`: A warning condition to trigger on.
+              3. `MissingData`: A condition that indicates data is missing.
+              4. `ResolvedCritical`: A condition to resolve a Critical trigger on.
+              5. `ResolvedWarning`: A condition to resolve a Warning trigger on.
+              6. `ResolvedMissingData`: A condition to resolve a MissingData trigger.
+          example: Critical
+          x-pattern-message: 'should be one of the following: ''Critical'', ''Warning'', ''MissingData'', ''ResolvedCritical'', ''ResolvedWarning'', or ''ResolvedMissingData'''
+        resolutionWindow:
+          type: string
+          description: 'The resolution window that the recovery condition must be met in each evaluation that happens within this entire duration before the alert is recovered (resolved). If not specified, the time range of your trigger will be used. Valid values are: `0m`, `-5m`, `-10m`, `-15m`, `-30m`, `-1h`, `-3h`, `-6h`, `-12h`, or `-24h`'
+          nullable: true
+          example: '-5m'
+      discriminator:
+        propertyName: detectionMethod
+        mapping:
+          StaticCondition: '#/components/schemas/StaticCondition'
+          LogsStaticCondition: '#/components/schemas/LogsStaticCondition'
+          MetricsStaticCondition: '#/components/schemas/MetricsStaticCondition'
+          LogsOutlierCondition: '#/components/schemas/LogsOutlierCondition'
+          MetricsOutlierCondition: '#/components/schemas/MetricsOutlierCondition'
+          LogsMissingDataCondition: '#/components/schemas/LogsMissingDataCondition'
+          MetricsMissingDataCondition: '#/components/schemas/MetricsMissingDataCondition'
+          SloSliCondition: '#/components/schemas/SloSliCondition'
+          SloBurnRateCondition: '#/components/schemas/SloBurnRateCondition'
+          LogsAnomalyCondition: '#/components/schemas/LogsAnomalyCondition'
+          MetricsAnomalyCondition: '#/components/schemas/MetricsAnomalyCondition'
+    MonitorNotification:
+      required:
+        - notification
+        - runForTriggerTypes
+      type: object
+      properties:
+        notification:
+          $ref: '#/components/schemas/Action'
+        runForTriggerTypes:
+          uniqueItems: true
+          type: array
+          description: The trigger types assigned to send this notification.
+          items:
+            type: string
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    Permissions:
+      required:
+        - permissions
+      type: object
+      properties:
+        permissions:
+          type: array
+          description: List of permissions.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+    PermissionSubject:
+      required:
+        - subjectId
+        - subjectType
+      type: object
+      properties:
+        subjectType:
+          pattern: ^(user|role|org)$
+          type: string
+          description: 'Type of subject for the permission. Valid values are: `user` or `role` or `org`.'
+          example: role
+          x-pattern-message: 'must be one of the following: `user`, `role`, `org`'
+        subjectId:
+          type: string
+          description: The identifier that belongs to the subject type chosen above. For e.g. if the subjectType is set to `user`, subjectId should be the identifier of a user (same goes for `role` or `org` subjectType).
+          example: 0000000006743FDA
+      description: Identifier for the entity (subject) that is granted the permission on resource(s).
+    PermissionSummaryMeta:
+      required:
+        - isExplicit
+        - isInherited
+        - isRecursive
+        - isRevoked
+        - isSystemDefined
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: 'Name of the permission. Example values are: `Read`, `Update`, `Create`, etc.'
+          example: Read
+        isInherited:
+          type: boolean
+          description: A true value implies that the permission is inherited from some ancestors of the resource. A false value implies that the permission is explicitly assigned to the resource.
+          example: true
+        isExplicit:
+          type: boolean
+          description: A true value implies that the permission is explicitly assigned to the resource. A false value implies that the permission is not explicitly assigned to the resource.
+          example: true
+        isRevoked:
+          type: boolean
+          description: A true value implies that the capability required for this permission has been revoked.
+          example: true
+        isRecursive:
+          type: boolean
+          description: A true value implies that the permission is recursively cascaded down to all the direct and indirect children of the resource.
+          example: true
+        isSystemDefined:
+          type: boolean
+          description: A true value implies that the permission is defined by the system on the resource and can not be modified by the user. A false value implies that the permission is defined by the user on the resource and can be modified by the user.
+          example: true
+      description: Permission Summary with additional information like inheritance, revocation, etc about the permission.
+    Action:
+      required:
+        - connectionType
+      type: object
+      properties:
+        connectionType:
+          pattern: ^(Email|AWSLambda|AzureFunctions|Datadog|HipChat|Jira|NewRelic|Opsgenie|PagerDuty|Slack|MicrosoftTeams|ServiceNow|SumoCloudSOAR|Webhook)$
+          type: string
+          description: |-
+            Connection type of the connection. Valid values:
+              1.  `Email`
+              2.  `AWSLambda`
+              3.  `AzureFunctions`
+              4.  `Datadog`
+              5.  `HipChat`
+              6.  `Jira`
+              7.  `NewRelic`
+              8.  `Opsgenie`
+              9.  `PagerDuty`
+              10. `Slack`
+              11. `MicrosoftTeams`
+              12. `ServiceNow`
+              13. `SumoCloudSOAR`
+              14. `Webhook`
+          x-pattern-message: 'should be one of the following: ''Email'', ''AWSLambda'', ''AzureFunctions'', ''Datadog'', ''HipChat'', ''Jira'', ''NewRelic'', ''Opsgenie'', ''PagerDuty'', ''Slack'', ''MicrosoftTeams'', ''ServiceNow'', ''SumoCloudSOAR'' and ''Webhook'''
+      description: The base class of all connection types.
+      discriminator:
+        propertyName: connectionType
+    GetMonitorUsageInfoResponse:
+      type: object
+      properties:
+        monitor_usage_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitorUsage'
+    GetMonitorPlaybooksResponse:
+      type: object
+      properties:
+        monitor_playbooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitorPlaybook'
+    GetPlaybooksDetailsResponse:
+      type: object
+      properties:
+        playbooks_details:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitorPlaybook'
+    MonitorsSearchResponse:
+      type: object
+      properties:
+        monitors_search:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitorsLibraryItemWithPath'

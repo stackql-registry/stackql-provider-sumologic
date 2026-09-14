@@ -1,0 +1,433 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Connections API
+  description: Webhook, ServiceNow, PagerDuty and other outbound connections used by monitors and scheduled searches.
+  version: 1.0.0
+paths:
+  /v1/connections:
+    get:
+      tags:
+        - connectionManagement
+      summary: Get a list of connections.
+      description: Get a list of all connections in the organization. The response is paginated with a default limit of 100 connections per page.
+      operationId: listConnections
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of connections returned in the response. The number of connections returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of connections in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListConnectionsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - connectionManagement
+      summary: Create a new connection.
+      description: Create a new connection in the organization.
+      operationId: createConnection
+      parameters: []
+      requestBody:
+        description: Information about the new connection.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionDefinition'
+        required: true
+      responses:
+        '200':
+          description: The connection has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/connections/test:
+    post:
+      tags:
+        - connectionManagement
+      summary: Test a new connection url.
+      description: Test a new connection url is valid and can connect.
+      operationId: testConnection
+      parameters:
+        - name: functionalities
+          in: query
+          description: 'A comma-separated functionalities of webhook payload to test. Acceptable values: `alert`, `resolution`.'
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+            default:
+              - alert
+          example: alert,resolution
+        - name: connectionId
+          in: query
+          description: Unique identifier of an existing connection to test. It should be provided when the request body of an existing connection contains masked authorization headers. If not provided, the authorization headers will not be correctly unmasked, and the test may fail due to unauthorized access.
+          required: false
+          schema:
+            type: string
+          example: 0000000000123ABC
+      requestBody:
+        description: Information about the new connection.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionDefinition'
+        required: true
+      responses:
+        '200':
+          description: The connection url has been tested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestConnectionResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/connections/incidentTemplates:
+    post:
+      tags:
+        - connectionManagement
+      summary: Get incident templates for CloudSOAR connections.
+      description: Get incident templates for CloudSOAR connections.
+      operationId: getIncidentTemplates
+      parameters: []
+      requestBody:
+        description: Information about the new connection.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetIncidentTemplatesRequest'
+        required: false
+      responses:
+        '200':
+          description: A list of the incident templates for the given CloudSOAR account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIncidentTemplatesResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/connections/{id}:
+    get:
+      tags:
+        - connectionManagement
+      summary: Get a connection.
+      description: Get a connection with the given identifier.
+      operationId: getConnection
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of connection to return.
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of connection to return. Valid values are `WebhookConnection`, `ServiceNowConnection`.
+          schema:
+            type: string
+            default: WebhookConnection
+      responses:
+        '200':
+          description: Connection object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - connectionManagement
+      summary: Update a connection.
+      description: Update an existing connection.
+      operationId: updateConnection
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the connection to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the connection.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionDefinition'
+        required: true
+      responses:
+        '200':
+          description: The connection was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - connectionManagement
+      summary: Delete a connection.
+      description: Delete a connection with the given identifier.
+      operationId: deleteConnection
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the connection to delete.
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of connection to delete. Valid values are `WebhookConnection`, `ServiceNowConnection`.
+          required: true
+          schema:
+            pattern: ^(WebhookConnection|ServiceNowConnection)$
+            type: string
+            x-pattern-message: must be either `WebhookConnection` or `ServiceNowConnection`
+      responses:
+        '204':
+          description: Connection was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListConnectionsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of connections.
+          items:
+            $ref: '#/components/schemas/Connection'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    ConnectionDefinition:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        type:
+          pattern: ^(WebhookDefinition|ServiceNowDefinition)$
+          type: string
+          description: Type of connection. Valid values are `WebhookDefinition`, `ServiceNowDefinition`.
+          x-pattern-message: must be either `WebhookDefinition` or `ServiceNowDefinition`
+        name:
+          maxLength: 127
+          minLength: 1
+          type: string
+          description: Name of the connection.
+        description:
+          maxLength: 1024
+          type: string
+          description: Description of the connection.
+          default: ''
+      discriminator:
+        propertyName: type
+        mapping:
+          ServiceNowDefinition: '#/components/schemas/ServiceNowDefinition'
+          WebhookDefinition: '#/components/schemas/WebhookDefinition'
+    Connection:
+      required:
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - modifiedAt
+        - modifiedBy
+        - name
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of connection. Valid values are `WebhookConnection`, `ServiceNowConnection`.
+        id:
+          type: string
+          description: Unique identifier for the connection.
+        name:
+          type: string
+          description: Name of the connection.
+        description:
+          type: string
+          description: Description of the connection.
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+      discriminator:
+        propertyName: type
+    TestConnectionResponse:
+      required:
+        - responseContent
+        - statusCode
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: Status code of the response of the connection test.
+        responseContent:
+          type: string
+          description: Content of the response of the connection test.
+        alertStatusCode:
+          type: integer
+          description: Status code of the response of alert payload test.
+          format: int32
+          example: 200
+        alertResponseContent:
+          type: string
+          description: Content of the response of alert payload test.
+          example: ok
+        resolutionStatusCode:
+          type: integer
+          description: Status code of the response of resolution payload test.
+          format: int32
+          example: 200
+        resolutionResponseContent:
+          type: string
+          description: Content of the response of resolution payload test.
+          example: ok
+    GetIncidentTemplatesRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Optional CloudSOAR domain URL to use for the API call to get incident templates.
+          example: https://staging.soar.sumologic.com/
+        authHeader:
+          type: string
+          description: Optional CloudSOAR authorization header to use for the API call to get incident templates.
+          example: SOMEAUTHHEADERSTRING
+        connectionId:
+          type: string
+          description: Optional connectionId to get incident templates for an existing CloudSOAR connection. If provided, the authHeader and url will be taken from the existing connection object.
+          example: 0000000000123ABC
+    GetIncidentTemplatesResponse:
+      required:
+        - templates
+      type: object
+      properties:
+        templates:
+          type: array
+          description: List of incident templates.
+          items:
+            $ref: '#/components/schemas/IncidentTemplate'
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    IncidentTemplate:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the incident template.
+        name:
+          type: string
+          description: Name of the incident template.
