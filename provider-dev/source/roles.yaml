@@ -1,0 +1,2142 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Roles API
+  description: Roles (v1 and v2) and role assignment to users.
+  version: 1.0.0
+paths:
+  /v1/roles:
+    get:
+      tags:
+        - roleManagement
+      summary: Get a list of roles.
+      description: Get a list of all the roles in the organization. The response is paginated with a default limit of 100 roles per page.
+      operationId: listRoles
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of roles returned in the response. The number of roles returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort the list of roles by the `name` field.
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Only return roles matching the given name.
+          required: false
+          schema:
+            minLength: 1
+            type: string
+      responses:
+        '200':
+          description: A paginated list of roles in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoleModelsResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - roleManagement
+      summary: Create a new role.
+      description: Create a new role in the organization.
+      operationId: createRole
+      parameters: []
+      requestBody:
+        description: Information about the new role.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleDefinition'
+        required: true
+      responses:
+        '200':
+          description: The role has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-create: createRole
+  /v1/roles/{id}:
+    get:
+      tags:
+        - roleManagement
+      summary: Get a role.
+      description: Get a role with the given identifier in the organization.
+      operationId: getRole
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to fetch.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-read: getRole
+    put:
+      tags:
+        - roleManagement
+      summary: Update a role.
+      description: Update an existing role in the organization.
+      operationId: updateRole
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the role.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleDefinition'
+        required: true
+      responses:
+        '200':
+          description: The user was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-update: updateRole
+    delete:
+      tags:
+        - roleManagement
+      summary: Delete a role.
+      description: Delete a role with the given identifier from the organization.
+      operationId: deleteRole
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Role was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-delete: deleteRole
+  /v1/roles/{roleId}/users/{userId}:
+    put:
+      tags:
+        - roleManagement
+      summary: Assign a role to a user.
+      description: Assign a role to a user in the organization.
+      operationId: assignRoleToUser
+      parameters:
+        - name: roleId
+          in: path
+          description: Identifier of the role to assign.
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: Identifier of the user to assign the role to.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role was successfully assigned to the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModel'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - roleManagement
+      summary: Remove role from a user.
+      description: Remove a role from a user in the organization.
+      operationId: removeRoleFromUser
+      parameters:
+        - name: roleId
+          in: path
+          description: Identifier of the role to delete.
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: Identifier of the user to remove the role from.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Role was successfully removed from the user.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/roles:
+    get:
+      tags:
+        - roleManagementV2
+      summary: Get a list of roles.
+      description: Get a list of all the roles in the organization. The response is paginated with a default limit of 100 roles per page.
+      operationId: listRolesV2
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of roles returned in the response. The number of roles returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort the list of roles by the `name` field.
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Only return roles matching the given name.
+          required: false
+          schema:
+            minLength: 1
+            type: string
+      responses:
+        '200':
+          description: A paginated list of roles in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoleModelsResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - roleManagementV2
+      summary: Create a new role.
+      description: Create a new role in the organization.
+      operationId: createRoleV2
+      parameters: []
+      requestBody:
+        description: Information about the new role.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleDefinitionV2'
+        required: true
+      responses:
+        '200':
+          description: The role has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModelV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-create: createRoleV2
+  /v2/roles/{id}:
+    get:
+      tags:
+        - roleManagementV2
+      summary: Get a role.
+      description: Get a role with the given identifier in the organization.
+      operationId: getRoleV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to fetch.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRoleDefinitionV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-read: getRoleV2
+    put:
+      tags:
+        - roleManagementV2
+      summary: Update a role.
+      description: Update an existing role in the organization.
+      operationId: updateRoleV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the role.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleDefinitionV2'
+        required: true
+      responses:
+        '200':
+          description: The user was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModelV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-update: updateRoleV2
+    delete:
+      tags:
+        - roleManagementV2
+      summary: Delete a role.
+      description: Delete a role with the given identifier from the organization.
+      operationId: deleteRoleV2
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the role to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Role was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-delete: deleteRoleV2
+  /v2/roles/{roleId}/users/{userId}:
+    put:
+      tags:
+        - roleManagementV2
+      summary: Assign a role to a user.
+      description: Assign a role to a user in the organization.
+      operationId: assignRoleToUserV2
+      parameters:
+        - name: roleId
+          in: path
+          description: Identifier of the role to assign.
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: Identifier of the user to assign the role to.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Role was successfully assigned to the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleModelV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - roleManagementV2
+      summary: Remove role from a user.
+      description: Remove a role from a user in the organization.
+      operationId: removeRoleFromUserV2
+      parameters:
+        - name: roleId
+          in: path
+          description: Identifier of the role to delete.
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: Identifier of the user to remove the role from.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Role was successfully removed from the user.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListRoleModelsResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of roles.
+          items:
+            $ref: '#/components/schemas/RoleModel'
+        next:
+          type: string
+          description: Next continuation token.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    CreateRoleDefinition:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        filterPredicate:
+          type: string
+          description: A search filter to restrict access to specific logs. The filter is silently added to the beginning of each query a user runs. For example, using '!_sourceCategory=billing' as a filter predicate will prevent users assigned to the role from viewing logs from the source category named 'billing'.
+          example: '!_sourceCategory=billing'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/docs/manage/users-roles/roles/role-capabilities/) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - manageIndexes
+              - manageDataStreams
+              - viewParsers
+              - viewDataStreams
+              - viewPipelines
+              - managePipelines
+
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - ipWhitelisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+              - shareDashboardWhitelist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+              - cseViewAutomations
+              - cseManageContextActions
+              - cseViewNetworkBlocks
+              - cseManageInsightTags
+              - cseViewRules
+              - cseViewThreatIntelligence
+              - cseCommentOnInsights
+              - cseViewEntityGroups
+              - cseManageEntityConfiguration
+              - cseManageNetworkBlocks
+              - cseManageMatchLists
+              - cseViewCustomInsights
+              - cseManageActions
+              - cseManageAutomations
+              - cseManageMappings
+              - cseManageThreatIntelligence
+              - cseViewActions
+              - cseCreateInsights
+              - cseManageTagSchemas
+              - cseInvokeInsights
+              - cseManageCustomEntityType
+              - cseViewTagSchemas
+              - cseDeleteInsights
+              - cseManageCustomInsights
+              - cseViewFileAnalysis
+              - cseManageFileAnalysis
+              - cseManageEntityCriticality
+              - cseViewEntityCriticality
+              - cseViewEntity
+              - cseManageCustomInsightStatuses
+              - cseViewContextActions
+              - cseViewMappings
+              - cseViewCustomEntityType
+              - cseManageEntityGroups
+              - cseViewCustomInsightStatuses
+              - cseViewEnrichments
+              - cseManageInsightSignals
+              - cseManageRules
+              - cseManageArtifacts
+              - cseViewMatchLists
+              - cseManageInsightPolicy
+              - cseManageEnrichments
+              - cseViewEntityConfiguration
+              - cseManageEntity
+              - cseExecuteAutomations
+              - cseManageSuppressedEntities
+              - cseManageInsightStatus  
+              - cseManageInsightAssignee
+              - cseManageFavoriteFields
+              - cseViewSuppressedEntities
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+              - viewMutingSchedules
+              - manageMutingSchedules
+              - adminMonitorsV2
+
+            ### SLO
+              - viewSlos
+              - manageSlos
+
+            ### CloudSoar
+              - cloudSoarPlaybooksAccess
+              - cloudSoarNotificationConfigure
+              - cloudSoarReportAll
+              - cloudSoarIncidentTriageAccess
+              - cloudSoarIncidentTaskView
+              - cloudSoarIncidentChangeOwnership
+              - cloudSoarIncidentNotesEdit
+              - cloudSoarAPIEmailEdit
+              - cloudSoarIncidentTemplatesAccess
+              - cloudSoarIncidentPlaybooksManage
+              - cloudSoarGeneralConfigure
+              - cloudSoarEntitiesAccess
+              - cloudSoarEntitiesBulkPhysicalDelete
+              - cloudSoarIncidentAttachmentsAccess
+              - cloudSoarAppCentralAccess
+              - cloudSoarBridgeMonitoringAccess
+              - viewCloudSoar
+              - cloudSoarIncidentView
+              - cloudSoarObservabilityAccess
+              - cloudSoarAPIEmailRead
+              - cloudSoarAppCentralExport
+              - cloudSoarWidgetsAll
+              - cloudSoarIncidentTaskReassign
+              - cloudSoarIntegrationsAccess
+              - cloudSoarCustomizationIncidentLabels
+              - cloudSoarAutomationRulesConfigure
+              - cloudSoarIncidentTaskAccessAll
+              - cloudSoarAuditAndInformationConfigureAuditTrail
+              - cloudSoarIncidentTriageEdit
+              - cloudSoarIncidentEdit
+              - cloudSoarNotificationTriage
+              - cloudSoarIncidentTriageBulkPhysicalDelete
+              - cloudSoarIncidentNotesAccess
+              - cloudSoarAPIUse
+              - cloudSoarIncidentPlaybooksEdit
+              - cloudSoarDashboardAll
+              - cloudSoarEntitiesManage
+              - cloudSoarIncidentTemplatesConfigure
+              - cloudSoarIncidentTriageAccessAll
+              - cloudSoarPlaybooksConfigure
+              - cloudSoarIncidentAccessAll
+              - cloudSoarCustomizationLogo
+              - cloudSoarIncidentTaskAccess
+              - cloudSoarIncidentTriageView
+              - cloudSoarIntegrationsConfigure
+              - cloudSoarIncidentManageInvestigators
+              - cloudSoarIncidentAccess
+              - cloudSoarAuditAndInformationLicenseInformation
+              - cloudSoarIncidentBulkOperations
+              - cloudSoarCustomizationFields
+              - cloudSoarIncidentTaskEdit
+              - cloudSoarDashboardAccess
+              - cloudSoarIncidentAttachmentsEdit
+              - cloudSoarIncidentFoldersEdit
+              - cloudSoarUserManagementGroups
+              - cloudSoarIncidentPlaybooksAccess
+              - cloudSoarIncidentWarRoomUse
+              - cloudSoarReportAccess
+              - cloudSoarAuditAndInformationAuditTrail
+              - cloudSoarAutomationRulesAccess
+              - cloudSoarIncidentTriageChangeOwnership
+              - cloudSoarObservabilityManagement
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+    RoleModel:
+      type: object
+      x-tf-generated-properties: id,name,description,filterPredicate,capabilities
+      x-tf-resource-name: Role
+      required:
+        - name
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        filterPredicate:
+          type: string
+          description: A search filter to restrict access to specific logs. The filter is silently added to the beginning of each query a user runs. For example, using '!_sourceCategory=billing' as a filter predicate will prevent users assigned to the role from viewing logs from the source category named 'billing'.
+          example: '!_sourceCategory=billing'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/docs/manage/users-roles/roles/role-capabilities/) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - manageIndexes
+              - manageDataStreams
+              - viewParsers
+              - viewDataStreams
+              - viewPipelines
+              - managePipelines
+
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - ipWhitelisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+              - shareDashboardWhitelist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+              - cseViewAutomations
+              - cseManageContextActions
+              - cseViewNetworkBlocks
+              - cseManageInsightTags
+              - cseViewRules
+              - cseViewThreatIntelligence
+              - cseCommentOnInsights
+              - cseViewEntityGroups
+              - cseManageEntityConfiguration
+              - cseManageNetworkBlocks
+              - cseManageMatchLists
+              - cseViewCustomInsights
+              - cseManageActions
+              - cseManageAutomations
+              - cseManageMappings
+              - cseManageThreatIntelligence
+              - cseViewActions
+              - cseCreateInsights
+              - cseManageTagSchemas
+              - cseInvokeInsights
+              - cseManageCustomEntityType
+              - cseViewTagSchemas
+              - cseDeleteInsights
+              - cseManageCustomInsights
+              - cseViewFileAnalysis
+              - cseManageFileAnalysis
+              - cseManageEntityCriticality
+              - cseViewEntityCriticality
+              - cseViewEntity
+              - cseManageCustomInsightStatuses
+              - cseViewContextActions
+              - cseViewMappings
+              - cseViewCustomEntityType
+              - cseManageEntityGroups
+              - cseViewCustomInsightStatuses
+              - cseViewEnrichments
+              - cseManageInsightSignals
+              - cseManageRules
+              - cseManageArtifacts
+              - cseViewMatchLists
+              - cseManageInsightPolicy
+              - cseManageEnrichments
+              - cseViewEntityConfiguration
+              - cseManageEntity
+              - cseExecuteAutomations
+              - cseManageSuppressedEntities
+              - cseManageInsightStatus  
+              - cseManageInsightAssignee
+              - cseManageFavoriteFields
+              - cseViewSuppressedEntities
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+              - viewMutingSchedules
+              - manageMutingSchedules
+              - adminMonitorsV2
+
+            ### SLO
+              - viewSlos
+              - manageSlos
+
+            ### CloudSoar
+              - cloudSoarPlaybooksAccess
+              - cloudSoarNotificationConfigure
+              - cloudSoarReportAll
+              - cloudSoarIncidentTriageAccess
+              - cloudSoarIncidentTaskView
+              - cloudSoarIncidentChangeOwnership
+              - cloudSoarIncidentNotesEdit
+              - cloudSoarAPIEmailEdit
+              - cloudSoarIncidentTemplatesAccess
+              - cloudSoarIncidentPlaybooksManage
+              - cloudSoarGeneralConfigure
+              - cloudSoarEntitiesAccess
+              - cloudSoarEntitiesBulkPhysicalDelete
+              - cloudSoarIncidentAttachmentsAccess
+              - cloudSoarAppCentralAccess
+              - cloudSoarBridgeMonitoringAccess
+              - viewCloudSoar
+              - cloudSoarIncidentView
+              - cloudSoarObservabilityAccess
+              - cloudSoarAPIEmailRead
+              - cloudSoarAppCentralExport
+              - cloudSoarWidgetsAll
+              - cloudSoarIncidentTaskReassign
+              - cloudSoarIntegrationsAccess
+              - cloudSoarCustomizationIncidentLabels
+              - cloudSoarAutomationRulesConfigure
+              - cloudSoarIncidentTaskAccessAll
+              - cloudSoarAuditAndInformationConfigureAuditTrail
+              - cloudSoarIncidentTriageEdit
+              - cloudSoarIncidentEdit
+              - cloudSoarNotificationTriage
+              - cloudSoarIncidentTriageBulkPhysicalDelete
+              - cloudSoarIncidentNotesAccess
+              - cloudSoarAPIUse
+              - cloudSoarIncidentPlaybooksEdit
+              - cloudSoarDashboardAll
+              - cloudSoarEntitiesManage
+              - cloudSoarIncidentTemplatesConfigure
+              - cloudSoarIncidentTriageAccessAll
+              - cloudSoarPlaybooksConfigure
+              - cloudSoarIncidentAccessAll
+              - cloudSoarCustomizationLogo
+              - cloudSoarIncidentTaskAccess
+              - cloudSoarIncidentTriageView
+              - cloudSoarIntegrationsConfigure
+              - cloudSoarIncidentManageInvestigators
+              - cloudSoarIncidentAccess
+              - cloudSoarAuditAndInformationLicenseInformation
+              - cloudSoarIncidentBulkOperations
+              - cloudSoarCustomizationFields
+              - cloudSoarIncidentTaskEdit
+              - cloudSoarDashboardAccess
+              - cloudSoarIncidentAttachmentsEdit
+              - cloudSoarIncidentFoldersEdit
+              - cloudSoarUserManagementGroups
+              - cloudSoarIncidentPlaybooksAccess
+              - cloudSoarIncidentWarRoomUse
+              - cloudSoarReportAccess
+              - cloudSoarAuditAndInformationAuditTrail
+              - cloudSoarAutomationRulesAccess
+              - cloudSoarIncidentTriageChangeOwnership
+              - cloudSoarObservabilityManagement
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the role.
+          example: 0000000000E20FE3
+        systemDefined:
+          type: boolean
+          description: Role is system or user defined.
+          example: false
+    UpdateRoleDefinition:
+      required:
+        - capabilities
+        - description
+        - filterPredicate
+        - name
+        - users
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        filterPredicate:
+          type: string
+          description: A search filter to restrict access to specific logs. The filter is silently added to the beginning of each query a user runs. For example, using '!_sourceCategory=billing' as a filter predicate will prevent users assigned to the role from viewing logs from the source category named 'billing'.
+          example: '!_sourceCategory=billing'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/Manage/Users-and-Roles/Manage-Roles/Role-Capabilities) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - viewPipelines
+              - managePipelines
+
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+    ListRoleModelsResponseV2:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of roles.
+          items:
+            $ref: '#/components/schemas/GetRoleDefinitionV2'
+        next:
+          type: string
+          description: Next continuation token.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    CreateRoleDefinitionV2:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        logAnalyticsFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Log Analytics product area.
+          example: '!_sourceCategory=collector'
+        auditDataFilter:
+          type: string
+          description: 'A search filter which would be applied on partitions which belong to Audit Data product area. Help Doc : (https://help.sumologic.com/docs/manage/security/audit-index/).'
+          example: info
+        securityDataFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Security Data product area.
+          example: error
+        selectionType:
+          type: string
+          description: |-
+            Describes the Permission Construct for the list of views in "selectedViews" parameter. 
+            ### Valid Values are : 
+              - `All` selectionType would allow access to all views in the org.
+              - `Allow` selectionType would allow access to specific views mentioned in "selectedViews" parameter.
+              - `Deny` selectionType would deny access to specific views mentioned in "selectedViews" parameter.
+          example: All
+        selectedViews:
+          type: array
+          description: List of views which with specific view level filters in accordance to the selectionType chosen.
+          items:
+            $ref: '#/components/schemas/ViewFilterDefinition'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/docs/manage/users-roles/roles/role-capabilities/) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - manageIndexes
+              - manageDataStreams
+              - viewParsers
+              - viewDataStreams
+              - viewPipelines
+              - managePipelines
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - ipWhitelisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+              - shareDashboardWhitelist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+              - cseViewAutomations
+              - cseManageContextActions
+              - cseViewNetworkBlocks
+              - cseManageInsightTags
+              - cseViewRules
+              - cseViewThreatIntelligence
+              - cseCommentOnInsights
+              - cseViewEntityGroups
+              - cseManageEntityConfiguration
+              - cseManageNetworkBlocks
+              - cseManageMatchLists
+              - cseViewCustomInsights
+              - cseManageActions
+              - cseManageAutomations
+              - cseManageMappings
+              - cseManageThreatIntelligence
+              - cseViewActions
+              - cseCreateInsights
+              - cseManageTagSchemas
+              - cseInvokeInsights
+              - cseManageCustomEntityType
+              - cseViewTagSchemas
+              - cseDeleteInsights
+              - cseManageCustomInsights
+              - cseViewFileAnalysis
+              - cseManageFileAnalysis
+              - cseManageEntityCriticality
+              - cseViewEntityCriticality
+              - cseViewEntity
+              - cseManageCustomInsightStatuses
+              - cseViewContextActions
+              - cseViewMappings
+              - cseViewCustomEntityType
+              - cseManageEntityGroups
+              - cseViewCustomInsightStatuses
+              - cseViewEnrichments
+              - cseManageInsightSignals
+              - cseManageRules
+              - cseManageArtifacts
+              - cseViewMatchLists
+              - cseManageInsightPolicy
+              - cseManageEnrichments
+              - cseViewEntityConfiguration
+              - cseManageEntity
+              - cseExecuteAutomations
+              - cseManageSuppressedEntities
+              - cseManageInsightStatus  
+              - cseManageInsightAssignee
+              - cseManageFavoriteFields
+              - cseViewSuppressedEntities
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+              - viewMutingSchedules
+              - manageMutingSchedules
+              - adminMonitorsV2
+
+            ### SLO
+              - viewSlos
+              - manageSlos
+
+            ### CloudSoar
+              - cloudSoarPlaybooksAccess
+              - cloudSoarNotificationConfigure
+              - cloudSoarReportAll
+              - cloudSoarIncidentTriageAccess
+              - cloudSoarIncidentTaskView
+              - cloudSoarIncidentChangeOwnership
+              - cloudSoarIncidentNotesEdit
+              - cloudSoarAPIEmailEdit
+              - cloudSoarIncidentTemplatesAccess
+              - cloudSoarIncidentPlaybooksManage
+              - cloudSoarGeneralConfigure
+              - cloudSoarEntitiesAccess
+              - cloudSoarEntitiesBulkPhysicalDelete
+              - cloudSoarIncidentAttachmentsAccess
+              - cloudSoarAppCentralAccess
+              - cloudSoarBridgeMonitoringAccess
+              - viewCloudSoar
+              - cloudSoarIncidentView
+              - cloudSoarObservabilityAccess
+              - cloudSoarAPIEmailRead
+              - cloudSoarAppCentralExport
+              - cloudSoarWidgetsAll
+              - cloudSoarIncidentTaskReassign
+              - cloudSoarIntegrationsAccess
+              - cloudSoarCustomizationIncidentLabels
+              - cloudSoarAutomationRulesConfigure
+              - cloudSoarIncidentTaskAccessAll
+              - cloudSoarAuditAndInformationConfigureAuditTrail
+              - cloudSoarIncidentTriageEdit
+              - cloudSoarIncidentEdit
+              - cloudSoarNotificationTriage
+              - cloudSoarIncidentTriageBulkPhysicalDelete
+              - cloudSoarIncidentNotesAccess
+              - cloudSoarAPIUse
+              - cloudSoarIncidentPlaybooksEdit
+              - cloudSoarDashboardAll
+              - cloudSoarEntitiesManage
+              - cloudSoarIncidentTemplatesConfigure
+              - cloudSoarIncidentTriageAccessAll
+              - cloudSoarPlaybooksConfigure
+              - cloudSoarIncidentAccessAll
+              - cloudSoarCustomizationLogo
+              - cloudSoarIncidentTaskAccess
+              - cloudSoarIncidentTriageView
+              - cloudSoarIntegrationsConfigure
+              - cloudSoarIncidentManageInvestigators
+              - cloudSoarIncidentAccess
+              - cloudSoarAuditAndInformationLicenseInformation
+              - cloudSoarIncidentBulkOperations
+              - cloudSoarCustomizationFields
+              - cloudSoarIncidentTaskEdit
+              - cloudSoarDashboardAccess
+              - cloudSoarIncidentAttachmentsEdit
+              - cloudSoarIncidentFoldersEdit
+              - cloudSoarUserManagementGroups
+              - cloudSoarIncidentPlaybooksAccess
+              - cloudSoarIncidentWarRoomUse
+              - cloudSoarReportAccess
+              - cloudSoarAuditAndInformationAuditTrail
+              - cloudSoarAutomationRulesAccess
+              - cloudSoarIncidentTriageChangeOwnership
+              - cloudSoarObservabilityManagement
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+    RoleModelV2:
+      type: object
+      x-tf-generated-properties: id,name,description,logAnalyticsFilter,auditDataFilter,securityDataFilter,selectionType,selectedViews,capabilities
+      x-tf-resource-name: RoleV2
+      required:
+        - name
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        logAnalyticsFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Log Analytics product area.
+          example: '!_sourceCategory=collector'
+        auditDataFilter:
+          type: string
+          description: 'A search filter which would be applied on partitions which belong to Audit Data product area. Help Doc : (https://help.sumologic.com/docs/manage/security/audit-index/).'
+          example: info
+        securityDataFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Security Data product area.
+          example: error
+        selectionType:
+          type: string
+          description: |-
+            Describes the Permission Construct for the list of views in "selectedViews" parameter. 
+            ### Valid Values are : 
+              - `All` selectionType would allow access to all views in the org.
+              - `Allow` selectionType would allow access to specific views mentioned in "selectedViews" parameter.
+              - `Deny` selectionType would deny access to specific views mentioned in "selectedViews" parameter.
+          example: All
+        selectedViews:
+          type: array
+          description: List of views which with specific view level filters in accordance to the selectionType chosen.
+          items:
+            $ref: '#/components/schemas/ViewFilterDefinition'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/docs/manage/users-roles/roles/role-capabilities/) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - manageIndexes
+              - manageDataStreams
+              - viewParsers
+              - viewDataStreams
+              - viewPipelines
+              - managePipelines
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - ipWhitelisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+              - shareDashboardWhitelist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+              - cseViewAutomations
+              - cseManageContextActions
+              - cseViewNetworkBlocks
+              - cseManageInsightTags
+              - cseViewRules
+              - cseViewThreatIntelligence
+              - cseCommentOnInsights
+              - cseViewEntityGroups
+              - cseManageEntityConfiguration
+              - cseManageNetworkBlocks
+              - cseManageMatchLists
+              - cseViewCustomInsights
+              - cseManageActions
+              - cseManageAutomations
+              - cseManageMappings
+              - cseManageThreatIntelligence
+              - cseViewActions
+              - cseCreateInsights
+              - cseManageTagSchemas
+              - cseInvokeInsights
+              - cseManageCustomEntityType
+              - cseViewTagSchemas
+              - cseDeleteInsights
+              - cseManageCustomInsights
+              - cseViewFileAnalysis
+              - cseManageFileAnalysis
+              - cseManageEntityCriticality
+              - cseViewEntityCriticality
+              - cseViewEntity
+              - cseManageCustomInsightStatuses
+              - cseViewContextActions
+              - cseViewMappings
+              - cseViewCustomEntityType
+              - cseManageEntityGroups
+              - cseViewCustomInsightStatuses
+              - cseViewEnrichments
+              - cseManageInsightSignals
+              - cseManageRules
+              - cseManageArtifacts
+              - cseViewMatchLists
+              - cseManageInsightPolicy
+              - cseManageEnrichments
+              - cseViewEntityConfiguration
+              - cseManageEntity
+              - cseExecuteAutomations
+              - cseManageSuppressedEntities
+              - cseManageInsightStatus  
+              - cseManageInsightAssignee
+              - cseManageFavoriteFields
+              - cseViewSuppressedEntities
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+              - viewMutingSchedules
+              - manageMutingSchedules
+              - adminMonitorsV2
+
+            ### SLO
+              - viewSlos
+              - manageSlos
+
+            ### CloudSoar
+              - cloudSoarPlaybooksAccess
+              - cloudSoarNotificationConfigure
+              - cloudSoarReportAll
+              - cloudSoarIncidentTriageAccess
+              - cloudSoarIncidentTaskView
+              - cloudSoarIncidentChangeOwnership
+              - cloudSoarIncidentNotesEdit
+              - cloudSoarAPIEmailEdit
+              - cloudSoarIncidentTemplatesAccess
+              - cloudSoarIncidentPlaybooksManage
+              - cloudSoarGeneralConfigure
+              - cloudSoarEntitiesAccess
+              - cloudSoarEntitiesBulkPhysicalDelete
+              - cloudSoarIncidentAttachmentsAccess
+              - cloudSoarAppCentralAccess
+              - cloudSoarBridgeMonitoringAccess
+              - viewCloudSoar
+              - cloudSoarIncidentView
+              - cloudSoarObservabilityAccess
+              - cloudSoarAPIEmailRead
+              - cloudSoarAppCentralExport
+              - cloudSoarWidgetsAll
+              - cloudSoarIncidentTaskReassign
+              - cloudSoarIntegrationsAccess
+              - cloudSoarCustomizationIncidentLabels
+              - cloudSoarAutomationRulesConfigure
+              - cloudSoarIncidentTaskAccessAll
+              - cloudSoarAuditAndInformationConfigureAuditTrail
+              - cloudSoarIncidentTriageEdit
+              - cloudSoarIncidentEdit
+              - cloudSoarNotificationTriage
+              - cloudSoarIncidentTriageBulkPhysicalDelete
+              - cloudSoarIncidentNotesAccess
+              - cloudSoarAPIUse
+              - cloudSoarIncidentPlaybooksEdit
+              - cloudSoarDashboardAll
+              - cloudSoarEntitiesManage
+              - cloudSoarIncidentTemplatesConfigure
+              - cloudSoarIncidentTriageAccessAll
+              - cloudSoarPlaybooksConfigure
+              - cloudSoarIncidentAccessAll
+              - cloudSoarCustomizationLogo
+              - cloudSoarIncidentTaskAccess
+              - cloudSoarIncidentTriageView
+              - cloudSoarIntegrationsConfigure
+              - cloudSoarIncidentManageInvestigators
+              - cloudSoarIncidentAccess
+              - cloudSoarAuditAndInformationLicenseInformation
+              - cloudSoarIncidentBulkOperations
+              - cloudSoarCustomizationFields
+              - cloudSoarIncidentTaskEdit
+              - cloudSoarDashboardAccess
+              - cloudSoarIncidentAttachmentsEdit
+              - cloudSoarIncidentFoldersEdit
+              - cloudSoarUserManagementGroups
+              - cloudSoarIncidentPlaybooksAccess
+              - cloudSoarIncidentWarRoomUse
+              - cloudSoarReportAccess
+              - cloudSoarAuditAndInformationAuditTrail
+              - cloudSoarAutomationRulesAccess
+              - cloudSoarIncidentTriageChangeOwnership
+              - cloudSoarObservabilityManagement
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the role.
+          example: 0000000000E20FE3
+        systemDefined:
+          type: boolean
+          description: Role is system or user defined.
+          example: false
+    GetRoleDefinitionV2:
+      type: object
+      required:
+        - name
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        logAnalyticsFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Log Analytics product area.
+          example: '!_sourceCategory=collector'
+        auditDataFilter:
+          type: string
+          description: 'A search filter which would be applied on partitions which belong to Audit Data product area. Help Doc : (https://help.sumologic.com/docs/manage/security/audit-index/).'
+          example: info
+        securityDataFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Security Data product area.
+          example: error
+        selectionType:
+          type: string
+          description: |-
+            Describes the Permission Construct for the list of views in "selectedViews" parameter. 
+            ### Valid Values are : 
+              - `All` selectionType would allow access to all views in the org.
+              - `Allow` selectionType would allow access to specific views mentioned in "selectedViews" parameter.
+              - `Deny` selectionType would deny access to specific views mentioned in "selectedViews" parameter.
+          example: All
+        selectedViews:
+          type: array
+          description: List of views which with specific view level filters in accordance to the selectionType chosen.
+          items:
+            $ref: '#/components/schemas/GetViewFilterDefinition'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/Manage/Users-and-Roles/Manage-Roles/Role-Capabilities) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - viewPipelines
+              - managePipelines
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the role.
+          example: 0000000000E20FE3
+        systemDefined:
+          type: boolean
+          description: Role is system or user defined.
+          example: false
+    UpdateRoleDefinitionV2:
+      required:
+        - auditDataFilter
+        - capabilities
+        - description
+        - logAnalyticsFilter
+        - name
+        - securityDataFilter
+        - selectedViews
+        - selectionType
+        - users
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        logAnalyticsFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Log Analytics product area.
+          example: '!_sourceCategory=collector'
+        auditDataFilter:
+          type: string
+          description: 'A search filter which would be applied on partitions which belong to Audit Data product area. Help Doc : (https://help.sumologic.com/docs/manage/security/audit-index/).'
+          example: info
+        securityDataFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Security Data product area.
+          example: error
+        selectionType:
+          type: string
+          description: |-
+            Describes the Permission Construct for the list of views in "selectedViews" parameter. 
+            ### Valid Values are : 
+              - `All` selectionType would allow access to all views in the org.
+              - `Allow` selectionType would allow access to specific views mentioned in "selectedViews" parameter.
+              - `Deny` selectionType would deny access to specific views mentioned in "selectedViews" parameter.
+          example: All
+        selectedViews:
+          type: array
+          description: List of views which with specific view level filters in accordance to the selectionType chosen.
+          items:
+            $ref: '#/components/schemas/ViewFilterDefinition'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/Manage/Users-and-Roles/Manage-Roles/Role-Capabilities) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - viewPipelines
+              - managePipelines
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    ViewFilterDefinition:
+      required:
+        - viewName
+      type: object
+      properties:
+        viewName:
+          type: string
+          description: Name of the view.
+          example: auditData
+    RoleDefinition:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: Name of the role.
+          example: DataAdmin
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the role.
+          example: Manage data of the org.
+        logAnalyticsFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Log Analytics product area.
+          example: '!_sourceCategory=collector'
+        auditDataFilter:
+          type: string
+          description: 'A search filter which would be applied on partitions which belong to Audit Data product area. Help Doc : (https://help.sumologic.com/docs/manage/security/audit-index/).'
+          example: info
+        securityDataFilter:
+          type: string
+          description: A search filter which would be applied on partitions which belong to Security Data product area.
+          example: error
+        selectionType:
+          type: string
+          description: |-
+            Describes the Permission Construct for the list of views in "selectedViews" parameter. 
+            ### Valid Values are : 
+              - `All` selectionType would allow access to all views in the org.
+              - `Allow` selectionType would allow access to specific views mentioned in "selectedViews" parameter.
+              - `Deny` selectionType would deny access to specific views mentioned in "selectedViews" parameter.
+          example: All
+        selectedViews:
+          type: array
+          description: List of views which with specific view level filters in accordance to the selectionType chosen.
+          items:
+            $ref: '#/components/schemas/GetViewFilterDefinition'
+        users:
+          type: array
+          description: List of user identifiers to assign the role to.
+          example:
+            - 0000000006743FE0
+            - 0000000005FCE0EE
+          items:
+            type: string
+        capabilities:
+          type: array
+          description: |-
+            List of [capabilities](https://help.sumologic.com/Manage/Users-and-Roles/Manage-Roles/Role-Capabilities) associated with this role. Valid values are
+            ### Data Management
+              - viewCollectors
+              - manageCollectors
+              - manageBudgets
+              - manageDataVolumeFeed
+              - viewFieldExtraction
+              - manageFieldExtractionRules
+              - manageS3DataForwarding
+              - manageContent
+              - manageApps
+              - dataVolumeIndex
+              - manageConnections
+              - viewScheduledViews
+              - manageScheduledViews
+              - viewPartitions
+              - managePartitions
+              - viewFields
+              - manageFields
+              - viewAccountOverview
+              - manageTokens
+              - downloadSearchResults
+              - viewPipelines
+              - managePipelines
+            ### Entity management
+              - manageEntityTypeConfig
+
+            ### Metrics
+              - metricsTransformation
+              - metricsExtraction
+              - metricsRules
+
+            ### Security
+              - managePasswordPolicy
+              - ipAllowlisting
+              - createAccessKeys
+              - manageAccessKeys
+              - manageSupportAccountAccess
+              - manageAuditDataFeed
+              - manageSaml
+              - shareDashboardOutsideOrg
+              - manageOrgSettings
+              - changeDataAccessLevel
+
+            ### Dashboards
+              - shareDashboardWorld
+              - shareDashboardAllowlist
+
+            ### UserManagement
+              - manageUsersAndRoles
+
+            ### Observability
+              - searchAuditIndex
+              - auditEventIndex
+
+            ### Cloud SIEM Enterprise
+              - viewCse
+
+            ### Alerting
+              - viewMonitorsV2
+              - manageMonitorsV2
+              - viewAlerts
+          example:
+            - manageContent
+            - manageDataVolumeFeed
+            - manageFieldExtractionRules
+            - manageS3DataForwarding
+          items:
+            type: string
+        autofillDependencies:
+          type: boolean
+          description: Set this to true if you want to automatically append all missing capability requirements. If set to false an error will be thrown if any capabilities are missing their dependencies.
+          default: true
+    GetViewFilterDefinition:
+      required:
+        - viewName
+      type: object
+      properties:
+        viewName:
+          type: string
+          description: Name of the view. Help Doc:- (https://help.sumologic.com/docs/manage/partitions-data-tiers/)
+          example: auditData

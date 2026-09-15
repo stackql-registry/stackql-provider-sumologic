@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>health_events</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>health_events</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="health_events" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.health_events.health_events" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>health_events</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="listAllHealthEvents"
+    defaultValue="list"
     values={[
-        { label: 'listAllHealthEvents', value: 'listAllHealthEvents' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listAllHealthEvents">
+<TabItem value="list">
 
 A paginated list of all the health events.
 
@@ -51,34 +52,34 @@ A paginated list of all the health events.
 </thead>
 <tbody>
 <tr>
+    <td><CopyableCode code="event_id" /></td>
+    <td><code>string</code></td>
+    <td>The unique identifier of the event. (example: e801dc7d-f483-46e9-bcc9-410f08f96497) (wire: eventId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="event_name" /></td>
+    <td><code>string</code></td>
+    <td>The name of the event. (example: InstalledCollectorOffline) (wire: eventName)</td>
+</tr>
+<tr>
     <td><CopyableCode code="details" /></td>
     <td><code>object</code></td>
     <td></td>
 </tr>
 <tr>
-    <td><CopyableCode code="eventId" /></td>
-    <td><code>string</code></td>
-    <td>The unique identifier of the event. (example: e801dc7d-f483-46e9-bcc9-410f08f96497)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="eventName" /></td>
-    <td><code>string</code></td>
-    <td>The name of the event. (example: InstalledCollectorOffline)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="eventTime" /></td>
+    <td><CopyableCode code="event_time" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00.000Z) (wire: eventTime)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="resourceIdentity" /></td>
+    <td><CopyableCode code="resource_identity" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: resourceIdentity)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="severityLevel" /></td>
+    <td><CopyableCode code="severity_level" /></td>
     <td><code>string</code></td>
-    <td>The criticality of the event. It is either `Error` or `Warning`</td>
+    <td>The criticality of the event. It is either `Error` or `Warning` (wire: severityLevel)</td>
 </tr>
 <tr>
     <td><CopyableCode code="subsystem" /></td>
@@ -106,11 +107,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#listAllHealthEvents"><CopyableCode code="listAllHealthEvents" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
     <td>Get a list of all the unresolved health events in your account.</td>
+</tr>
+<tr>
+    <td><a href="#list_for_resources"><CopyableCode code="list_for_resources" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data"><code>data</code></a></td>
+    <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
+    <td>Get a list of all the unresolved events in your account that belong to the supplied resource identifiers.</td>
 </tr>
 </tbody>
 </table>
@@ -131,7 +139,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
@@ -149,28 +157,57 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="listAllHealthEvents"
+    defaultValue="list"
     values={[
-        { label: 'listAllHealthEvents', value: 'listAllHealthEvents' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listAllHealthEvents">
+<TabItem value="list">
 
 Get a list of all the unresolved health events in your account.
 
 ```sql
 SELECT
+event_id,
+event_name,
 details,
-eventId,
-eventName,
-eventTime,
-resourceIdentity,
-severityLevel,
+event_time,
+resource_identity,
+severity_level,
 subsystem
 FROM sumologic.health_events.health_events
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 AND limit = '{{ limit }}'
 AND token = '{{ token }}'
+;
+```
+</TabItem>
+</Tabs>
+
+
+## Lifecycle Methods
+
+EXEC variables use wire (API) names.
+
+<Tabs
+    defaultValue="list_for_resources"
+    values={[
+        { label: 'list_for_resources', value: 'list_for_resources' }
+    ]}
+>
+<TabItem value="list_for_resources">
+
+Get a list of all the unresolved events in your account that belong to the supplied resource identifiers.
+
+```sql
+EXEC sumologic.health_events.health_events.list_for_resources 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set, 
+@limit='{{ limit }}', 
+@token='{{ token }}' 
+@@json=
+'{
+"data": "{{ data }}"
+}'
 ;
 ```
 </TabItem>

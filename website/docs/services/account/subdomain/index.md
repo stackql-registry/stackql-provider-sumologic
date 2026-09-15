@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>subdomain</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>subdomain</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="subdomain" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.account.subdomain" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>subdomain</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getSubdomain"
+    defaultValue="get"
     values={[
-        { label: 'getSubdomain', value: 'getSubdomain' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getSubdomain">
+<TabItem value="get">
 
 The subdomain's definition.
 
@@ -51,24 +52,24 @@ The subdomain's definition.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format. </td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format.  (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource.</td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC.</td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource.</td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="subdomain" /></td>
@@ -78,7 +79,7 @@ The subdomain's definition.
 <tr>
     <td><CopyableCode code="url" /></td>
     <td><code>string</code></td>
-    <td>Login URL corresponding to the subdomain. (example: https://your-company.sumologic.com)</td>
+    <td>Login URL corresponding to the subdomain. (example: https:​//your-company.sumologic.com)</td>
 </tr>
 </tbody>
 </table>
@@ -101,32 +102,39 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getSubdomain"><CopyableCode code="getSubdomain" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get the configured subdomain.</td>
 </tr>
 <tr>
-    <td><a href="#createSubdomain"><CopyableCode code="createSubdomain" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__subdomain"><code>data__subdomain</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-subdomain"><code>subdomain</code></a></td>
     <td></td>
     <td>Create a subdomain. Only the Account Owner can create a subdomain.</td>
 </tr>
 <tr>
-    <td><a href="#deleteSubdomain"><CopyableCode code="deleteSubdomain" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-subdomain"><code>subdomain</code></a></td>
+    <td></td>
+    <td>Update a subdomain. Only the Account Owner can update the subdomain.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Delete the configured subdomain.</td>
 </tr>
 <tr>
-    <td><a href="#updateSubdomain"><CopyableCode code="updateSubdomain" /></a></td>
+    <td><a href="#recover"><CopyableCode code="recover" /></a></td>
     <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-subdomain"><code>subdomain</code></a></td>
+    <td><a href="#parameter-email"><code>email</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Update a subdomain. Only the Account Owner can update the subdomain.</td>
+    <td>Send an email with the subdomain information for a user with the given email address.</td>
 </tr>
 </tbody>
 </table>
@@ -144,10 +152,15 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
+<tr id="parameter-email">
+    <td><CopyableCode code="email" /></td>
+    <td><code>string</code></td>
+    <td>Email address of the user to get subdomain information.</td>
+</tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -155,25 +168,25 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getSubdomain"
+    defaultValue="get"
     values={[
-        { label: 'getSubdomain', value: 'getSubdomain' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getSubdomain">
+<TabItem value="get">
 
 Get the configured subdomain.
 
 ```sql
 SELECT
-createdAt,
-createdBy,
-modifiedAt,
-modifiedBy,
+created_at,
+created_by,
+modified_at,
+modified_by,
 subdomain,
 url
 FROM sumologic.account.subdomain
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -183,29 +196,29 @@ WHERE region = '{{ region }}' -- required
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createSubdomain"
+    defaultValue="create"
     values={[
-        { label: 'createSubdomain', value: 'createSubdomain' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createSubdomain">
+<TabItem value="create">
 
 Create a subdomain. Only the Account Owner can create a subdomain.
 
 ```sql
 INSERT INTO sumologic.account.subdomain (
-data__subdomain,
+subdomain,
 region
 )
 SELECT 
 '{{ subdomain }}' /* required */,
 '{{ region }}'
 RETURNING
-createdAt,
-createdBy,
-modifiedAt,
-modifiedBy,
+created_at,
+created_by,
+modified_at,
+modified_by,
 subdomain,
 url
 ;
@@ -213,17 +226,48 @@ url
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: subdomain
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the subdomain resource.
     - name: subdomain
-      value: string
+      value: "{{ subdomain }}"
       description: |
         The new subdomain.
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Update a subdomain. Only the Account Owner can update the subdomain.
+
+```sql
+UPDATE sumologic.account.subdomain
+SET 
+subdomain = '{{ subdomain }}'
+WHERE 
+region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND subdomain = '{{ subdomain }}' --required
+RETURNING
+created_at,
+created_by,
+modified_at,
+modified_by,
+subdomain,
+url;
 ```
 </TabItem>
 </Tabs>
@@ -232,18 +276,18 @@ url
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteSubdomain"
+    defaultValue="delete"
     values={[
-        { label: 'deleteSubdomain', value: 'deleteSubdomain' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteSubdomain">
+<TabItem value="delete">
 
 Delete the configured subdomain.
 
 ```sql
 DELETE FROM sumologic.account.subdomain
-WHERE region = '{{ region }}' --required
+WHERE region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -252,23 +296,22 @@ WHERE region = '{{ region }}' --required
 
 ## Lifecycle Methods
 
+EXEC variables use wire (API) names.
+
 <Tabs
-    defaultValue="updateSubdomain"
+    defaultValue="recover"
     values={[
-        { label: 'updateSubdomain', value: 'updateSubdomain' }
+        { label: 'recover', value: 'recover' }
     ]}
 >
-<TabItem value="updateSubdomain">
+<TabItem value="recover">
 
-Update a subdomain. Only the Account Owner can update the subdomain.
+Send an email with the subdomain information for a user with the given email address.
 
 ```sql
-EXEC sumologic.account.subdomain.updateSubdomain 
-@region='{{ region }}' --required 
-@@json=
-'{
-"subdomain": "{{ subdomain }}"
-}'
+EXEC sumologic.account.subdomain.recover 
+@email='{{ email }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

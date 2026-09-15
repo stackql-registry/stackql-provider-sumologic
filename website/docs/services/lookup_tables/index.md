@@ -18,20 +18,16 @@ lookup_tables service documentation.
 
 :::info[Service Summary]
 
-total resources: __6__  
+total resources: __2__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/lookup_tables/delete_table_row/">delete_table_row</a><br />
-<a href="/services/lookup_tables/jobs_status/">jobs_status</a><br />
-<a href="/services/lookup_tables/lookup_tables/">lookup_tables</a>
+<a href="/services/lookup_tables/jobs/">jobs</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/lookup_tables/row/">row</a><br />
-<a href="/services/lookup_tables/truncate/">truncate</a><br />
-<a href="/services/lookup_tables/upload/">upload</a>
+<a href="/services/lookup_tables/lookup_tables/">lookup_tables</a>
 </div>
 </div>

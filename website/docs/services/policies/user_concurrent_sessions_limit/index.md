@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>user_concurrent_sessions_limit<
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>user_concurrent_sessions_limit</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="user_concurrent_sessions_limit" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.policies.user_concurrent_sessions_limit" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>user_concurrent_sessions_limit<
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getUserConcurrentSessionsLimitPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getUserConcurrentSessionsLimitPolicy', value: 'getUserConcurrentSessionsLimitPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getUserConcurrentSessionsLimitPolicy">
+<TabItem value="get">
 
 The User Concurrent Sessions Limit policy.
 
@@ -56,9 +57,9 @@ The User Concurrent Sessions Limit policy.
     <td>Whether the User Concurrent Sessions Limit policy is enabled.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="maxConcurrentSessions" /></td>
+    <td><CopyableCode code="max_concurrent_sessions" /></td>
     <td><code>integer (int32)</code></td>
-    <td>Maximum number of concurrent sessions a user may have.</td>
+    <td>Maximum number of concurrent sessions a user may have. (wire: maxConcurrentSessions)</td>
 </tr>
 </tbody>
 </table>
@@ -81,18 +82,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getUserConcurrentSessionsLimitPolicy"><CopyableCode code="getUserConcurrentSessionsLimitPolicy" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Get the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)</td>
+    <td>Get the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. &#91;Learn More&#93;(https:​//help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)</td>
 </tr>
 <tr>
-    <td><a href="#setUserConcurrentSessionsLimitPolicy"><CopyableCode code="setUserConcurrentSessionsLimitPolicy" /></a></td>
-    <td><CopyableCode code="exec" /></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-enabled"><code>enabled</code></a></td>
     <td></td>
-    <td>Set the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)</td>
+    <td>Set the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. &#91;Learn More&#93;(https:​//help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)</td>
 </tr>
 </tbody>
 </table>
@@ -113,7 +114,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -121,48 +122,50 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getUserConcurrentSessionsLimitPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getUserConcurrentSessionsLimitPolicy', value: 'getUserConcurrentSessionsLimitPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getUserConcurrentSessionsLimitPolicy">
+<TabItem value="get">
 
 Get the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)
 
 ```sql
 SELECT
 enabled,
-maxConcurrentSessions
+max_concurrent_sessions
 FROM sumologic.policies.user_concurrent_sessions_limit
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
 </Tabs>
 
 
-## Lifecycle Methods
+## `UPDATE` examples
 
 <Tabs
-    defaultValue="setUserConcurrentSessionsLimitPolicy"
+    defaultValue="update"
     values={[
-        { label: 'setUserConcurrentSessionsLimitPolicy', value: 'setUserConcurrentSessionsLimitPolicy' }
+        { label: 'update', value: 'update' }
     ]}
 >
-<TabItem value="setUserConcurrentSessionsLimitPolicy">
+<TabItem value="update">
 
 Set the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)
 
 ```sql
-EXEC sumologic.policies.user_concurrent_sessions_limit.setUserConcurrentSessionsLimitPolicy 
-@region='{{ region }}' --required 
-@@json=
-'{
-"enabled": {{ enabled }}, 
-"maxConcurrentSessions": {{ maxConcurrentSessions }}
-}'
-;
+UPDATE sumologic.policies.user_concurrent_sessions_limit
+SET 
+enabled = {{ enabled }},
+max_concurrent_sessions = {{ max_concurrent_sessions }}
+WHERE 
+region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND enabled = {{ enabled }} --required
+RETURNING
+enabled,
+max_concurrent_sessions;
 ```
 </TabItem>
 </Tabs>

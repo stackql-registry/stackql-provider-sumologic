@@ -1,0 +1,16 @@
+{
+  "specs": {
+    "sumologic-api": {
+      "url": "https://api.sumologic.com/docs/sumologic-api.yaml",
+      "filename": "sumologic-api.yaml",
+      "openapi": "3.0.0",
+      "spec_version": "1.0.0",
+      "paths": 305,
+      "operations": 443,
+      "tags": 58,
+      "sha256": "111fdae618b1b5a42bb897bd64d5e8f4084fa9a79397d56dc1038e86bbc020c5",
+      "bytes": 1404982,
+      "fetched": "2026-09-14"
+    }
+  }
+}

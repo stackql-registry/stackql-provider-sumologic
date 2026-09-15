@@ -18,18 +18,16 @@ ingest_budgets service documentation.
 
 :::info[Service Summary]
 
-total resources: __4__  
+total resources: __1__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/ingest_budgets/collectors/">collectors</a><br />
-<a href="/services/ingest_budgets/ingest_budgets_v1/">ingest_budgets_v1</a>
+<a href="/services/ingest_budgets/ingest_budgets/">ingest_budgets</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/ingest_budgets/ingest_budgets_v2/">ingest_budgets_v2</a><br />
-<a href="/services/ingest_budgets/usage_reset/">usage_reset</a>
+
 </div>
 </div>

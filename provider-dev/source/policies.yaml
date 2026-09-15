@@ -1,0 +1,616 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Policies API
+  description: Organization security and behaviour policies - audit, search audit, data access level, data deletion, session limits, dashboard sharing, timestamp format, OAuth CIMD and access key lifetime.
+  version: 1.0.0
+paths:
+  /v1/policies/audit:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Audit policy.
+      description: Get the Audit policy. This policy specifies whether audit records for your account are enabled. You can access details about reported account events in the Sumo Logic Audit Index. [Learn More](https://help.sumologic.com/Manage/Security/Audit-Index)
+      operationId: getAuditPolicy
+      responses:
+        '200':
+          description: The Audit policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Audit policy.
+      description: Set the Audit policy. This policy specifies whether audit records for your account are enabled. You can access details about reported account events in the Sumo Logic Audit Index. [Learn More](https://help.sumologic.com/Manage/Security/Audit-Index)
+      operationId: setAuditPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditPolicy'
+        required: true
+      responses:
+        '200':
+          description: Audit policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/searchAudit:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Search Audit policy.
+      description: Get the Search Audit policy. This policy specifies whether search records for your account are enabled. You can access details about your account's search capacity, queries run by users from the Sumo Search Audit Index. [Learn More](https://help.sumologic.com/Manage/Security/Search_Audit_Index)
+      operationId: getSearchAuditPolicy
+      responses:
+        '200':
+          description: The Search Audit policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchAuditPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Search Audit policy.
+      description: Set the Search Audit policy. This policy specifies whether search records for your account are enabled. You can access details about your account's search capacity, queries run by users from the Sumo Search Audit Index. [Learn More](https://help.sumologic.com/Manage/Security/Search_Audit_Index)
+      operationId: setSearchAuditPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchAuditPolicy'
+        required: true
+      responses:
+        '200':
+          description: Search Audit policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchAuditPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/shareDashboardsOutsideOrganization:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Share Dashboards Outside Organization policy.
+      description: Get the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)
+      operationId: getShareDashboardsOutsideOrganizationPolicy
+      responses:
+        '200':
+          description: The Share Dashboards Outside Organization policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareDashboardsOutsideOrganizationPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Share Dashboards Outside Organization policy.
+      description: Set the Share Dashboards Outside Organization policy. This policy allows users to share the dashboard with view only privileges outside of the organization (capability must be enabled from the Roles page). Disabling this policy will disable all dashboards that have been shared outside of the organization. [Learn More](https://help.sumologic.com/Visualizations-and-Alerts/Dashboards/Share_Dashboards/Share_a_Dashboard_Outside_Your_Org)
+      operationId: setShareDashboardsOutsideOrganizationPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareDashboardsOutsideOrganizationPolicy'
+        required: true
+      responses:
+        '200':
+          description: Share Dashboards Outside Organization policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareDashboardsOutsideOrganizationPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/dataAccessLevel:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Data Access Level policy.
+      description: Get the Data Access Level policy. When enabled, this policy sets the default data access level for all newly created dashboards to the viewer’s role access filter. Otherwise, newly created dashboards will default to the sharer’s role access filter and might display data that viewers’ roles don’t allow them to view. [Learn More](https://help.sumologic.com/Manage/Security/Data_Access_Level_for_Shared_Dashboards)
+      operationId: getDataAccessLevelPolicy
+      responses:
+        '200':
+          description: The Data Access Level policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataAccessLevelPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Data Access Level policy.
+      description: Set the Data Access Level policy. When enabled, this policy sets the default data access level for all newly created dashboards to the viewer’s role access filter. Otherwise, newly created dashboards will default to the sharer’s role access filter and might display data that viewers’ roles don’t allow them to view. [Learn More](https://help.sumologic.com/Manage/Security/Data_Access_Level_for_Shared_Dashboards)
+      operationId: setDataAccessLevelPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataAccessLevelPolicy'
+        required: true
+      responses:
+        '200':
+          description: Data Access Level policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataAccessLevelPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/userConcurrentSessionsLimit:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get User Concurrent Sessions Limit policy.
+      description: Get the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)
+      operationId: getUserConcurrentSessionsLimitPolicy
+      responses:
+        '200':
+          description: The User Concurrent Sessions Limit policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserConcurrentSessionsLimitPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set User Concurrent Sessions Limit policy.
+      description: Set the User Concurrent Sessions Limit policy. When enabled, the number of concurrent sessions a user may have is limited to the value entered. If a user exceeds the allowed number of sessions, the user's oldest session will be logged out to accommodate the new one. Disabling this policy means a user may have an unlimited number of concurrent sessions. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Limit_for_User_Concurrent_Sessions)
+      operationId: setUserConcurrentSessionsLimitPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserConcurrentSessionsLimitPolicy'
+        required: true
+      responses:
+        '200':
+          description: User Concurrent Sessions Limit policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserConcurrentSessionsLimitPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/maxUserSessionTimeout:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Max User Session Timeout policy.
+      description: Get the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)
+      operationId: getMaxUserSessionTimeoutPolicy
+      responses:
+        '200':
+          description: The Max User Session Timeout policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaxUserSessionTimeoutPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Max User Session Timeout policy.
+      description: Set the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)
+      operationId: setMaxUserSessionTimeoutPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaxUserSessionTimeoutPolicy'
+        required: true
+      responses:
+        '200':
+          description: Max User Session Timeout policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaxUserSessionTimeoutPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/accessKeysLifetime:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get access key lifetime policy.
+      description: Get access key lifetime policy. This policy defines the maximum time an access key has once it has been created or rotated before it must be rotated. Otherwise, it will no longer be able to be used. The value 0 represents that the access keys will never expire and the time specified can be configured  by the organization.
+      operationId: getAccessKeysLifetimePolicy
+      responses:
+        '200':
+          description: The Access Key Lifetime Policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessKeysLifetimePolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set access keys lifetime policy.
+      description: Sets the access keys lifetime policy. By setting this policy, the time  an access key has to live before it is expired or must be rotated is defined based on the period (default = never) configured for the organization. Setting the value to 0 would represent that the access keys never expire.
+      operationId: setAccessKeysLifetimePolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeysLifetimePolicy'
+        required: true
+      responses:
+        '200':
+          description: Access Keys Lifetime policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessKeysLifetimePolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/dataDeletion:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Data Deletion policy.
+      description: Get the Data Deletion policy. This policy specifies whether users are allowed to delete data from Sumo Logic. Disabling this policy prevents users from deleting log data. [Learn More](https://help.sumologic.com/Manage/Security/Data_Deletion)
+      operationId: getDataDeletionPolicy
+      responses:
+        '200':
+          description: The Data Deletion policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDeletionPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Data Deletion policy.
+      description: Set the Data Deletion policy. This policy specifies whether users are allowed to delete data from Sumo Logic. Disabling this policy prevents users from deleting log data. [Learn More](https://help.sumologic.com/Manage/Security/Data_Deletion)
+      operationId: setDataDeletionPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataDeletionPolicy'
+        required: true
+      responses:
+        '200':
+          description: Data Deletion policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDeletionPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/timestampFormat:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get Alert Timestamp Format policy.
+      description: Get the Alert Timestamp Format policy. This policy controls the date/time format used in alert and recovery notification payloads across all connections and monitor types. When set to ISO, timestamps use the format yyyy-MM-dd HH:mm:ss z. When set to LEGACY, timestamps use the format MM/dd/yyyy hh:mm:ss a z.
+      operationId: getTimestampFormatPolicy
+      responses:
+        '200':
+          description: The Alert Timestamp Format policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimestampFormatPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set Alert Timestamp Format policy.
+      description: Set the Alert Timestamp Format policy. This policy controls the date/time format used in alert and recovery notification payloads across all connections and monitor types. When set to ISO, timestamps use the format yyyy-MM-dd HH:mm:ss z. When set to LEGACY, timestamps use the format MM/dd/yyyy hh:mm:ss a z.
+      operationId: setTimestampFormatPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimestampFormatPolicy'
+        required: true
+      responses:
+        '200':
+          description: Alert Timestamp Format policy was set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimestampFormatPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/policies/oAuthCimd:
+    get:
+      tags:
+        - policiesManagement
+      summary: Get OAuth policy for Client ID Metadata Documents (CIMD) authentication.
+      description: If disabled then authentication with Client ID Metadata Documents (CIMD) is disabled and no new CIMD clients can be created. If set to "enabled" then authentication with CIMD clients is enabled and new CIMD clients can be created automatically as part of authentication. If set to "enabled-pre-registered-only" then authentication with CIMD clients  is enabled but new CIMD clients can only be created manually on the OAuth Clients page in the UI.
+      operationId: getOAuthCimdPolicy
+      responses:
+        '200':
+          description: The OAuth policy for Client ID Metadata Documents (CIMD) authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthCimdPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - policiesManagement
+      summary: Set OAuth policy for Client ID Metadata Documents (CIMD) authentication.
+      description: If disabled then authentication with Client ID Metadata Documents (CIMD) is disabled and no new CIMD clients can be created. If set to "enabled" then authentication with CIMD clients is enabled and new CIMD clients can be created automatically as part of authentication. If set to "enabled-pre-registered-only" then authentication with CIMD clients  is enabled but new CIMD clients can only be created manually on the OAuth Clients page in the UI.
+      operationId: setOAuthCimdPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthCimdPolicy'
+        required: true
+      responses:
+        '200':
+          description: The OAuth policy for Client ID Metadata Documents (CIMD) authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthCimdPolicy'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AuditPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the Audit policy is enabled.
+          example: true
+      description: Audit policy.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    SearchAuditPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the Search Audit policy is enabled.
+          example: true
+      description: Search Audit policy.
+    ShareDashboardsOutsideOrganizationPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the Share Dashboards Outside Organization policy is enabled.
+          example: true
+      description: Share Dashboards Outside Organization policy.
+    DataAccessLevelPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the Data Access Level policy is enabled.
+          example: true
+      description: Data Access Level policy.
+    UserConcurrentSessionsLimitPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the User Concurrent Sessions Limit policy is enabled.
+          example: true
+        maxConcurrentSessions:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Maximum number of concurrent sessions a user may have.
+          format: int32
+          example: 50
+          default: 100
+      description: User Concurrent Sessions Limit policy.
+    MaxUserSessionTimeoutPolicy:
+      required:
+        - maxUserSessionTimeout
+      type: object
+      properties:
+        maxUserSessionTimeout:
+          pattern: ^(5m|15m|30m|1h|2h|6h|12h|1d|2d|3d|5d|7d)$
+          type: string
+          description: 'Maximum web session timeout users are able to configure within their user preferences. Valid values are: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d`'
+          example: 1d
+          x-pattern-message: 'must be one of the following: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d`'
+      description: Max User Session Timeout policy.
+    AccessKeysLifetimePolicy:
+      required:
+        - accessKeysLifetimeInDays
+      type: object
+      properties:
+        accessKeysLifetimeInDays:
+          pattern: ^(0|30|45|60|90|180|365)$
+          type: string
+          description: 'The number of days it will take for an access key to expire without being rotated/copied. Setting it to 0 (never) means that access keys will never expire. Valid values are: `0`, `30`, `45`, `60`, `90`, `180`, or `365`'
+          example: '60'
+          x-pattern-message: 'must be one of the following: `0`, `30`, `45`, `60`, `90`, `180`, or `365`'
+      description: Access Keys Lifetime policy.
+    DataDeletionPolicy:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether the Data Deletion policy is enabled.
+          example: true
+      description: Whether the Data Deletion policy is enabled.
+    TimestampFormatPolicy:
+      required:
+        - timestampFormat
+      type: object
+      properties:
+        timestampFormat:
+          type: string
+          description: 'The timestamp format used in alert notification payloads. Valid values: `ISO`, `LEGACY`. ISO format: yyyy-MM-dd HH:mm:ss z. LEGACY format: MM/dd/yyyy hh:mm:ss a z.'
+          example: LEGACY
+      description: Alert Timestamp Format policy.
+    OAuthCimdPolicy:
+      required:
+        - oAuthCimdPolicy
+      type: object
+      properties:
+        oAuthCimdPolicy:
+          pattern: ^(disabled|enabled|enabled-pre-registered-only)$
+          type: string
+          description: 'OAuth CIMD policy. Valid values are: `disabled`, `enabled`, ''enabled-pre-registered-only'''
+          example: disabled
+          x-pattern-message: 'must be one of the following: `disabled`, `enabled`, ''enabled-pre-registered-only'''
+      description: The OAuth policy for Client ID Metadata Documents (CIMD) authentication.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5

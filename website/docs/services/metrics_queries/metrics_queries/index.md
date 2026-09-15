@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>metrics_queries</code> resource
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>metrics_queries</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="metrics_queries" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.metrics_queries.metrics_queries" /></td></tr>
 </tbody></table>
@@ -50,11 +51,11 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#runMetricsQueries"><CopyableCode code="runMetricsQueries" /></a></td>
+    <td><a href="#run"><CopyableCode code="run" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queries"><code>queries</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a></td>
     <td></td>
-    <td>Execute up to six metrics queries. If you specify multiple queries, each is returned as a separate set of time series. A metric query returns a maximum of 300 data points per metric. A metric query will process a maximum of 15K unique time series to calculate the query results. Query results are limited to 1000 unique time series.<br />For more information see [Metrics Queries](https://help.sumologic.com/?cid=10144).</td>
+    <td>Execute multiple metrics queries. Limits of this API are described in &#91;Metrics Query Error Messages&#93;(https:​//help.sumologic.com/docs/metrics/metrics-queries/metric-query-error-messages/). For general information about Metrics Queries see &#91;Metrics Queries&#93;(https:​//help.sumologic.com/docs/metrics/metrics-queries/).</td>
 </tr>
 </tbody>
 </table>
@@ -75,26 +76,28 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
 
 ## Lifecycle Methods
 
+EXEC variables use wire (API) names.
+
 <Tabs
-    defaultValue="runMetricsQueries"
+    defaultValue="run"
     values={[
-        { label: 'runMetricsQueries', value: 'runMetricsQueries' }
+        { label: 'run', value: 'run' }
     ]}
 >
-<TabItem value="runMetricsQueries">
+<TabItem value="run">
 
-Execute up to six metrics queries. If you specify multiple queries, each is returned as a separate set of time series. A metric query returns a maximum of 300 data points per metric. A metric query will process a maximum of 15K unique time series to calculate the query results. Query results are limited to 1000 unique time series.<br />For more information see [Metrics Queries](https://help.sumologic.com/?cid=10144).
+Execute multiple metrics queries. Limits of this API are described in [Metrics Query Error Messages](https://help.sumologic.com/docs/metrics/metrics-queries/metric-query-error-messages/). For general information about Metrics Queries see [Metrics Queries](https://help.sumologic.com/docs/metrics/metrics-queries/).
 
 ```sql
-EXEC sumologic.metrics_queries.metrics_queries.runMetricsQueries 
-@region='{{ region }}' --required 
+EXEC sumologic.metrics_queries.metrics_queries.run 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
 @@json=
 '{
 "queries": "{{ queries }}", 

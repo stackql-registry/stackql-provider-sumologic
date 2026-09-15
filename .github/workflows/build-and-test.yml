@@ -1,0 +1,166 @@
+name: build-and-test
+
+# Build the sumologic provider from the pinned spec and run every
+# credential-free test layer on each push / PR; the live smoke suite runs
+# only where the Sumo Logic secrets are configured; a scheduled spec-drift
+# job diffs the served spec against the pin (the spec is served unversioned,
+# so drift is expected over time and must be reviewed, never silent).
+
+on:
+  push:
+    branches: [main, 'feature/**']
+    paths-ignore: ['website/**']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['website/**']
+  schedule:
+    - cron: '23 3 * * 1'   # weekly spec-drift check (Monday 03:23 UTC)
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # puts the latest stackql on PATH; bin/start-server.sh and the test
+      # runners resolve it from there
+      - name: Install stackql
+        uses: stackql/setup-stackql@v2
+
+      - name: stackql version
+        run: stackql --version
+
+      # Drift is reported, not fatal, here: the committed pin is what gets
+      # built and tested. The spec-drift job below opens the review issue.
+      - name: Verify the pinned spec against upstream (warns on drift)
+        run: |
+          if ! make spec-check; then
+            echo "::warning title=Sumo Logic spec drift::The served spec no longer matches provider-dev/config/spec_pin.json - run 'make spec build compare test docs' and review the diff. Building from the committed pin."
+            git checkout -- provider-dev/downloaded provider-dev/config/spec_pin.json
+          fi
+
+      - name: Build provider from the pinned spec
+        run: make build
+
+      - name: Fail on uncommitted generation drift
+        run: |
+          git add -N .
+          if ! git diff --quiet -- provider-dev/openapi provider-dev/config provider-dev/source; then
+            echo "Generated output differs from the committed artifacts - run 'make build' and commit."
+            git diff --stat -- provider-dev/openapi provider-dev/config provider-dev/source
+            exit 1
+          fi
+
+      - name: Breaking changes section is current
+        run: node provider-dev/scripts/compare_predecessor.mjs --check
+
+      - name: Offline validation
+        run: make test-offline
+
+      - name: Integration tests (mock Sumo Logic API)
+        run: make test-integration
+
+      - name: Meta-route tests
+        run: make test-meta
+
+      - name: Generate docs (sanity - the site build runs on the web workflows)
+        run: make docs
+
+  smoke:
+    # secret-gated live smoke suite against a dedicated Sumo Logic account;
+    # skipped with a notice when the secrets are not configured (forks, PRs
+    # from outside). Nothing it creates is billable and everything it creates
+    # is swept.
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name != 'pull_request' && github.event_name != 'schedule'
+    env:
+      SUMOLOGIC_ACCESSID: ${{ secrets.SUMOLOGIC_ACCESSID }}
+      SUMOLOGIC_ACCESSKEY: ${{ secrets.SUMOLOGIC_ACCESSKEY }}
+      SUMOLOGIC_ENVIRONMENT: ${{ secrets.SUMOLOGIC_ENVIRONMENT }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install stackql
+        uses: stackql/setup-stackql@v2
+
+      - name: Live smoke suite (local provider)
+        if: env.SUMOLOGIC_ACCESSID != ''
+        run: make smoke-test
+
+      - name: Live smoke skipped (no credentials)
+        if: env.SUMOLOGIC_ACCESSID == ''
+        run: |
+          echo "::notice title=Live smoke suite skipped::SUMOLOGIC_ACCESSID / SUMOLOGIC_ACCESSKEY / SUMOLOGIC_ENVIRONMENT secrets are not configured - the live smoke suite did not run. Credential-free coverage still ran via the mock-server integration suite."
+
+  spec-drift:
+    # Diff the served spec against the pin on a schedule and on demand, and
+    # open an issue when it moves.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch and compare against the pin
+        id: drift
+        run: |
+          set +e
+          make spec-check > fetch.log 2>&1
+          rc=$?
+          set -e
+          cat fetch.log
+          if [ "$rc" -eq 0 ]; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            bash bin/fetch-spec.sh --update > /dev/null 2>&1 || true
+            git diff --stat -- provider-dev/downloaded provider-dev/config/spec_pin.json > drift.txt || true
+            cat drift.txt
+          fi
+
+      - name: Report drift
+        if: steps.drift.outputs.drift == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const stat = fs.existsSync('drift.txt') ? fs.readFileSync('drift.txt', 'utf8') : '(diff unavailable)';
+            const title = 'Sumo Logic API spec drift detected';
+            const body = 'The spec served at https://api.sumologic.com/docs/sumologic-api.yaml no longer matches the pin in provider-dev/config/spec_pin.json.\n\n```\n' + stat + '\n```\nRun `make spec build compare test docs`, review the generated diff (new operations are mapped by map_operations.mjs and reported; a new tag fails the split until it is added to service_names.json), and commit.';
+            await core.summary.addHeading(title).addCodeBlock(stat).write();
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'spec-drift'
+            });
+            if (issues.some(i => i.title === title)) return;
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['spec-drift']
+            });

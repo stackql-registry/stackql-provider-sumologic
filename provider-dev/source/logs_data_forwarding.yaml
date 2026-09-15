@@ -1,0 +1,762 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Logs Data Forwarding API
+  description: Log data forwarding destinations (AWS S3) and forwarding rules per partition.
+  version: 1.0.0
+paths:
+  /v1/logsDataForwarding/destinations:
+    get:
+      tags:
+        - logsDataForwardingManagement
+      summary: Get Amazon S3 data forwarding destinations.
+      description: Get a list of all Amazon S3 data forwarding destinations.
+      operationId: getDataForwardingBuckets
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of data forwarding destinations returned in the response. The number of data forwarding destinations returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 10
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all S3 data forwarding destinations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDataForwardingDestinations'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - logsDataForwardingManagement
+      summary: Create an S3 data forwarding destination.
+      description: Create a new Amazon S3 data forwarding destination.
+      operationId: createDataForwardingBucket
+      parameters: []
+      requestBody:
+        description: Parameters to create new S3 data forwarding destination.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBucketDefinition'
+        required: true
+      responses:
+        '200':
+          description: The new data forwarding destination has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logsDataForwarding/destinations/{id}:
+    get:
+      tags:
+        - logsDataForwardingManagement
+      summary: Get an S3 data forwarding destination.
+      description: Get an S3 data forwarding destination by the given identifier.
+      operationId: getDataForwardingDestination
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the S3 data forwarding destination to return.
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          description: Data forwarding destination object requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - logsDataForwardingManagement
+      summary: Update an S3 data forwarding destination.
+      description: Update an S3 data forwarding destination by the given identifier.
+      operationId: UpdateDataForwardingBucket
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the data forwarding destination to update.
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        description: Object with the updated parameters.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBucketDefinition'
+        required: true
+      responses:
+        '200':
+          description: The data forwarding destination has been updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BucketDefinition'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - logsDataForwardingManagement
+      summary: Delete an S3 data forwarding destination.
+      description: Delete an existing Amazon S3 data forwarding destination with the given identifier.
+      operationId: deleteDataForwardingBucket
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the data forwarding destination to delete.
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          description: The data forwarding destination has been deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logsDataForwarding/rules:
+    get:
+      tags:
+        - logsDataForwardingManagement
+      summary: Get all S3 data forwarding rules.
+      description: Get a list of all S3 data forwarding rules.
+      operationId: getRulesAndBuckets
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of data forwarding rules returned in the response. The number of data forwarding rules returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 10
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all S3 data forwarding rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRulesAndBucketsResult'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - logsDataForwardingManagement
+      summary: Create an S3 data forwarding rule.
+      description: Create a data forwarding rule to send data from a Partition or Scheduled View to an S3 bucket.
+      operationId: createDataForwardingRule
+      parameters: []
+      requestBody:
+        description: Parameters to create the new S3 data forwarding rule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDataForwardingRule'
+        required: true
+      responses:
+        '200':
+          description: The data forwarding rule was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataForwardingRule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/logsDataForwarding/rules/{indexId}:
+    get:
+      tags:
+        - logsDataForwardingManagement
+      summary: Get an S3 data forwarding rule by its index.
+      description: Get the details of an S3 data forwarding rule by its Partition or Scheduled View identifier.
+      operationId: getDataForwardingRule
+      parameters:
+        - name: indexId
+          in: path
+          description: The `id` of the Partition or Scheduled View.
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          description: Data forwarding rule that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleAndBucketDetail'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - logsDataForwardingManagement
+      summary: Update an S3 data forwarding rule by its index.
+      description: Update an S3 data forwarding rule by its Partition or Scheduled View identifier.
+      operationId: updateDataForwardingRule
+      parameters:
+        - name: indexId
+          in: path
+          description: The `id` of the Partition or Scheduled View with the data forwarding rule to update.
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        description: Parameters of an S3 data forwarding rule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDataForwardingRule'
+        required: true
+      responses:
+        '200':
+          description: The data forwarding rule was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataForwardingRule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - logsDataForwardingManagement
+      summary: Delete an S3 data forwarding rule by its index.
+      description: Delete an S3 data forwarding rule by its Partition or Scheduled View identifier.
+      operationId: deleteDataForwardingRule
+      parameters:
+        - name: indexId
+          in: path
+          description: The `id` of the Partition or Scheduled View with the data forwarding rule to delete.
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          description: The S3 data forwarding rule was deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    GetDataForwardingDestinations:
+      type: object
+      properties:
+        nextToken:
+          type: string
+          description: Next continuation token.
+          example: VEZuRU4veXF2UWFCUURYSDNQUzJxWlpRRUsvTlBieXA
+        data:
+          type: array
+          description: List of data forwarding destinations.
+          items:
+            $ref: '#/components/schemas/BucketDefinition'
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    CreateBucketDefinition:
+      type: object
+      required:
+        - authenticationMode
+        - bucketName
+        - destinationName
+      properties:
+        destinationName:
+          type: string
+          description: Name of the S3 data forwarding destination.
+          example: df-destination
+        description:
+          type: string
+          description: Description of the S3 data forwarding destination.
+        authenticationMode:
+          type: string
+          description: 'AWS IAM authentication method used for access. Possible values are: 1. `AccessKey` 2. `RoleBased`'
+          example: RoleBased
+        accessKeyId:
+          type: string
+          description: The AWS Access ID to access the S3 bucket.
+          example: accessKeyId
+        secretAccessKey:
+          type: string
+          description: The AWS Secret Key to access the S3 bucket.
+          example: secretAccessKey
+        roleArn:
+          type: string
+          description: The AWS Role ARN to access the S3 bucket.
+          example: roleArn
+        region:
+          type: string
+          description: The region where the S3 bucket is located.
+          example: us-east-1
+        encrypted:
+          type: boolean
+          description: Enable S3 server-side encryption.
+        enabled:
+          type: boolean
+          description: True if the destination is Active.
+          example: true
+        bucketName:
+          pattern: (?!(^xn--|-s3alias$))^[a-z0-9][a-z0-9-.]{1,61}[a-z0-9]$
+          type: string
+          description: The name of the Amazon S3 bucket.
+          example: df-bucket
+          x-pattern-message: Must be a valid AWS S3 Bucket name.
+    BucketDefinition:
+      type: object
+      required:
+        - authenticationMode
+        - bucketName
+        - destinationName
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        destinationName:
+          type: string
+          description: Name of the S3 data forwarding destination.
+          example: df-destination
+        description:
+          type: string
+          description: Description of the S3 data forwarding destination.
+        authenticationMode:
+          type: string
+          description: 'AWS IAM authentication method used for access. Possible values are: 1. `AccessKey` 2. `RoleBased`'
+          example: RoleBased
+        accessKeyId:
+          type: string
+          description: The AWS Access ID to access the S3 bucket.
+          example: accessKeyId
+        secretAccessKey:
+          type: string
+          description: The AWS Secret Key to access the S3 bucket.
+          example: secretAccessKey
+        roleArn:
+          type: string
+          description: The AWS Role ARN to access the S3 bucket.
+          example: roleArn
+        region:
+          type: string
+          description: The region where the S3 bucket is located.
+          example: us-east-1
+        encrypted:
+          type: boolean
+          description: Enable S3 server-side encryption.
+        enabled:
+          type: boolean
+          description: True if the destination is Active.
+          example: true
+        bucketName:
+          pattern: (?!(^xn--|-s3alias$))^[a-z0-9][a-z0-9-.]{1,61}[a-z0-9]$
+          type: string
+          description: The name of the Amazon S3 bucket.
+          example: df-bucket
+          x-pattern-message: Must be a valid AWS S3 Bucket name.
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: The unique identifier of the data forwarding destination.
+          example: '1'
+        invalidatedBySystem:
+          type: boolean
+          description: True if invalidated by the system.
+    UpdateBucketDefinition:
+      required:
+        - authenticationMode
+      type: object
+      properties:
+        destinationName:
+          type: string
+          description: Name of the S3 data forwarding destination.
+          example: df-destination
+        description:
+          type: string
+          description: Description of the S3 data forwarding destination.
+        authenticationMode:
+          type: string
+          description: 'AWS IAM authentication method used for access. Possible values are: 1. `AccessKey` 2. `RoleBased`'
+          example: RoleBased
+        accessKeyId:
+          type: string
+          description: The AWS Access ID to access the S3 bucket.
+          example: accessKeyId
+        secretAccessKey:
+          type: string
+          description: The AWS Secret Key to access the S3 bucket.
+          example: secretAccessKey
+        roleArn:
+          type: string
+          description: The AWS Role ARN to access the S3 bucket.
+          example: roleArn
+        region:
+          type: string
+          description: The region where the S3 bucket is located.
+          example: us-east-1
+        encrypted:
+          type: boolean
+          description: Enable S3 server-side encryption.
+        enabled:
+          type: boolean
+          description: True if the destination is Active.
+          example: true
+    GetRulesAndBucketsResult:
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of S3 data forwarding rules.
+          items:
+            $ref: '#/components/schemas/RuleAndBucketDetail'
+        nextToken:
+          type: string
+          description: Next continuation token.
+          example: VEZuRU4veXF2UWFCUURYSDNQUzJxWlpRRUsvTlBieXA
+    CreateDataForwardingRule:
+      required:
+        - destinationId
+        - indexId
+      type: object
+      properties:
+        indexId:
+          type: string
+          description: The `id` of the Partition or Scheduled View the rule applies to.
+          example: '1'
+        destinationId:
+          type: string
+          description: The data forwarding destination id.
+          example: '1'
+        enabled:
+          type: boolean
+          description: True when the data forwarding rule is enabled.
+          example: true
+        fileFormat:
+          type: string
+          description: Specify the path prefix to a directory in the S3 bucket and how to format the file name.
+          example: '{index}_{day}_{hour}_{minute}_{second}'
+        payloadSchema:
+          pattern: ^(builtInFields|allFields|raw)$
+          type: string
+          description: Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa.
+          example: builtInFields
+          x-pattern-message: 'should be one of the following: ''builtInFields'', ''allFields'' or ''raw'''
+        format:
+          pattern: ^(csv|json|text)$
+          type: string
+          description: Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa.
+          example: csv
+          x-pattern-message: 'should be one of the following: ''csv'', ''json'' or ''text'''
+    DataForwardingRule:
+      required:
+        - destinationId
+        - indexId
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        indexId:
+          type: string
+          description: The `id` of the Partition or Scheduled View the rule applies to.
+          example: '1'
+        destinationId:
+          type: string
+          description: The data forwarding destination id.
+          example: '1'
+        enabled:
+          type: boolean
+          description: True when the data forwarding rule is enabled.
+          example: true
+        fileFormat:
+          type: string
+          description: Specify the path prefix to a directory in the S3 bucket and how to format the file name.
+          example: '{index}_{day}_{hour}_{minute}_{second}'
+        payloadSchema:
+          pattern: ^(builtInFields|allFields|raw)$
+          type: string
+          description: Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa.
+          example: builtInFields
+          x-pattern-message: 'should be one of the following: ''builtInFields'', ''allFields'' or ''raw'''
+        format:
+          pattern: ^(csv|json|text)$
+          type: string
+          description: Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa.
+          example: csv
+          x-pattern-message: 'should be one of the following: ''csv'', ''json'' or ''text'''
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: The unique identifier of the data forwarding rule.
+          example: '1'
+    RuleAndBucketDetail:
+      required:
+        - destinationId
+        - indexId
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        indexId:
+          type: string
+          description: The `id` of the Partition or Scheduled View the rule applies to.
+          example: '1'
+        destinationId:
+          type: string
+          description: The data forwarding destination id.
+          example: '1'
+        enabled:
+          type: boolean
+          description: True when the data forwarding rule is enabled.
+          example: true
+        fileFormat:
+          type: string
+          description: Specify the path prefix to a directory in the S3 bucket and how to format the file name.
+          example: '{index}_{day}_{hour}_{minute}_{second}'
+        payloadSchema:
+          pattern: ^(builtInFields|allFields|raw)$
+          type: string
+          description: Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa.
+          example: builtInFields
+          x-pattern-message: 'should be one of the following: ''builtInFields'', ''allFields'' or ''raw'''
+        format:
+          pattern: ^(csv|json|text)$
+          type: string
+          description: Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa.
+          example: csv
+          x-pattern-message: 'should be one of the following: ''csv'', ''json'' or ''text'''
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: The unique identifier of the data forwarding rule.
+          example: '1'
+        bucket:
+          $ref: '#/components/schemas/logs-data-forwarding-rule-management'
+    UpdateDataForwardingRule:
+      type: object
+      properties:
+        destinationId:
+          type: string
+          description: Data forwarding destination id.
+          example: '1'
+        enabled:
+          type: boolean
+          description: True when the data forwarding rule is enabled.
+          example: true
+        fileFormat:
+          type: string
+          description: Specify the path prefix to a directory in the S3 bucket and how to format the file name.
+          example: '{index}_{day}_{hour}_{minute}_{second}'
+        payloadSchema:
+          pattern: ^(builtInFields|allFields|raw)$
+          type: string
+          description: Schema for the payload. Default value of the payload schema is "allFields" for scheduled view, and "builtInFields" for partition. "raw" payloadSchema should be used in conjunction with "text" format and vice-versa.
+          example: builtInFields
+          x-pattern-message: 'should be one of the following: ''builtInFields'', ''allFields'' or ''raw'''
+        format:
+          pattern: ^(csv|json|text)$
+          type: string
+          description: Format of the payload. Default format will be "csv". "text" format should be used in conjunction with "raw" payloadSchema and vice-versa.
+          example: csv
+          x-pattern-message: 'should be one of the following: ''csv'', ''json'' or ''text'''
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    CreateBucketDefinitionItems:
+      required:
+        - authenticationMode
+        - bucketName
+        - destinationName
+      type: object
+      properties:
+        bucketName:
+          pattern: (?!(^xn--|-s3alias$))^[a-z0-9][a-z0-9-.]{1,61}[a-z0-9]$
+          type: string
+          description: The name of the Amazon S3 bucket.
+          example: df-bucket
+          x-pattern-message: Must be a valid AWS S3 Bucket name.
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    logs-data-forwarding-rule-management:
+      type: string
+      description: (opaque JSON object)

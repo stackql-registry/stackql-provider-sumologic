@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>jobs</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>jobs</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="jobs" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.archive.jobs" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>jobs</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="listArchiveJobsBySourceId"
+    defaultValue="list"
     values={[
-        { label: 'listArchiveJobsBySourceId', value: 'listArchiveJobsBySourceId' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listArchiveJobsBySourceId">
+<TabItem value="list">
 
 A paginated list of ingestion jobs for an Archive Source.
 
@@ -61,24 +62,24 @@ A paginated list of ingestion jobs for an Archive Source.
     <td>The name of the ingestion job.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>The creation timestamp in UTC of the ingestion job. (example: 2018-10-16T09:10:00Z)</td>
+    <td>The creation timestamp in UTC of the ingestion job. (example: 2018-10-16T09:10:00.000Z) (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>The identifier of the user who created the ingestion job. (example: 0000000006743FDD)</td>
+    <td>The identifier of the user who created the ingestion job. (example: 0000000006743FDD) (wire: createdBy)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="endTime" /></td>
+    <td><CopyableCode code="end_time" /></td>
     <td><code>string (date-time)</code></td>
-    <td>The ending timestamp of the ingestion job. (example: 2018-10-16T10:10:00Z)</td>
+    <td>The ending timestamp of the ingestion job. (example: 2018-10-16T10:10:00.000Z) (wire: endTime)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="startTime" /></td>
+    <td><CopyableCode code="start_time" /></td>
     <td><code>string (date-time)</code></td>
-    <td>The starting timestamp of the ingestion job. (example: 2018-10-16T09:10:00Z)</td>
+    <td>The starting timestamp of the ingestion job. (example: 2018-10-16T09:10:00.000Z) (wire: startTime)</td>
 </tr>
 <tr>
     <td><CopyableCode code="status" /></td>
@@ -86,19 +87,19 @@ A paginated list of ingestion jobs for an Archive Source.
     <td>The status of the ingestion job, either `Pending`,`Scanning`,`Ingesting`,`Failed`, or `Succeeded`. (example: Scanning)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="totalBytesIngested" /></td>
+    <td><CopyableCode code="total_bytes_ingested" /></td>
     <td><code>integer (int64)</code></td>
-    <td>The total bytes ingested by the ingestion job.</td>
+    <td>The total bytes ingested by the ingestion job. (wire: totalBytesIngested)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="totalObjectsIngested" /></td>
+    <td><CopyableCode code="total_objects_ingested" /></td>
     <td><code>integer (int64)</code></td>
-    <td>The total number of objects ingested by the ingestion job.</td>
+    <td>The total number of objects ingested by the ingestion job. (wire: totalObjectsIngested)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="totalObjectsScanned" /></td>
+    <td><CopyableCode code="total_objects_scanned" /></td>
     <td><code>integer (int64)</code></td>
-    <td>The total number of objects scanned by the ingestion job.</td>
+    <td>The total number of objects scanned by the ingestion job. (wire: totalObjectsScanned)</td>
 </tr>
 </tbody>
 </table>
@@ -121,23 +122,23 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#listArchiveJobsBySourceId"><CopyableCode code="listArchiveJobsBySourceId" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-token"><code>token</code></a></td>
     <td>Get a list of all the ingestion jobs created on an Archive Source. The response is paginated with a default limit of 10 jobs per page.</td>
 </tr>
 <tr>
-    <td><a href="#createArchiveJob"><CopyableCode code="createArchiveJob" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__endTime"><code>data__endTime</code></a>, <a href="#parameter-data__name"><code>data__name</code></a>, <a href="#parameter-data__startTime"><code>data__startTime</code></a></td>
+    <td><a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-end_time"><code>end_time</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-start_time"><code>start_time</code></a></td>
     <td></td>
     <td>Create an ingestion job to pull data from your S3 bucket.</td>
 </tr>
 <tr>
-    <td><a href="#deleteArchiveJob"><CopyableCode code="deleteArchiveJob" /></a></td>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
-    <td><a href="#parameter-sourceId"><code>sourceId</code></a>, <a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-source_id"><code>source_id</code></a>, <a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Delete an ingestion job with the given identifier from the organization. The delete operation is only possible for jobs with a Succeeded or Failed status.</td>
 </tr>
@@ -165,12 +166,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
-<tr id="parameter-sourceId">
-    <td><CopyableCode code="sourceId" /></td>
+<tr id="parameter-source_id">
+    <td><CopyableCode code="source_id" /></td>
     <td><code>string</code></td>
-    <td>The identifier of the Archive Source.</td>
+    <td>The identifier of the Archive Source. (wire: sourceId)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
@@ -188,12 +189,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="listArchiveJobsBySourceId"
+    defaultValue="list"
     values={[
-        { label: 'listArchiveJobsBySourceId', value: 'listArchiveJobsBySourceId' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="listArchiveJobsBySourceId">
+<TabItem value="list">
 
 Get a list of all the ingestion jobs created on an Archive Source. The response is paginated with a default limit of 10 jobs per page.
 
@@ -201,17 +202,17 @@ Get a list of all the ingestion jobs created on an Archive Source. The response 
 SELECT
 id,
 name,
-createdAt,
-createdBy,
-endTime,
-startTime,
+created_at,
+created_by,
+end_time,
+start_time,
 status,
-totalBytesIngested,
-totalObjectsIngested,
-totalObjectsScanned
+total_bytes_ingested,
+total_objects_ingested,
+total_objects_scanned
 FROM sumologic.archive.jobs
-WHERE sourceId = '{{ sourceId }}' -- required
-AND region = '{{ region }}' -- required
+WHERE source_id = '{{ source_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 AND limit = '{{ limit }}'
 AND token = '{{ token }}'
 ;
@@ -223,69 +224,69 @@ AND token = '{{ token }}'
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createArchiveJob"
+    defaultValue="create"
     values={[
-        { label: 'createArchiveJob', value: 'createArchiveJob' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createArchiveJob">
+<TabItem value="create">
 
 Create an ingestion job to pull data from your S3 bucket.
 
 ```sql
 INSERT INTO sumologic.archive.jobs (
-data__name,
-data__startTime,
-data__endTime,
-sourceId,
+name,
+start_time,
+end_time,
+source_id,
 region
 )
 SELECT 
 '{{ name }}' /* required */,
-'{{ startTime }}' /* required */,
-'{{ endTime }}' /* required */,
-'{{ sourceId }}',
+'{{ start_time }}' /* required */,
+'{{ end_time }}' /* required */,
+'{{ source_id }}',
 '{{ region }}'
 RETURNING
 id,
 name,
-createdAt,
-createdBy,
-endTime,
-startTime,
+created_at,
+created_by,
+end_time,
+start_time,
 status,
-totalBytesIngested,
-totalObjectsIngested,
-totalObjectsScanned
+total_bytes_ingested,
+total_objects_ingested,
+total_objects_scanned
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: jobs
   props:
-    - name: sourceId
-      value: string
+    - name: source_id
+      value: "{{ source_id }}"
       description: Required parameter for the jobs resource.
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the jobs resource.
     - name: name
-      value: string
+      value: "{{ name }}"
       description: |
         The name of the ingestion job.
-    - name: startTime
-      value: string
+    - name: start_time
+      value: "{{ start_time }}"
       description: |
         The starting timestamp of the ingestion job.
-    - name: endTime
-      value: string
+    - name: end_time
+      value: "{{ end_time }}"
       description: |
         The ending timestamp of the ingestion job.
-```
+`}</CodeBlock>
+
 </TabItem>
 </Tabs>
 
@@ -293,20 +294,20 @@ totalObjectsScanned
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteArchiveJob"
+    defaultValue="delete"
     values={[
-        { label: 'deleteArchiveJob', value: 'deleteArchiveJob' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteArchiveJob">
+<TabItem value="delete">
 
 Delete an ingestion job with the given identifier from the organization. The delete operation is only possible for jobs with a Succeeded or Failed status.
 
 ```sql
 DELETE FROM sumologic.archive.jobs
-WHERE sourceId = '{{ sourceId }}' --required
+WHERE source_id = '{{ source_id }}' --required
 AND id = '{{ id }}' --required
-AND region = '{{ region }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

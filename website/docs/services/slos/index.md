@@ -18,23 +18,18 @@ slos service documentation.
 
 :::info[Service Summary]
 
-total resources: __10__  
+total resources: __5__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/slos/copy/">copy</a><br />
-<a href="/services/slos/export/">export</a><br />
-<a href="/services/slos/import/">import</a><br />
-<a href="/services/slos/move/">move</a><br />
-<a href="/services/slos/path/">path</a>
+<a href="/services/slos/paths/">paths</a><br />
+<a href="/services/slos/root/">root</a><br />
+<a href="/services/slos/search/">search</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/slos/root/">root</a><br />
-<a href="/services/slos/search/">search</a><br />
-<a href="/services/slos/sli/">sli</a><br />
 <a href="/services/slos/slos/">slos</a><br />
 <a href="/services/slos/usage_info/">usage_info</a>
 </div>

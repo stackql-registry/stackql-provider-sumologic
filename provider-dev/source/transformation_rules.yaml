@@ -1,0 +1,344 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Transformation Rules API
+  description: Metrics transformation rules.
+  version: 1.0.0
+paths:
+  /v1/transformationRules:
+    get:
+      tags:
+        - transformationRuleManagement
+      summary: Get a list of transformation rules.
+      description: Get a list of transformation rules in the organization. The response is paginated with a default limit of 100 rules per page.
+      operationId: getTransformationRules
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of transformation rules returned in the response.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+          example: 10
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of transformation rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransformationRulesResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - transformationRuleManagement
+      summary: Create a new transformation rule.
+      description: Create a new transformation rule.
+      operationId: createRule
+      parameters: []
+      requestBody:
+        description: The configuration of the transformation rule to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransformationRuleRequest'
+        required: true
+      responses:
+        '200':
+          description: The transformation rule was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransformationRuleResponse'
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/transformationRules/{id}:
+    get:
+      tags:
+        - transformationRuleManagement
+      summary: Get a transformation rule.
+      description: Get a transformation rule with the given identifier.
+      operationId: getTransformationRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of transformation rule to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transformation rule object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransformationRuleResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - transformationRuleManagement
+      summary: Update a transformation rule.
+      description: Update an existing transformation rule. All properties specified in the request are replaced. Missing properties will remain the same.
+      operationId: updateTransformationRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the transformation rule to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the transformation rule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransformationRuleRequest'
+        required: true
+      responses:
+        '200':
+          description: The transformation rule was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransformationRuleResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - transformationRuleManagement
+      summary: Delete a transformation rule.
+      description: Delete a transformation rule with the given identifier.
+      operationId: deleteRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the transformation rule to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The transformation rule was successfully deleted.
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    TransformationRulesResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of transformation rules.
+          items:
+            $ref: '#/components/schemas/TransformationRuleResponse'
+        next:
+          type: string
+          description: Next continuation token.
+          example: aGNzTmZBN1ZZWFk9
+      description: A generic response for transformation rule.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    TransformationRuleRequest:
+      required:
+        - enabled
+        - ruleDefinition
+      type: object
+      properties:
+        ruleDefinition:
+          $ref: '#/components/schemas/TransformationRuleDefinition'
+        enabled:
+          type: boolean
+          description: True if the rule is enabled.
+          example: true
+      description: A request for creating or updating a transformation rule.
+    TransformationRuleResponse:
+      type: object
+      description: A generic response for transformation rule.
+      required:
+        - enabled
+        - ruleDefinition
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        ruleDefinition:
+          $ref: '#/components/schemas/TransformationRuleDefinition'
+        enabled:
+          type: boolean
+          description: True if the rule is enabled.
+          example: true
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the transformation rule.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    TransformationRuleDefinition:
+      required:
+        - name
+        - retention
+        - selector
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the transformation rule.
+          example: Transformation Rule 1
+        selector:
+          type: string
+          description: Selector of the transformation rule.
+          example: _sourceCategory=metricsstore
+        dimensionTransformations:
+          type: array
+          description: Dimension transformations of the transformation rule.
+          example:
+            - transformationType: AggregateOnTransformation
+              aggregateOn:
+                - metric
+            - transformationType: AddOrReplaceTransformation
+              dimensionToReplace: metric
+              value: '{{metric}}_aggregated'
+          items:
+            $ref: '#/components/schemas/DimensionTransformation'
+          default: []
+        transformedMetricsRetention:
+          type: integer
+          description: Retention period in days for the transformed metrics that are generated by this rule. The supported retention periods for transformed metrics are 8 days, and 400 days. If no dimension transformations are defined, this value will be set to 0.
+          format: int64
+          example: 8
+          default: 0
+        retention:
+          type: integer
+          description: Retention period in days for the metrics that are selected by the selector. The supported retention periods for selected metrics are 8 days, 400 days, and 0 (Do not store) if this rule contains dimension transformation.
+          format: int64
+          example: 8
+          default: 400
+      description: The properties that define a transformation rule.
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    DimensionTransformation:
+      required:
+        - transformationType
+      type: object
+      properties:
+        transformationType:
+          type: string
+          description: This is the base type of all dimension transformations.
+      description: Base class of all transformation types.
+      discriminator:
+        propertyName: transformationType

@@ -1,0 +1,1421 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Dashboards API
+  description: Dashboards (New), dashboard report schedules, report generation jobs and legacy report migration.
+  version: 1.0.0
+paths:
+  /v2/dashboards:
+    get:
+      tags:
+        - dashboardManagement
+      summary: List all dashboards.
+      description: List all dashboards under the Personal folder created by the user or under folders viewable by user.
+      operationId: listDashboards
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of dashboard returned in the response. The number of dashboards returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+        - name: mode
+          in: query
+          description: whether to list all viewable dashboards under the folders
+          required: false
+          schema:
+            pattern: ^(createdByUser|allViewableByUser)$
+            type: string
+            example: createdByUser
+            x-pattern-message: Must be `createdByUser` or `allViewableByUser`
+          example: createdByUser
+      responses:
+        '200':
+          description: Paginated list of dashboards under the Personal folder created by the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDashboards'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - dashboardManagement
+      summary: Create a new dashboard.
+      description: Creates a new dashboard.
+      operationId: createDashboard
+      requestBody:
+        description: Information to create the new dashboard.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+        required: true
+      responses:
+        '200':
+          description: The dashboard has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/{id}:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get a dashboard.
+      description: Get a dashboard by the given identifier.
+      operationId: getDashboard
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the dashboard to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - dashboardManagement
+      summary: Update a dashboard.
+      description: Update a dashboard by the given identifier.
+      operationId: updateDashboard
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the dashboard to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update on the dashboard.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+        required: true
+      responses:
+        '200':
+          description: The dashboard was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - dashboardManagement
+      summary: Delete a dashboard.
+      description: Delete a dashboard by the given identifier.
+      operationId: deleteDashboard
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the dashboard to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dashboard was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/reportJobs:
+    post:
+      tags:
+        - dashboardManagement
+      summary: Start a report job
+      description: |
+        Schedule an asynchronous job to generate a report from a template. All items in the template will be included unless specified. See template section for more details on individual templates. Reports can be generated in Pdf or Png format and exported in various methods (ex. direct download). You will get back an asynchronous job identifier on success. Use the getAsyncReportGenerationStatus endpoint and the job identifier you got back in the response to track the status of an asynchronous report generation job.
+      operationId: generateDashboardReport
+      requestBody:
+        description: Request for a report.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportRequest'
+        required: true
+      responses:
+        '200':
+          description: Export job has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/reportJobs/{jobId}/status:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get report generation job status
+      description: Get the status of an asynchronous report generation request for the given job identifier. On success, use the getReportGenerationResult endpoint to get the result of the report generation job.
+      operationId: getAsyncReportGenerationStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: The identifier of the asynchronous report generation job.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The status of the report generation job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncJobStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/reportJobs/{jobId}/result:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get report generation job result
+      description: Get the result of an asynchronous report generation request for the given job identifier.
+      operationId: getAsyncReportGenerationResult
+      parameters:
+        - name: jobId
+          in: path
+          description: The identifier of the asynchronous report generation job.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of export job.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/migrate:
+    post:
+      tags:
+        - dashboardManagement
+      summary: Migrate Legacy Dashboards to Dashboards(New)
+      description: |
+        Schedule an asynchronous job to migrate a list of legacy Dashboards to Dashboard(New). Once migration is finished, the migrated dashboards will be in the same folder as the corresponding legacy Dashboard.
+        Note: This feature is in beta and may not support all existing features of legacy dashboards.
+      operationId: migrateReportToDashboard
+      requestBody:
+        description: List of legacy dashboard content identifiers.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardMigrationRequest'
+        required: true
+      responses:
+        '200':
+          description: Async job identifier to get the status and result of the dashboard migration job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeginAsyncJobResponseV2'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/migrate/preview:
+    post:
+      tags:
+        - dashboardManagement
+      summary: Preview of Migrating Legacy Dashboards to Dashboards(New)
+      description: Get a preview of migrating Legacy Dashboards to Dashboard(New)
+      operationId: previewMigrateReportToDashboard
+      requestBody:
+        description: List of content identifiers. Can be folders or classic dashboard.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardMigrationRequest'
+        required: true
+      responses:
+        '200':
+          description: Preview of the dashboard migration job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationPreviewResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/migrate/{jobId}/status:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get dashboard migration status.
+      description: Get the status of an asynchronous Dashboard Migration job for the given job identifier. If job succeeds, use Dashboard Migration Result endpoint to see results of the migration.
+      operationId: getDashboardMigrationStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: The identifier of the asynchronous Dashboard Migration job.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard migration job status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncJobStatus'
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/dashboards/migrate/{jobId}/result:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get dashboard migration result.
+      description: Get the result of an asynchronous Dashboard Migration request for the given job identifier.
+      operationId: getDashboardMigrationResult
+      parameters:
+        - name: jobId
+          in: path
+          description: The identifier of the asynchronous Dashboard Migration job.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard migration job result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardMigrationResult'
+        default:
+          description: The operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/dashboards/reportSchedules:
+    get:
+      tags:
+        - dashboardManagement
+      summary: List all dashboard report schedules.
+      description: List all dashboard report schedules created by the user.
+      operationId: listReportSchedules
+      parameters:
+        - name: dashboardId
+          in: query
+          description: UUID of the dashboard that the report shedules are associated with.
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Limit the number of dashboard report schedules returned in the response. The number of dashboard report schedules returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results. `token` is set to null when no more pages are left.
+          required: false
+          schema:
+            type: string
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+      responses:
+        '200':
+          description: Paginated list of dashboard report schedules created by the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportSchedules'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - dashboardManagement
+      summary: Schedule dashboard report
+      description: 'Schedule dashboard report to send at a specific date and time. The report should be sent as attachment or downloadable URL in one of the following notification types: ''Email'', ''AWSLambda'', ''AzureFunctions'', ''Datadog'', ''HipChat'', ''Jira'', ''NewRelic'', ''Opsgenie'', ''PagerDuty'', ''Slack'', ''MicrosoftTeams'', ''ServiceNow'', ''SumoCloudSOAR'' and ''Webhook''.'
+      operationId: createScheduleReport
+      requestBody:
+        description: Request for scheduling dashboard report.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportScheduleRequest'
+        required: true
+      responses:
+        '200':
+          description: Dashboard report has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/dashboards/reportSchedules/{scheduleId}:
+    get:
+      tags:
+        - dashboardManagement
+      summary: Get dashboard report schedule.
+      description: Get the schedule of a scheduled dashboard report by the given identifier.
+      operationId: getReportSchedule
+      parameters:
+        - name: scheduleId
+          in: path
+          description: Identifier of the dashboard report schedule to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard report schedule object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - dashboardManagement
+      summary: Update dashboard report schedule.
+      description: Update the schedule of a scheduled dashboard report by the given identifier.
+      operationId: updateReportSchedule
+      parameters:
+        - name: scheduleId
+          in: path
+          description: identifier of the dashboard report schedule to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request to update on the dashboard report schedule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportScheduleRequest'
+        required: true
+      responses:
+        '200':
+          description: The dashboard report schedule was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - dashboardManagement
+      summary: Delete dashboard report schedule.
+      description: Delete the schedule of a scheduled dashboard report by the given identifier. The scheduled dashboard report will no longer be generated and sent.
+      operationId: deleteReportSchedule
+      parameters:
+        - name: scheduleId
+          in: path
+          description: UUID of the dashboard report schedule to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dashboard report schedule was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PaginatedDashboards:
+      required:
+        - dashboards
+      type: object
+      properties:
+        dashboards:
+          type: array
+          description: List of dashboards.
+          items:
+            $ref: '#/components/schemas/Dashboard'
+        next:
+          type: string
+          description: Next continuation token. `next` is set to null when no more pages are left.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    DashboardRequest:
+      required:
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Title of the dashboard.
+          example: Kubernetes Dashboard
+        description:
+          type: string
+          description: Description of the dashboard.
+          example: A view of pods, namespaces and nodes of your cluster.
+        folderId:
+          type: string
+          description: |
+            The identifier of the folder to save the dashboard in. By default it is saved in your personal folder.
+          example: 000000000C1C17C6
+        topologyLabelMap:
+          $ref: '#/components/schemas/TopologyLabelMap'
+        domain:
+          type: string
+          description: If set denotes that the dashboard concerns a given domain (e.g. `aws`, `k8s`, `app`).
+          example: aws
+          default: ''
+        hierarchies:
+          maxItems: 20
+          type: array
+          description: If set to non-empty array denotes that the dashboard concerns given hierarchies.
+          example:
+            - Kubernetes Node View
+          items:
+            type: string
+          default: []
+        refreshInterval:
+          type: integer
+          description: |
+            Interval of time (in seconds) to automatically refresh the dashboard. A value of 0 means we never automatically refresh the dashboard. Allowed values are `0`, `30`, `60`, `120`, `300`, `900`, `1800`, `3600`, `7200`, `86400`.
+          format: int32
+          example: 30
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        panels:
+          type: array
+          description: Panels in the dashboard.
+          items:
+            $ref: '#/components/schemas/Panel'
+        layout:
+          $ref: '#/components/schemas/Layout'
+        variables:
+          type: array
+          description: Variables to apply to the panels.
+          items:
+            $ref: '#/components/schemas/Variable'
+        theme:
+          pattern: ^(light|dark|Light|Dark)$
+          type: string
+          description: Theme for the dashboard. Either `Light` or `Dark`.
+          example: light
+          default: Light
+          x-pattern-message: Must be `Light`, or `Dark`
+        isPublic:
+          type: boolean
+          description: Is the dashboard public
+          default: false
+        highlightViolations:
+          type: boolean
+          description: Whether to highlight threshold violations.
+          default: false
+        organizations:
+          $ref: '#/components/schemas/Organizations'
+    Dashboard:
+      required:
+        - timeRange
+        - title
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Title of the dashboard.
+          example: Kubernetes Dashboard
+        description:
+          type: string
+          description: Description of the dashboard.
+          example: A view of pods, namespaces and nodes of your cluster.
+        folderId:
+          type: string
+          description: |
+            The identifier of the folder to save the dashboard in. By default it is saved in your personal folder.
+          example: 000000000C1C17C6
+        topologyLabelMap:
+          $ref: '#/components/schemas/TopologyLabelMap'
+        domain:
+          type: string
+          description: If set denotes that the dashboard concerns a given domain (e.g. `aws`, `k8s`, `app`).
+          example: aws
+          default: ''
+        hierarchies:
+          maxItems: 20
+          type: array
+          description: If set to non-empty array denotes that the dashboard concerns given hierarchies.
+          example:
+            - Kubernetes Node View
+          items:
+            type: string
+          default: []
+        refreshInterval:
+          type: integer
+          description: |
+            Interval of time (in seconds) to automatically refresh the dashboard. A value of 0 means we never automatically refresh the dashboard. Allowed values are `0`, `30`, `60`, `120`, `300`, `900`, `1800`, `3600`, `7200`, `86400`.
+          format: int32
+          example: 30
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        panels:
+          type: array
+          description: Panels in the dashboard.
+          items:
+            $ref: '#/components/schemas/Panel'
+        layout:
+          $ref: '#/components/schemas/Layout'
+        variables:
+          type: array
+          description: Variables to apply to the panels.
+          items:
+            $ref: '#/components/schemas/Variable'
+        theme:
+          pattern: ^(light|dark|Light|Dark)$
+          type: string
+          description: Theme for the dashboard. Either `Light` or `Dark`.
+          example: light
+          default: Light
+          x-pattern-message: Must be `Light`, or `Dark`
+        isPublic:
+          type: boolean
+          description: Is the dashboard public
+          default: false
+        highlightViolations:
+          type: boolean
+          description: Whether to highlight threshold violations.
+          default: false
+        organizations:
+          $ref: '#/components/schemas/Organizations'
+        id:
+          type: string
+          description: |
+            Unique identifier for the dashboard. This id is used to get detailed information about the dashboard, such as panels, variables and the layout.
+          example: B23OjNs5ZCyn5VdMwOBoLo3PjgRnJSAlNTKEDAcpuDG2CIgRe9KFXMofm2H2
+        contentId:
+          type: string
+          description: |
+            Content identifier for the dashboard. This id is used to connect to the Sumo Content Library and get general metadata about the dashboard. Use this id if you want to search for dashboards in Sumo folders.
+          example: '1'
+        scheduleId:
+          type: string
+          description: |
+            Scheduled report identifier for the dashboard. Only most recently modified report schedule is rerun per dashboard. This id is used to manage the schedule details through the scheduled report API.
+          example: RdQHYPh2jxoS90DXtKfA7nAJV2rsQ9BncpfY7IkjNzQWi52ug85W7r6Rrmtd
+        scheduleCount:
+          type: integer
+          description: Count of report schedules for the dashboard.
+          format: int32
+          example: 10
+    GenerateReportRequest:
+      required:
+        - action
+        - exportFormat
+        - template
+        - timezone
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ReportAction'
+        exportFormat:
+          pattern: ^(Pdf|Png)$
+          type: string
+          description: File format of the report. Can be `Pdf` or `Png`. `Pdf` is portable document format. `Png` is portable graphics image format.
+          example: Pdf
+          x-pattern-message: 'should be one of the following: ''Pdf'', ''Png'''
+        timezone:
+          type: string
+          description: Time zone for the query time ranges. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        template:
+          $ref: '#/components/schemas/Template'
+        theme:
+          pattern: ^(light|dark|Light|Dark)$
+          type: string
+          description: Theme for the report rendering. If absent, the default theme of the dashboard is used.
+          example: Light
+          x-pattern-message: Must be `Light`, 'light, `Dark`, 'dark'
+        exportWidth:
+          maximum: 6000
+          minimum: 1500
+          type: integer
+          description: Pixel width of the exported PDF or PNG. If absent, the default width is used.
+          example: 1500
+    BeginAsyncJobResponse:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier to get the status of an asynchronous job.
+          example: C03E086C137F38B4
+    AsyncJobStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Whether or not the request is in progress (`InProgress`), has completed successfully (`Success`), or has completed with an error (`Failed`).
+        statusMessage:
+          type: string
+          description: Additional status message generated if the status is not `Failed`.
+        error:
+          $ref: '#/components/schemas/ErrorDescription'
+      example:
+        status: Success
+        statusMessage: ''
+    DashboardMigrationRequest:
+      required:
+        - contentIds
+      type: object
+      properties:
+        contentIds:
+          maxItems: 50
+          type: array
+          description: Content identifiers of the Legacy dashboards.
+          items:
+            type: string
+            description: Content identifier of the Legacy dashboard.
+            example: 00000000000001C8
+    BeginAsyncJobResponseV2:
+      required:
+        - jobId
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: Identifier of the asynchronous job. Use it to get status of the job.
+          example: C03E086C137F38B4
+    MigrationPreviewResponse:
+      required:
+        - count
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Count of dashboards to be migrated.
+          example: 5
+      description: Preview of the dashboard migration.
+    DashboardMigrationResult:
+      required:
+        - data
+        - status
+      type: object
+      properties:
+        data:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: |
+            A mapping of Legacy Dashboard Content Ids to migrated Dashboard(New) Content Ids. Only successful migration are shown here, see errors field for failed migrations and the failure reason.
+          example:
+            '1': 64
+        richData:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MigratedDashboardInfo'
+          description: |
+            A mapping of Legacy Dashboard Content Ids to migrated Dashboard(New) info. Only successful migration are shown here, see errors field for failed migrations and the failure reason.
+        status:
+          $ref: '#/components/schemas/DashboardMigrationStatus'
+        errors:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDescription'
+          description: A mapping of Legacy Dashboards Content Identifiers that failed validation to the failure reason(s).
+        warnings:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDescription'
+          description: A mapping of Legacy Dashboards Content Identifiers to warnings.
+    PaginatedReportSchedules:
+      required:
+        - reportSchedules
+      type: object
+      properties:
+        reportSchedules:
+          type: array
+          description: List of dashboard report schedules.
+          items:
+            $ref: '#/components/schemas/ReportSchedule'
+        next:
+          type: string
+          description: Next continuation token. `token` is set to null when no more pages are left.
+          example: GDCiRv4vebF3UWFJQ1kySXBOR3Bzh69GR0RyWm9vCtc
+    ReportScheduleRequest:
+      required:
+        - dashboardId
+        - emailNotification
+        - reportFormat
+        - scheduleType
+        - timeZone
+      type: object
+      properties:
+        dashboardId:
+          type: string
+          description: Identifier of dashboard the schedule will generate report for.
+          example: B23OjNs5ZCyn5VdMwOBoLo3PjgRnJSAlNTKEDAcpuDG2CIgRe9KFXMofm2H2
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        variableValues:
+          $ref: '#/components/schemas/VariablesValuesData'
+        reportFormat:
+          pattern: ^(Pdf|Png)$
+          type: string
+          description: File format of the report. Can be `Pdf` or `Png`. `Pdf` is portable document format. `Png` is portable graphics image format.
+          example: Pdf
+          x-pattern-message: 'should be one of the following: ''Pdf'', ''Png'''
+        scheduleType:
+          type: string
+          description: |-
+            Run schedule of the scheduled report. Set to "Custom" to specify the schedule with a CRON expression. Possible schedule types are:
+              - `RealTime`
+              - `15Minutes`
+              - `1Hour`
+              - `2Hours`
+              - `4Hours`
+              - `6Hours`
+              - `8Hours`
+              - `12Hours`
+              - `1Day`
+              - `1Week`
+              - `Custom`
+          example: 1Day
+        cronExpression:
+          type: string
+          description: Cron-like expression specifying the report's schedule. Field scheduleType must be set to "Custom", otherwise, scheduleType takes precedence over cronExpression.
+          example: 0 0/15 * * * ? *
+        timeZone:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: Time zone identifier for time specification. Either an abbreviation such as "PST", a full name such as "America/Los_Angeles", or a custom ID such as "GMT-8:00". Note that the support of abbreviations is for JDK 1.1.x compatibility only and full names should be used.
+          example: America/Los_Angeles
+        emailNotification:
+          $ref: '#/components/schemas/Email'
+        isActive:
+          type: boolean
+          description: Is the dashboard report schedule active
+          default: true
+        theme:
+          pattern: ^(light|dark|Light|Dark)$
+          type: string
+          description: Theme for the report rendering. Must be `Light` or `Dark`. If absent, the dashboard's own theme is used.
+          example: Light
+          x-pattern-message: Must be `Light`, `light`, `dark` or `Dark`
+        exportWidth:
+          maximum: 6000
+          minimum: 1500
+          type: integer
+          description: Pixel width of the exported PDF or PNG. If absent, the default width is used.
+          example: 1500
+    ReportSchedule:
+      required:
+        - dashboardId
+        - emailNotification
+        - reportFormat
+        - scheduleType
+        - timeZone
+      type: object
+      properties:
+        dashboardId:
+          type: string
+          description: Identifier of dashboard the schedule will generate report for.
+          example: B23OjNs5ZCyn5VdMwOBoLo3PjgRnJSAlNTKEDAcpuDG2CIgRe9KFXMofm2H2
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+        variableValues:
+          $ref: '#/components/schemas/VariablesValuesData'
+        reportFormat:
+          pattern: ^(Pdf|Png)$
+          type: string
+          description: File format of the report. Can be `Pdf` or `Png`. `Pdf` is portable document format. `Png` is portable graphics image format.
+          example: Pdf
+          x-pattern-message: 'should be one of the following: ''Pdf'', ''Png'''
+        scheduleType:
+          type: string
+          description: |-
+            Run schedule of the scheduled report. Set to "Custom" to specify the schedule with a CRON expression. Possible schedule types are:
+              - `RealTime`
+              - `15Minutes`
+              - `1Hour`
+              - `2Hours`
+              - `4Hours`
+              - `6Hours`
+              - `8Hours`
+              - `12Hours`
+              - `1Day`
+              - `1Week`
+              - `Custom`
+          example: 1Day
+        cronExpression:
+          type: string
+          description: Cron-like expression specifying the report's schedule. Field scheduleType must be set to "Custom", otherwise, scheduleType takes precedence over cronExpression.
+          example: 0 0/15 * * * ? *
+        timeZone:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: Time zone identifier for time specification. Either an abbreviation such as "PST", a full name such as "America/Los_Angeles", or a custom ID such as "GMT-8:00". Note that the support of abbreviations is for JDK 1.1.x compatibility only and full names should be used.
+          example: America/Los_Angeles
+        emailNotification:
+          $ref: '#/components/schemas/Email'
+        isActive:
+          type: boolean
+          description: Is the dashboard report schedule active
+          default: true
+        theme:
+          pattern: ^(light|dark|Light|Dark)$
+          type: string
+          description: Theme for the report rendering. Must be `Light` or `Dark`. If absent, the dashboard's own theme is used.
+          example: Light
+          x-pattern-message: Must be `Light`, `light`, `dark` or `Dark`
+        exportWidth:
+          maximum: 6000
+          minimum: 1500
+          type: integer
+          description: Pixel width of the exported PDF or PNG. If absent, the default width is used.
+          example: 1500
+        scheduleId:
+          type: string
+          description: Identifier of the dashboard report schedule.
+          example: RdQHYPh2jxoS90DXtKfA7nAJV2rsQ9BncpfY7IkjNzQWi52ug85W7r6Rrmtd
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    TopologyLabelMap:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TopologyLabelValuesList'
+          description: Map from topology labels to `TopologyLabelValuesList`.
+      description: |
+        Map of the topology labels. Each label has a key and a list of values. If a value is `*`, it means the label will match content for all values of its key.
+      example:
+        data:
+          service:
+            - kube-scheduler
+            - kube-dns
+    ResolvableTimeRange:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the time range. Value must be either `CompleteLiteralTimeRange` or `BeginBoundedTimeRange`.
+      example:
+        type: BeginBoundedTimeRange
+        from:
+          type: RelativeTimeRangeBoundary
+          relativeTime: '-15m'
+      discriminator:
+        propertyName: type
+    Panel:
+      required:
+        - key
+        - panelType
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the panel.
+          example: 2F7D449E3D511066
+        key:
+          type: string
+          description: |
+            Key for the panel. Used to create searches for the queries in the panel and configure the layout of the panel in the dashboard.
+          example: panelca6280e4a75fca45
+        title:
+          type: string
+          description: Title of the panel.
+          example: This panel shows memory usage for your kubernetes pod.
+        visualSettings:
+          type: string
+          description: Visual settings of the panel.
+          example: '{\"general\":{\"type\":\"column\"}'
+        keepVisualSettingsConsistentWithParent:
+          type: boolean
+          description: Keeps the visual settings, like series colors, consistent with the settings of the parent panel.
+          default: true
+        panelType:
+          type: string
+          description: Type of panel.
+          example: SumoSearchPanel
+      discriminator:
+        propertyName: panelType
+    Layout:
+      required:
+        - layoutStructures
+        - layoutType
+      type: object
+      properties:
+        layoutType:
+          type: string
+          description: The type of panel layout on the Dashboard. For example, Grid, Tabs, or Hierarchical. Currently supports `Grid` only.
+          example: Grid
+        layoutStructures:
+          type: array
+          description: Layout structures for the panel childen.
+          items:
+            $ref: '#/components/schemas/LayoutStructure'
+      discriminator:
+        propertyName: layoutType
+    Variable:
+      required:
+        - name
+        - sourceDefinition
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the variable.
+        name:
+          maxLength: 256
+          type: string
+          description: Name of the variable. The variable name is case-insensitive.
+          example: _sourceHost
+        displayName:
+          maxLength: 256
+          type: string
+          description: |
+            Display name of the variable shown in the UI. If this field is empty, the name field will be used.
+            The display name is case-insensitive. Only numbers, and underscores are allowed in the variable name.
+            This field is not yet supported by the UI.
+          example: Source Host
+        defaultValue:
+          type: string
+          description: Default value of the variable.
+          example: default_value
+        sourceDefinition:
+          $ref: '#/components/schemas/VariableSourceDefinition'
+        allowMultiSelect:
+          type: boolean
+          description: Allow multiple selections in the values dropdown.
+          example: false
+          default: false
+        includeAllOption:
+          type: boolean
+          description: Include an "All" option at the top of the variable's values dropdown.
+          example: true
+          default: true
+        hideFromUI:
+          type: boolean
+          description: Hide the variable in the dashboard UI.
+          example: false
+          default: false
+        valueType:
+          type: string
+          description: |
+            The type of value of the variable. Allowed values are `String`, Any` and `Numeric`. - `String` considers as a single phrase and will wrap in double-quotes. - `Any` is all characters. - `Numeric` consists of a numeric value for variables, it will be displayed differently in the UI. - `Integer` is a variable with an `Int` value. - `Long` is a variable with a `Long` value. - `Double` is a variable with a `Double` value. - `Boolean` is a variable with a `Boolean` value.
+          example: Any
+          default: Any
+    Organizations:
+      type: object
+      properties:
+        defaultOrgIds:
+          type: array
+          description: The default list of organization IDs to run the dashboard by
+          items:
+            $ref: '#/components/schemas/OrgId'
+      description: The organization details to run the dashboard by
+    ReportAction:
+      required:
+        - actionType
+      type: object
+      properties:
+        actionType:
+          pattern: ^DirectDownloadReportAction$
+          type: string
+          description: Type of action.
+          example: DirectDownloadReportAction
+          x-pattern-message: should be 'DirectDownloadReportAction'
+      description: The base class of all report action types. `DirectDownloadReportAction` downloads dashboard from browser. New action types may be supported in the future.
+      discriminator:
+        propertyName: actionType
+    Template:
+      required:
+        - templateType
+      type: object
+      properties:
+        templateType:
+          pattern: ^(DashboardTemplate|DashboardReportModeTemplate)$
+          type: string
+          description: The type of template. `DashboardTemplate` provides a snapshot view of the exported dashboard. `DashboardReportModeTemplate` provides a printer-friendly view of the exported dashboard. New templates may be supported in the future.
+          example: DashboardTemplate
+          x-pattern-message: Must be `DashboardTemplate`, or `DashboardReportModeTemplate`
+      discriminator:
+        propertyName: templateType
+    MigratedDashboardInfo:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the Dashboard(New)
+          example: jgiJLiFP9dX6YdNG0u9t0yqUVOF0iIlNcX0usw2Uy6g8BYTgBj0vYVeiRjRj
+        name:
+          type: string
+          description: The name of the Dashboard(New)
+          example: New Dashboard
+    DashboardMigrationStatus:
+      required:
+        - failedCount
+        - successCount
+        - totalCount
+      type: object
+      properties:
+        successCount:
+          type: integer
+          description: A successful migration to Dashboard(New).
+          example: 3
+        failedCount:
+          type: integer
+          description: A failed migration to Dashboard(New).
+          example: 1
+        totalCount:
+          type: integer
+          description: The total number of Legacy Dashboards to migrate.
+          example: 10
+    VariablesValuesData:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Data for variable values.
+          default: {}
+        richData:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/VariableValuesData'
+          description: A rich form of data for the variable search, including variable values, status and variable type. This field is different from `data` in that it includes an object instead of list as the value in the map. The `data` field is kept for backwards compatibility, please use `richData` for all usages going forward.
+    Email:
+      required:
+        - connectionType
+        - recipients
+        - subject
+      type: object
+      properties:
+        connectionType:
+          pattern: ^(Email|AWSLambda|AzureFunctions|Datadog|HipChat|Jira|NewRelic|Opsgenie|PagerDuty|Slack|MicrosoftTeams|ServiceNow|SumoCloudSOAR|Webhook)$
+          type: string
+          description: |-
+            Connection type of the connection. Valid values:
+              1.  `Email`
+              2.  `AWSLambda`
+              3.  `AzureFunctions`
+              4.  `Datadog`
+              5.  `HipChat`
+              6.  `Jira`
+              7.  `NewRelic`
+              8.  `Opsgenie`
+              9.  `PagerDuty`
+              10. `Slack`
+              11. `MicrosoftTeams`
+              12. `ServiceNow`
+              13. `SumoCloudSOAR`
+              14. `Webhook`
+          x-pattern-message: 'should be one of the following: ''Email'', ''AWSLambda'', ''AzureFunctions'', ''Datadog'', ''HipChat'', ''Jira'', ''NewRelic'', ''Opsgenie'', ''PagerDuty'', ''Slack'', ''MicrosoftTeams'', ''ServiceNow'', ''SumoCloudSOAR'' and ''Webhook'''
+        recipients:
+          type: array
+          description: A list of email addresses to send to when the rule fires.
+          items:
+            type: string
+            example: john@doe.com
+        subject:
+          type: string
+          description: The subject line of the email.
+          example: Sample Email Subject
+        messageBody:
+          type: string
+          description: The message body of the email to send.
+          example: Sample Email Message Body
+        timeZone:
+          type: string
+          description: Time zone for the email content. All dates/times will be displayed in this timeZone in the email payload. Follow the format in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+          example: America/Los_Angeles
+        includeQuery:
+          type: boolean
+          description: Whether to include the triggering query in the notification email.
+        includeResultSet:
+          type: boolean
+          description: Whether to include the result set in the notification email. This field is not applicable for SLO monitors.
+      description: The base class of all connection types.
+      discriminator:
+        propertyName: connectionType
+    TopologyLabelValuesList:
+      type: array
+      description: List of values corresponding to a key of a label.
+      example:
+        - kube-scheduler
+      items:
+        type: string
+        description: Value of the label.
+    LayoutStructure:
+      required:
+        - key
+        - structure
+      type: object
+      properties:
+        key:
+          type: string
+          description: The identifier of the panel that this structure applies to.
+          example: panelPANE-3DC454FD977E2A46
+        structure:
+          type: string
+          description: The structure of a panel.
+          example: '{\"height\":5,\"width\":9,\"x\":0,\"y\":0}'
+    VariableSourceDefinition:
+      required:
+        - variableSourceType
+      type: object
+      properties:
+        variableSourceType:
+          type: string
+          description: Source type of the variable values.
+          example: MetadataVariableSourceDefinition
+      discriminator:
+        propertyName: variableSourceType
+    OrgId:
+      maxLength: 23
+      minLength: 19
+      type: string
+      description: The unique identifier of an organization. It consists of the deployment ID and the hexadecimal account ID separated by a dash `-` character.
+      example: us2-00000000FF42A0C3
+    VariableValuesData:
+      required:
+        - variableValues
+      type: object
+      properties:
+        variableValues:
+          type: array
+          description: Values for the variable.
+          example:
+            - myCluster
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/DashboardSearchStatus'
+        variableType:
+          pattern: ^(LogQueryVariableSourceDefinition|MetadataVariableSourceDefinition|CsvVariableSourceDefinition|FilterSourceDefinition)$
+          type: string
+          description: The type of the variable.
+          example: LogQueryVariableSourceDefinition
+          x-pattern-message: Must be `LogQueryVariableSourceDefinition`, `MetadataVariableSourceDefinition` `CsvVariableSourceDefinition` or `FilterSourceDefinition`.
+        valueType:
+          type: string
+          description: |
+            The type of value of the variable. Allowed values are `String`, Any`, `Numeric`, `Integer`, `Long`, `Double`, `Boolean`. - `String` considers as a single phrase and will wrap in double-quotes. - `Any` is all characters. - `Numeric` consists of a numeric value for variables, it will be displayed differently in the UI. - `Integer` is a variable with an `Int` value. - `Long` is a variable with a `Long` value. - `Double` is a variable with a `Double` value. - `Boolean` is a variable with a `Boolean` value.
+          example: Any
+          default: Any
+        allowMultiSelect:
+          type: boolean
+          description: Allow multiple selections in the values dropdown.
+          example: false
+          default: false
+        variableKey:
+          type: string
+          description: The key of the variable.
+          example: _source
+        errors:
+          type: array
+          description: Generic errors returned by backend from downstream assemblies. More specific errors will be thrown in the future.
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+      description: Variable values, status, type and errors for the variable values search.
+    Action:
+      required:
+        - connectionType
+      type: object
+      properties:
+        connectionType:
+          pattern: ^(Email|AWSLambda|AzureFunctions|Datadog|HipChat|Jira|NewRelic|Opsgenie|PagerDuty|Slack|MicrosoftTeams|ServiceNow|SumoCloudSOAR|Webhook)$
+          type: string
+          description: |-
+            Connection type of the connection. Valid values:
+              1.  `Email`
+              2.  `AWSLambda`
+              3.  `AzureFunctions`
+              4.  `Datadog`
+              5.  `HipChat`
+              6.  `Jira`
+              7.  `NewRelic`
+              8.  `Opsgenie`
+              9.  `PagerDuty`
+              10. `Slack`
+              11. `MicrosoftTeams`
+              12. `ServiceNow`
+              13. `SumoCloudSOAR`
+              14. `Webhook`
+          x-pattern-message: 'should be one of the following: ''Email'', ''AWSLambda'', ''AzureFunctions'', ''Datadog'', ''HipChat'', ''Jira'', ''NewRelic'', ''Opsgenie'', ''PagerDuty'', ''Slack'', ''MicrosoftTeams'', ''ServiceNow'', ''SumoCloudSOAR'' and ''Webhook'''
+      description: The base class of all connection types.
+      discriminator:
+        propertyName: connectionType
+    DashboardSearchStatus:
+      required:
+        - state
+      type: object
+      properties:
+        state:
+          type: string
+          description: Current state of the search.
+        percentCompleted:
+          maximum: 100
+          minimum: 0
+          type: integer
+          description: Percentage of search completed.
+          format: int32

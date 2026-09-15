@@ -18,19 +18,16 @@ users service documentation.
 
 :::info[Service Summary]
 
-total resources: __5__  
+total resources: __1__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/users/email_request_change/">email_request_change</a><br />
-<a href="/services/users/mfa_disable/">mfa_disable</a><br />
-<a href="/services/users/password_reset/">password_reset</a>
+<a href="/services/users/users/">users</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/users/unlock/">unlock</a><br />
-<a href="/services/users/users/">users</a>
+
 </div>
 </div>

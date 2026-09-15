@@ -18,17 +18,16 @@ connections service documentation.
 
 :::info[Service Summary]
 
-total resources: __3__  
+total resources: __1__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/connections/connections/">connections</a><br />
-<a href="/services/connections/incident_templates/">incident_templates</a>
+<a href="/services/connections/connections/">connections</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/connections/test/">test</a>
+
 </div>
 </div>

@@ -18,36 +18,31 @@ content service documentation.
 
 :::info[Service Summary]
 
-total resources: __22__  
+total resources: __17__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/content/copy/">copy</a><br />
-<a href="/services/content/copy_status/">copy_status</a><br />
-<a href="/services/content/delete/">delete</a><br />
-<a href="/services/content/delete_status/">delete_status</a><br />
-<a href="/services/content/export/">export</a><br />
-<a href="/services/content/export_result/">export_result</a><br />
-<a href="/services/content/export_status/">export_status</a><br />
+<a href="/services/content/admin_recommended_folder_jobs/">admin_recommended_folder_jobs</a><br />
+<a href="/services/content/admin_recommended_folder_results/">admin_recommended_folder_results</a><br />
+<a href="/services/content/copy_jobs/">copy_jobs</a><br />
+<a href="/services/content/delete_jobs/">delete_jobs</a><br />
+<a href="/services/content/export_jobs/">export_jobs</a><br />
+<a href="/services/content/export_results/">export_results</a><br />
 <a href="/services/content/folders/">folders</a><br />
-<a href="/services/content/folders_admin_recommended/">folders_admin_recommended</a><br />
-<a href="/services/content/folders_admin_recommended_result/">folders_admin_recommended_result</a><br />
-<a href="/services/content/folders_admin_recommended_status/">folders_admin_recommended_status</a>
+<a href="/services/content/global_folder_jobs/">global_folder_jobs</a><br />
+<a href="/services/content/global_folder_results/">global_folder_results</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/content/folders_global/">folders_global</a><br />
-<a href="/services/content/folders_global_result/">folders_global_result</a><br />
-<a href="/services/content/folders_global_status/">folders_global_status</a><br />
-<a href="/services/content/folders_import/">folders_import</a><br />
-<a href="/services/content/folders_import_status/">folders_import_status</a><br />
-<a href="/services/content/folders_personal/">folders_personal</a><br />
-<a href="/services/content/move/">move</a><br />
-<a href="/services/content/path/">path</a><br />
+<a href="/services/content/import_jobs/">import_jobs</a><br />
+<a href="/services/content/import_results/">import_results</a><br />
+<a href="/services/content/installed_apps_folder_jobs/">installed_apps_folder_jobs</a><br />
+<a href="/services/content/installed_apps_folder_results/">installed_apps_folder_results</a><br />
+<a href="/services/content/items/">items</a><br />
+<a href="/services/content/paths/">paths</a><br />
 <a href="/services/content/permissions/">permissions</a><br />
-<a href="/services/content/permissions_add/">permissions_add</a><br />
-<a href="/services/content/permissions_remove/">permissions_remove</a>
+<a href="/services/content/personal_folder/">personal_folder</a>
 </div>
 </div>

@@ -18,17 +18,16 @@ partitions service documentation.
 
 :::info[Service Summary]
 
-total resources: __3__  
+total resources: __2__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
-<a href="/services/partitions/cancel_retention_update/">cancel_retention_update</a><br />
-<a href="/services/partitions/decommission/">decommission</a>
+<a href="/services/partitions/partitions/">partitions</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/partitions/partitions/">partitions</a>
+<a href="/services/partitions/quota/">quota</a>
 </div>
 </div>

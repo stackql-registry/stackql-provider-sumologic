@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Tokens API
+  description: Installation tokens (tokens library).
+  version: 1.0.0
+paths:
+  /v1/tokens:
+    get:
+      tags:
+        - tokensLibraryManagement
+      summary: Get a list of tokens.
+      description: Get a list of all tokens in the token library.
+      operationId: listTokens
+      responses:
+        '200':
+          description: A list of tokens.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTokensBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - tokensLibraryManagement
+      summary: Create a token.
+      description: Create a token in the token library.
+      operationId: createToken
+      requestBody:
+        description: Information about the token to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenBaseDefinition'
+        required: true
+      responses:
+        '200':
+          description: The token has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/tokens/{id}:
+    get:
+      tags:
+        - tokensLibraryManagement
+      summary: Get a token.
+      description: Get a token with the given identifier in the token library.
+      operationId: getToken
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the token to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Token object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - tokensLibraryManagement
+      summary: Update a token.
+      description: Update a token with the given identifier in the token library.
+      operationId: updateToken
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the token to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The token to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenBaseDefinitionUpdate'
+        required: true
+      responses:
+        '200':
+          description: The token was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - tokensLibraryManagement
+      summary: Delete a token.
+      description: Delete a token with the given identifier in the token library.
+      operationId: deleteToken
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the token to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The token was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ListTokensBaseResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of tokens.
+          items:
+            $ref: '#/components/schemas/TokenBaseResponse'
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    TokenBaseDefinition:
+      required:
+        - name
+        - status
+        - type
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Name of the token.
+          example: token-name
+        description:
+          maxLength: 4096
+          minLength: 0
+          type: string
+          description: Description of the token.
+          example: 'token description: for test.'
+        status:
+          pattern: ^(Active|Inactive)$
+          type: string
+          description: Status of the token. Can be `Active`, or `Inactive`.
+          example: Active
+          x-pattern-message: must be either `Active` or `Inactive`
+        type:
+          pattern: ^(CollectorRegistration)$
+          type: string
+          description: 'Type of the token. Valid values: 1) CollectorRegistration'
+          example: CollectorRegistration
+          x-pattern-message: must be `CollectorRegistration`
+    TokenBaseResponse:
+      required:
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - modifiedAt
+        - modifiedBy
+        - name
+        - status
+        - type
+        - version
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the token.
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Name of the token.
+          example: token-name
+        description:
+          maxLength: 4096
+          minLength: 0
+          type: string
+          description: Description of the token.
+          example: 'token description: for test.'
+        status:
+          pattern: ^(Active|Inactive)$
+          type: string
+          description: Status of the token. Can be `Active`, or `Inactive`.
+          example: Active
+          x-pattern-message: must be either `Active` or `Inactive`
+        type:
+          pattern: ^(CollectorRegistrationTokenResponse)$
+          type: string
+          description: 'Type of the token. Valid values: 1) CollectorRegistrationTokenResponse'
+          example: CollectorRegistrationTokenResponse
+          x-pattern-message: must be `CollectorRegistrationTokenResponse`
+        version:
+          type: integer
+          description: Version of the token.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+      discriminator:
+        propertyName: type
+    TokenBaseDefinitionUpdate:
+      required:
+        - name
+        - status
+        - type
+        - version
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Name of the token.
+          example: token-name
+        description:
+          maxLength: 4096
+          minLength: 0
+          type: string
+          description: Description of the token.
+          example: 'token description: for test.'
+        status:
+          pattern: ^(Active|Inactive)$
+          type: string
+          description: Status of the token. Can be `Active`, or `Inactive`.
+          example: Active
+          x-pattern-message: must be either `Active` or `Inactive`
+        type:
+          pattern: ^(CollectorRegistration)$
+          type: string
+          description: 'Type of the token. Valid values: 1) CollectorRegistration'
+          example: CollectorRegistration
+          x-pattern-message: must be `CollectorRegistration`
+        version:
+          type: integer
+          description: Version of the token.
+          format: int64
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5

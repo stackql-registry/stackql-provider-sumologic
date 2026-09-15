@@ -4,11 +4,13 @@ hide_title: false
 hide_table_of_contents: false
 keywords:
   - sumologic
+  - sumo logic
   - stackql
   - infrastructure-as-code
   - configuration-as-data
   - cloud inventory
-description: Query, deploy and manage Sumologic resources using SQL
+  - observability
+description: Query, provision and manage Sumo Logic collectors, sources, users, roles, monitors, dashboards, partitions, fields and the rest of the Sumo Logic platform using SQL
 custom_edit_url: null
 image: /img/stackql-sumologic-provider-featured-image.png
 id: 'provider-intro'
@@ -16,68 +18,266 @@ id: 'provider-intro'
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
 
-Cloud-native, real-time, unified logs and metrics analytics platform.
+Query, provision and operate the Sumo Logic platform using SQL - collectors and sources, users, roles and service accounts, access keys, the content library (folders, dashboards, saved searches), monitors, SLOs and muting schedules, partitions, scheduled views, fields and extraction rules, ingest budgets, connections, lookup tables, apps, security policies, tracing and search jobs. The provider covers the Sumo Logic API reference (every deployment) together with the Collector Management API.
+
 
 :::info[Provider Summary] 
 
-total services: __32__  
-total resources: __182__  
+total services: __50__  
+total resources: __213__  
 
 :::
 
-See also:   
+See also:
 [[` SHOW `]](https://stackql.io/docs/language-spec/show) [[` DESCRIBE `]](https://stackql.io/docs/language-spec/describe)  [[` REGISTRY `]](https://stackql.io/docs/language-spec/registry)
-* * * 
+* * *
 
 ## Installation
 
-To pull the latest version of the `sumologic` provider, run the following command:  
+To pull the latest version of the `sumologic` provider, run the following command:
 
 ```bash
 REGISTRY PULL sumologic;
 ```
-> To view previous provider versions or to pull a specific provider version, see [here](https://stackql.io/docs/language-spec/registry).  
+> To view previous provider versions or to pull a specific provider version, see [here](https://stackql.io/docs/language-spec/registry).
 
 ## Authentication
 
-The following system environment variables are used for authentication by default:  
+The provider authenticates with a Sumo Logic access key pair using HTTP Basic auth (the access ID is the username, the access key is the password). Create a key in the Sumo Logic console under Administration -> Security -> Access Keys (see <a href="https://help.sumologic.com/docs/manage/security/access-keys/">Access Keys</a>). The following environment variables are read by default - the same variables the Terraform provider uses:
 
-- <CopyableCode code="SUMOLOGIC_ACCESSID" /> - SumoLogic Access ID (see <a href="https://help.sumologic.com/docs/manage/security/access-keys/">Generating an Access Key</a>)
-- <CopyableCode code="SUMOLOGIC_ACCESSKEY" /> - SumoLogic Access Key (see <a href="https://help.sumologic.com/docs/manage/security/access-keys/">Generating an Access Key</a>)
-  
-These variables are sourced at runtime (from the local machine or as CI variables/secrets).  
+- <CopyableCode code="SUMOLOGIC_ACCESSID" /> - Sumo Logic access ID
+- <CopyableCode code="SUMOLOGIC_ACCESSKEY" /> - Sumo Logic access key
+- <CopyableCode code="SUMOLOGIC_ENVIRONMENT" /> - the deployment your account lives in (`us1`, `us2`, `au`, `ca`, `ch`, `de`, `eu`, `fed`, `in`, `jp` or `kr`, see <a href="https://help.sumologic.com/docs/api/getting-started/#sumo-logic-endpoints-by-deployment-and-firewall-security">Sumo Logic endpoints by deployment</a>)
+
+These variables are sourced at runtime (from the local machine or as CI variables/secrets):
+
+```bash
+export SUMOLOGIC_ACCESSID='su...'
+export SUMOLOGIC_ACCESSKEY='...'
+export SUMOLOGIC_ENVIRONMENT='us2'
+```
+
+or using PowerShell:
+
+```powershell
+$env:SUMOLOGIC_ACCESSID = 'su...'
+$env:SUMOLOGIC_ACCESSKEY = '...'
+$env:SUMOLOGIC_ENVIRONMENT = 'us2'
+```
 
 <details>
 
 <summary>Using different environment variables</summary>
 
-To use different environment variables (instead of the defaults), use the `--auth` flag of the `stackql` program.  For example:  
+To use different environment variables for the access key pair, use the `--auth` flag of the `stackql` program. For example:
 
 ```bash
-
-AUTH='{ "sumologic": { "type": "basic",  "username_var": "YOUR_SUMOLOGIC_ACCESS_ID_VAR", "password_var": "YOUR_SUMOLOGIC_ACCESS_KEY_VAR" }}'
+AUTH='{ "sumologic": { "type": "basic", "username_var": "YOUR_SUMOLOGIC_ACCESS_ID_VAR", "password_var": "YOUR_SUMOLOGIC_ACCESS_KEY_VAR" }}'
 stackql shell --auth="${AUTH}"
-
 ```
-or using PowerShell:  
+
+or using PowerShell:
 
 ```powershell
-
-$Auth = "{ 'sumologic': { 'type': 'basic',  'username_var': 'YOUR_SUMOLOGIC_ACCESS_ID_VAR', 'password_var': 'YOUR_SUMOLOGIC_ACCESS_KEY_VAR' }}"
+$Auth = "{ 'sumologic': { 'type': 'basic', 'username_var': 'YOUR_SUMOLOGIC_ACCESS_ID_VAR', 'password_var': 'YOUR_SUMOLOGIC_ACCESS_KEY_VAR' }}"
 stackql.exe shell --auth=$Auth
-
 ```
+
 </details>
 
+## Deployment (region)
 
-## Server Parameters
+Every Sumo Logic deployment has its own API endpoint (`https://api.us2.sumologic.com/api`, `https://api.au.sumologic.com/api` and so on; `us1` is `https://api.sumologic.com/api`). The deployment is the <CopyableCode code="region" /> server parameter of every resource, resolved from the <CopyableCode code="SUMOLOGIC_ENVIRONMENT" /> environment variable, so with the variable set queries need no `WHERE region` clause:
 
+```sql
+SELECT id, first_name, last_name, email FROM sumologic.users.users;
+```
 
-The following parameter is required for the `sumologic` provider if you are not using the `us2` region:  
+A `WHERE region = '...'` value always takes precedence over the environment, which is how a single session addresses accounts in several deployments:
 
-- <CopyableCode code="region" /> - The SumoLogic regional endpoint (e.g. <code>au</code>, <code>ca</code>, <code>de</code>, <code>eu</code>, <code>fed</code>, <code>in</code>, <code>jp</code>)
+```sql
+SELECT id, name FROM sumologic.collectors.collectors WHERE region = 'au';
+```
 
-This parameter would be supplied to the `WHERE` clause of each `SELECT` statement if you are not usign the `us2` region.
+With <CopyableCode code="SUMOLOGIC_ENVIRONMENT" /> unset, `region` is listed as a required parameter by `SHOW METHODS` and must be supplied on `INSERT`, `UPDATE`, `DELETE` and `EXEC` statements (a `SELECT` without it falls back to `us2`, the default of the previous provider release). Access keys are deployment-specific: a key created in one deployment is rejected (`401`) by every other endpoint, so a `401` on a fresh key usually means the wrong `region`.
+
+## Column and parameter casing
+
+The Sumo Logic API is camelCase on the wire. Columns, `WHERE` parameters and `INSERT` / `UPDATE` columns are presented in `snake_case` (`first_name`, `is_active`, `role_ids`, `collector_type`); the provider translates them to the wire names. Nested JSON columns keep the wire casing inside the value, so `json_extract(children, '$[0].itemType')` uses `itemType`.
+
+## Pagination and pushdown
+
+Paginated lists (users, roles, partitions, dashboards, connections, health events and the other `limit` / `token` lists) are traversed automatically - a `SELECT` returns every page. Every documented query or header parameter of an operation can be supplied in the `WHERE` clause and is sent on the wire, so filtering happens server-side where the API supports it:
+
+```sql
+-- ?email=  on GET /v1/users
+SELECT id, first_name, last_name FROM sumologic.users.users WHERE email = 'ada@example.com';
+
+-- ?filter=hosted on GET /v1/collectors (Collector Management API)
+SELECT id, name, category FROM sumologic.collectors.collectors WHERE filter = 'hosted';
+
+-- ?query= on GET /v1/monitors/search
+SELECT json_extract(item, '$.name') AS name, path FROM sumologic.monitors.search WHERE query = 'type:monitor';
+```
+
+## Users and roles
+
+Users with their state and role assignment:
+
+```sql
+SELECT id, first_name, last_name, email, is_active, is_locked, is_mfa_enabled, last_login_timestamp,
+       json_array_length(role_ids) AS roles
+FROM sumologic.users.users
+ORDER BY last_login_timestamp DESC;
+```
+
+Roles and the capabilities they grant:
+
+```sql
+SELECT id, name, description, system_defined, json_array_length(capabilities) AS capabilities, json_array_length(users) AS users
+FROM sumologic.roles.roles;
+```
+
+## Collectors and sources
+
+The collector estate - type, liveness and version:
+
+```sql
+SELECT id, name, collector_type, alive, collector_version, category, ephemeral, last_seen_alive
+FROM sumologic.collectors.collectors
+ORDER BY alive, name;
+```
+
+Sources of one collector:
+
+```sql
+SELECT id, name, source_type, category, alive, url
+FROM sumologic.collectors.sources
+WHERE collector_id = '100000001';
+```
+
+Installed collectors that have been offline for more than 30 days:
+
+```sql
+SELECT id, name, collector_version, last_seen_alive
+FROM sumologic.collectors.offline_collectors
+WHERE alive_before_days = 30;
+```
+
+## Content library, monitors and dashboards
+
+The personal folder and its children:
+
+```sql
+SELECT id, name, item_type, json_extract(children, '$[0].name') AS first_child, json_array_length(children) AS items
+FROM sumologic.content.personal_folder;
+```
+
+Dashboards (New) with their folder and refresh interval:
+
+```sql
+SELECT id, title, folder_id, refresh_interval, theme
+FROM sumologic.dashboards.dashboards;
+```
+
+Monitors, disabled or not, from the monitors library search:
+
+```sql
+SELECT json_extract(item, '$.name') AS name,
+       json_extract(item, '$.monitorType') AS monitor_type,
+       json_extract(item, '$.isDisabled') AS is_disabled,
+       path
+FROM sumologic.monitors.search
+WHERE query = 'type:monitor';
+```
+
+## Data tiers, partitions and budgets
+
+Partitions with tier and retention:
+
+```sql
+SELECT id, name, analytics_tier, retention_period, is_active, is_included_in_default_search, total_bytes
+FROM sumologic.partitions.partitions
+ORDER BY total_bytes DESC;
+```
+
+Ingest budgets and their current usage:
+
+```sql
+SELECT id, name, capacity_bytes, usage_bytes, usage_status, action, reset_time, timezone
+FROM sumologic.ingest_budgets.ingest_budgets;
+```
+
+## Provision, mutate and tear down
+
+Mutations use the same SQL grammar - `INSERT` creates a resource, `UPDATE` replaces it (Sumo Logic updates are `PUT`s, so supply every required field), `EXEC` invokes lifecycle actions and `DELETE` removes it. Structured values (arrays, objects) are passed as JSON strings, and booleans are quoted (`is_active = 'false'`) - a bare `true` / `false` on the right-hand side of `SET` is not accepted. A hosted collector with an HTTP source end to end (the Collector Management API wraps its bodies in `collector` / `source` objects, passed as JSON values):
+
+```sql
+-- create a hosted collector
+INSERT INTO sumologic.collectors.collectors (collector)
+SELECT '{"name": "stackql-hosted", "collectorType": "Hosted", "category": "stackql/demo", "description": "Created by StackQL"}';
+
+-- find its id
+SELECT id FROM sumologic.collectors.collectors WHERE name = 'stackql-hosted';
+
+-- add an HTTP source to it
+INSERT INTO sumologic.collectors.sources (collector_id, source)
+SELECT '100000002', '{"name": "stackql-http", "sourceType": "HTTP", "category": "stackql/demo/http", "messagePerRequest": false}';
+
+-- remove both
+DELETE FROM sumologic.collectors.sources WHERE collector_id = '100000002' AND source_id = '200000002';
+DELETE FROM sumologic.collectors.collectors WHERE id = '100000002';
+```
+
+A role from creation to deletion, with a user assignment in between:
+
+```sql
+INSERT INTO sumologic.roles.roles (name, description, capabilities)
+SELECT 'stackql-readers', 'Read-only', '["viewCollectors", "viewFieldExtraction"]';
+
+EXEC sumologic.roles.roles.assign_user @roleId = '00000000000001AC', @userId = '000000000000ABCD';
+
+UPDATE sumologic.roles.roles
+SET name = 'stackql-readers', description = 'Read-only (audited)', capabilities = '["viewCollectors"]'
+WHERE id = '00000000000001AC';
+
+DELETE FROM sumologic.roles.roles WHERE id = '00000000000001AC';
+```
+
+Deactivating a user (a `PUT`, so the name and role assignment are supplied again):
+
+```sql
+UPDATE sumologic.users.users
+SET first_name = 'Ada', last_name = 'Lovelace', is_active = 'false', role_ids = '["00000000000001AB"]'
+WHERE id = '000000000000ABCD';
+```
+
+## Lifecycle operations
+
+State transitions are `EXEC` methods on the resource they act on, addressed with the wire-cased parameter names:
+
+```sql
+EXEC sumologic.users.users.unlock @id = '000000000000ABCD';
+
+EXEC sumologic.scheduled_views.scheduled_views.pause @id = '0000000000000A01';
+
+EXEC sumologic.partitions.partitions.decommission @id = '0000000000000A02';
+
+EXEC sumologic.monitors.monitors.disable_by_ids @ids = '0000000000000101,0000000000000102';
+```
+
+Asynchronous jobs follow the same shape: an `EXEC` starts the job on a `<x>_jobs` resource, a `SELECT` on the same resource polls its status, and a `<x>_results` resource reads the outcome:
+
+```sql
+EXEC sumologic.content.export_jobs.start @id = '0000000000A1B2C5';
+
+SELECT status, status_message FROM sumologic.content.export_jobs
+WHERE content_id = '0000000000A1B2C5' AND job_id = '5B4C3D2E1F0A9B8C';
+
+SELECT type, name FROM sumologic.content.export_results
+WHERE content_id = '0000000000A1B2C5' AND job_id = '5B4C3D2E1F0A9B8C';
+```
+
 
 ## Services
 <div class="row">
@@ -86,32 +286,50 @@ This parameter would be supplied to the `WHERE` clause of each `SELECT` statemen
 <a href="/services/account/">account</a><br />
 <a href="/services/apps/">apps</a><br />
 <a href="/services/archive/">archive</a><br />
+<a href="/services/budgets/">budgets</a><br />
 <a href="/services/collectors/">collectors</a><br />
 <a href="/services/connections/">connections</a><br />
 <a href="/services/content/">content</a><br />
+<a href="/services/content_sync/">content_sync</a><br />
 <a href="/services/dashboards/">dashboards</a><br />
+<a href="/services/data_archiving/">data_archiving</a><br />
+<a href="/services/data_deletion_rules/">data_deletion_rules</a><br />
+<a href="/services/data_masking_rules/">data_masking_rules</a><br />
 <a href="/services/dynamic_parsing_rules/">dynamic_parsing_rules</a><br />
+<a href="/services/event_extraction_rules/">event_extraction_rules</a><br />
 <a href="/services/extraction_rules/">extraction_rules</a><br />
+<a href="/services/feature_settings/">feature_settings</a><br />
 <a href="/services/fields/">fields</a><br />
 <a href="/services/health_events/">health_events</a><br />
 <a href="/services/ingest_budgets/">ingest_budgets</a><br />
 <a href="/services/log_searches/">log_searches</a><br />
 <a href="/services/logs_data_forwarding/">logs_data_forwarding</a><br />
 <a href="/services/lookup_tables/">lookup_tables</a><br />
+<a href="/services/macros/">macros</a><br />
+<a href="/services/metrics_queries/">metrics_queries</a><br />
 </div>
 <div class="providerDocColumn">
-<a href="/services/metrics_queries/">metrics_queries</a><br />
 <a href="/services/metrics_searches/">metrics_searches</a><br />
 <a href="/services/monitors/">monitors</a><br />
+<a href="/services/muting_schedules/">muting_schedules</a><br />
+<a href="/services/oauth/">oauth</a><br />
+<a href="/services/organizations/">organizations</a><br />
+<a href="/services/ot_collectors/">ot_collectors</a><br />
+<a href="/services/parsers/">parsers</a><br />
 <a href="/services/partitions/">partitions</a><br />
 <a href="/services/password_policy/">password_policy</a><br />
-<a href="/services/plan/">plan</a><br />
 <a href="/services/policies/">policies</a><br />
 <a href="/services/roles/">roles</a><br />
 <a href="/services/saml/">saml</a><br />
 <a href="/services/scheduled_views/">scheduled_views</a><br />
+<a href="/services/schemas/">schemas</a><br />
+<a href="/services/scim/">scim</a><br />
+<a href="/services/search_jobs/">search_jobs</a><br />
+<a href="/services/service_accounts/">service_accounts</a><br />
 <a href="/services/service_allowlist/">service_allowlist</a><br />
 <a href="/services/slos/">slos</a><br />
+<a href="/services/source_templates/">source_templates</a><br />
+<a href="/services/threat_intel/">threat_intel</a><br />
 <a href="/services/tokens/">tokens</a><br />
 <a href="/services/tracing/">tracing</a><br />
 <a href="/services/transformation_rules/">transformation_rules</a><br />

@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>fields</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>fields</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="fields" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.fields.fields" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists a <code>fields</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getCustomField"
+    defaultValue="get"
     values={[
-        { label: 'getCustomField', value: 'getCustomField' },
-        { label: 'listCustomFields', value: 'listCustomFields' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getCustomField">
+<TabItem value="get">
 
 The details of the custom field.
 
@@ -52,29 +53,29 @@ The details of the custom field.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="dataType" /></td>
+    <td><CopyableCode code="field_id" /></td>
     <td><code>string</code></td>
-    <td>Field type. Possible values are `String`, `Long`, `Int`, `Double`, and `Boolean`. (pattern: <code>^(String|Long|Int|Double|Boolean)$</code>, example: String, x-pattern-message: Must be `String`, `Long`, `Int`, `Double` or `Boolean`)</td>
+    <td>Identifier of the field. (example: 00000000031D02DA) (wire: fieldId)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="fieldId" /></td>
+    <td><CopyableCode code="field_name" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the field. (example: 00000000031D02DA)</td>
+    <td>Field name. (example: hostIP) (wire: fieldName)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="fieldName" /></td>
+    <td><CopyableCode code="data_type" /></td>
     <td><code>string</code></td>
-    <td>Field name. (example: hostIP)</td>
+    <td>Field type. Possible values are `String`, `Long`, `Int`, `Double`, and `Boolean`. (pattern: &lt;code&gt;^(String|Long|Int|Double|Boolean)$&lt;/code&gt;, example: String, x-pattern-message: Must be `String`, `Long`, `Int`, `Double` or `Boolean`) (wire: dataType)</td>
 </tr>
 <tr>
     <td><CopyableCode code="state" /></td>
     <td><code>string</code></td>
-    <td>Indicates whether the field is enabled and its values are being accepted. Possible values are `Enabled` and `Disabled`. (pattern: <code>^(Enabled|Disabled)$</code>, example: Enabled, x-pattern-message: Must be `Enabled` or `Disabled`)</td>
+    <td>Indicates whether the field is enabled and its values are being accepted. Possible values are `Enabled` and `Disabled`. (pattern: &lt;code&gt;^(Enabled|Disabled)$&lt;/code&gt;, example: Enabled, x-pattern-message: Must be `Enabled` or `Disabled`)</td>
 </tr>
 </tbody>
 </table>
 </TabItem>
-<TabItem value="listCustomFields">
+<TabItem value="list">
 
 List of all custom fields.
 
@@ -88,9 +89,24 @@ List of all custom fields.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="data" /></td>
-    <td><code>array</code></td>
-    <td>List of custom fields.</td>
+    <td><CopyableCode code="field_id" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the field. (example: 00000000031D02DA) (wire: fieldId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="field_name" /></td>
+    <td><code>string</code></td>
+    <td>Field name. (example: hostIP) (wire: fieldName)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="data_type" /></td>
+    <td><code>string</code></td>
+    <td>Field type. Possible values are `String`, `Long`, `Int`, `Double`, and `Boolean`. (pattern: &lt;code&gt;^(String|Long|Int|Double|Boolean)$&lt;/code&gt;, example: String, x-pattern-message: Must be `String`, `Long`, `Int`, `Double` or `Boolean`) (wire: dataType)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="state" /></td>
+    <td><code>string</code></td>
+    <td>Indicates whether the field is enabled and its values are being accepted. Possible values are `Enabled` and `Disabled`. (pattern: &lt;code&gt;^(Enabled|Disabled)$&lt;/code&gt;, example: Enabled, x-pattern-message: Must be `Enabled` or `Disabled`)</td>
 </tr>
 </tbody>
 </table>
@@ -113,32 +129,46 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getCustomField"><CopyableCode code="getCustomField" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get the details of a custom field.</td>
 </tr>
 <tr>
-    <td><a href="#listCustomFields"><CopyableCode code="listCustomFields" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Request a list of all the custom fields configured in your account.</td>
 </tr>
 <tr>
-    <td><a href="#createField"><CopyableCode code="createField" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__fieldName"><code>data__fieldName</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-field_name"><code>field_name</code></a></td>
     <td></td>
     <td>Adding a field will define it in the Fields schema allowing it to be assigned as metadata to your logs.</td>
 </tr>
 <tr>
-    <td><a href="#deleteField"><CopyableCode code="deleteField" /></a></td>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Deleting a field does not delete historical data assigned with that field. If you  delete a field by mistake and one or more of those dependencies break, you can  re-add the field to get things working properly again. You should always disable  a field and ensure things are behaving as expected before deleting a field.</td>
+</tr>
+<tr>
+    <td><a href="#enable"><CopyableCode code="enable" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td></td>
+    <td>Fields have to be enabled to be assigned to your data. This operation ensures that a specified field is enabled and Sumo Logic will treat it as safe to process. All manually created custom fields are  enabled by default.</td>
+</tr>
+<tr>
+    <td><a href="#disable"><CopyableCode code="disable" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td></td>
+    <td>After disabling a field Sumo Logic will start dropping its incoming values at ingest. As a result, they won't be searchable or usable. Historical values are not removed and remain searchable.</td>
 </tr>
 </tbody>
 </table>
@@ -159,12 +189,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-id">
     <td><CopyableCode code="id" /></td>
     <td><code>string</code></td>
-    <td>Identifier of a field to delete. (example: 00000000031D02DA)</td>
+    <td>Identifier of a field to disable. (example: 00000000031D02DA)</td>
 </tr>
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -172,37 +202,40 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getCustomField"
+    defaultValue="get"
     values={[
-        { label: 'getCustomField', value: 'getCustomField' },
-        { label: 'listCustomFields', value: 'listCustomFields' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getCustomField">
+<TabItem value="get">
 
 Get the details of a custom field.
 
 ```sql
 SELECT
-dataType,
-fieldId,
-fieldName,
+field_id,
+field_name,
+data_type,
 state
 FROM sumologic.fields.fields
 WHERE id = '{{ id }}' -- required
-AND region = '{{ region }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
-<TabItem value="listCustomFields">
+<TabItem value="list">
 
 Request a list of all the custom fields configured in your account.
 
 ```sql
 SELECT
-data
+field_id,
+field_name,
+data_type,
+state
 FROM sumologic.fields.fields
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -212,46 +245,46 @@ WHERE region = '{{ region }}' -- required
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createField"
+    defaultValue="create"
     values={[
-        { label: 'createField', value: 'createField' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createField">
+<TabItem value="create">
 
 Adding a field will define it in the Fields schema allowing it to be assigned as metadata to your logs.
 
 ```sql
 INSERT INTO sumologic.fields.fields (
-data__fieldName,
+field_name,
 region
 )
 SELECT 
-'{{ fieldName }}' /* required */,
+'{{ field_name }}' /* required */,
 '{{ region }}'
 RETURNING
-dataType,
-fieldId,
-fieldName,
+field_id,
+field_name,
+data_type,
 state
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: fields
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the fields resource.
-    - name: fieldName
-      value: string
+    - name: field_name
+      value: "{{ field_name }}"
       description: |
         Field name.
-```
+`}</CodeBlock>
+
 </TabItem>
 </Tabs>
 
@@ -259,19 +292,55 @@ state
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteField"
+    defaultValue="delete"
     values={[
-        { label: 'deleteField', value: 'deleteField' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteField">
+<TabItem value="delete">
 
 Deleting a field does not delete historical data assigned with that field. If you  delete a field by mistake and one or more of those dependencies break, you can  re-add the field to get things working properly again. You should always disable  a field and ensure things are behaving as expected before deleting a field.
 
 ```sql
 DELETE FROM sumologic.fields.fields
 WHERE id = '{{ id }}' --required
-AND region = '{{ region }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+;
+```
+</TabItem>
+</Tabs>
+
+
+## Lifecycle Methods
+
+EXEC variables use wire (API) names.
+
+<Tabs
+    defaultValue="enable"
+    values={[
+        { label: 'enable', value: 'enable' },
+        { label: 'disable', value: 'disable' }
+    ]}
+>
+<TabItem value="enable">
+
+Fields have to be enabled to be assigned to your data. This operation ensures that a specified field is enabled and Sumo Logic will treat it as safe to process. All manually created custom fields are  enabled by default.
+
+```sql
+EXEC sumologic.fields.fields.enable 
+@id='{{ id }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+;
+```
+</TabItem>
+<TabItem value="disable">
+
+After disabling a field Sumo Logic will start dropping its incoming values at ingest. As a result, they won't be searchable or usable. Historical values are not removed and remain searchable.
+
+```sql
+EXEC sumologic.fields.fields.disable 
+@id='{{ id }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

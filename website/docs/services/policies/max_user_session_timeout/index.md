@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>max_user_session_timeout</code>
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>max_user_session_timeout</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="max_user_session_timeout" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.policies.max_user_session_timeout" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>max_user_session_timeout</code>
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getMaxUserSessionTimeoutPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getMaxUserSessionTimeoutPolicy', value: 'getMaxUserSessionTimeoutPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMaxUserSessionTimeoutPolicy">
+<TabItem value="get">
 
 The Max User Session Timeout policy.
 
@@ -51,9 +52,9 @@ The Max User Session Timeout policy.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="maxUserSessionTimeout" /></td>
+    <td><CopyableCode code="max_user_session_timeout" /></td>
     <td><code>string</code></td>
-    <td>Maximum web session timeout users are able to configure within their user preferences. Valid values are: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d` (pattern: <code>^(5m|15m|30m|1h|2h|6h|12h|1d|2d|3d|5d|7d)$</code>, example: 1d, x-pattern-message: must be one of the following: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d`)</td>
+    <td>Maximum web session timeout users are able to configure within their user preferences. Valid values are: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d` (pattern: &lt;code&gt;^(5m|15m|30m|1h|2h|6h|12h|1d|2d|3d|5d|7d)$&lt;/code&gt;, example: 1d, x-pattern-message: must be one of the following: `5m`, `15m`, `30m`, `1h`, `2h`, `6h`, `12h`, `1d`, `2d`, `3d`, `5d`, or `7d`) (wire: maxUserSessionTimeout)</td>
 </tr>
 </tbody>
 </table>
@@ -76,18 +77,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getMaxUserSessionTimeoutPolicy"><CopyableCode code="getMaxUserSessionTimeoutPolicy" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
-    <td>Get the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)</td>
+    <td>Get the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. &#91;Learn More&#93;(https:​//help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)</td>
 </tr>
 <tr>
-    <td><a href="#setMaxUserSessionTimeoutPolicy"><CopyableCode code="setMaxUserSessionTimeoutPolicy" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-maxUserSessionTimeout"><code>maxUserSessionTimeout</code></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-max_user_session_timeout"><code>max_user_session_timeout</code></a></td>
     <td></td>
-    <td>Set the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)</td>
+    <td>Set the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. &#91;Learn More&#93;(https:​//help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)</td>
 </tr>
 </tbody>
 </table>
@@ -108,7 +109,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -116,46 +117,47 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getMaxUserSessionTimeoutPolicy"
+    defaultValue="get"
     values={[
-        { label: 'getMaxUserSessionTimeoutPolicy', value: 'getMaxUserSessionTimeoutPolicy' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMaxUserSessionTimeoutPolicy">
+<TabItem value="get">
 
 Get the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)
 
 ```sql
 SELECT
-maxUserSessionTimeout
+max_user_session_timeout
 FROM sumologic.policies.max_user_session_timeout
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
 </Tabs>
 
 
-## Lifecycle Methods
+## `UPDATE` examples
 
 <Tabs
-    defaultValue="setMaxUserSessionTimeoutPolicy"
+    defaultValue="update"
     values={[
-        { label: 'setMaxUserSessionTimeoutPolicy', value: 'setMaxUserSessionTimeoutPolicy' }
+        { label: 'update', value: 'update' }
     ]}
 >
-<TabItem value="setMaxUserSessionTimeoutPolicy">
+<TabItem value="update">
 
 Set the Max User Session Timeout policy. When enabled, this policy sets the maximum web session timeout users are able to configure within their user preferences. Users preferences will be updated to match this value only if their current preference is set to a higher value. [Learn More](https://help.sumologic.com/Manage/Security/Set_a_Maximum_Web_Session_Timeout)
 
 ```sql
-EXEC sumologic.policies.max_user_session_timeout.setMaxUserSessionTimeoutPolicy 
-@region='{{ region }}' --required 
-@@json=
-'{
-"maxUserSessionTimeout": "{{ maxUserSessionTimeout }}"
-}'
-;
+UPDATE sumologic.policies.max_user_session_timeout
+SET 
+max_user_session_timeout = '{{ max_user_session_timeout }}'
+WHERE 
+region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND max_user_session_timeout = '{{ max_user_session_timeout }}' --required
+RETURNING
+max_user_session_timeout;
 ```
 </TabItem>
 </Tabs>

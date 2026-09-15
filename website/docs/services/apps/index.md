@@ -18,17 +18,21 @@ apps service documentation.
 
 :::info[Service Summary]
 
-total resources: __3__  
+total resources: __7__  
 
 :::
 
 ## Resources
 <div class="row">
 <div class="providerDocColumn">
+<a href="/services/apps/app_subscriptions/">app_subscriptions</a><br />
 <a href="/services/apps/apps/">apps</a><br />
-<a href="/services/apps/install/">install</a>
+<a href="/services/apps/apps_v2/">apps_v2</a><br />
+<a href="/services/apps/install_jobs/">install_jobs</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/apps/install_status/">install_status</a>
+<a href="/services/apps/install_jobs_v2/">install_jobs_v2</a><br />
+<a href="/services/apps/uninstall_jobs/">uninstall_jobs</a><br />
+<a href="/services/apps/upgrade_jobs/">upgrade_jobs</a>
 </div>
 </div>

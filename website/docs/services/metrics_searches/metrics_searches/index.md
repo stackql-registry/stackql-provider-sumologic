@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>metrics_searches</code> resourc
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>metrics_searches</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="metrics_searches" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.metrics_searches.metrics_searches" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>metrics_searches</code> resourc
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getMetricsSearch"
+    defaultValue="get"
     values={[
-        { label: 'getMetricsSearch', value: 'getMetricsSearch' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMetricsSearch">
+<TabItem value="get">
 
 A metrics search object with metadata.
 
@@ -56,14 +57,19 @@ A metrics search object with metadata.
     <td>Identifier of the metrics search. (example: 000000000000001A)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
-    <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00Z)</td>
+    <td><CopyableCode code="parent_id" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the parent element in the content library, such as folder. (example: 0000000000007D2B) (wire: parentId)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_at" /></td>
+    <td><code>string (date-time)</code></td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2018-10-16T09:10:00.000Z) (wire: createdAt)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource. (example: 0000000006743FDD)</td>
+    <td>Identifier of the user who created the resource. (example: 0000000006743FDD) (wire: createdBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="description" /></td>
@@ -71,34 +77,29 @@ A metrics search object with metadata.
     <td>Item description in the content library. (example: Long and detailed description)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="desiredQuantizationInSecs" /></td>
+    <td><CopyableCode code="desired_quantization_in_secs" /></td>
     <td><code>integer (int32)</code></td>
-    <td>Desired quantization in seconds.</td>
+    <td>Desired quantization in seconds. (wire: desiredQuantizationInSecs)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="logQuery" /></td>
+    <td><CopyableCode code="log_query" /></td>
     <td><code>string</code></td>
-    <td>Log query used to add an overlay to the chart. (example: my_metric | timeslice 1m | count by _timeslice)</td>
+    <td>Log query used to add an overlay to the chart. (example: my_metric | timeslice 1m | count by _timeslice) (wire: logQuery)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="metricsQueries" /></td>
+    <td><CopyableCode code="metrics_queries" /></td>
     <td><code>array</code></td>
-    <td>Metrics queries, up to the maximum of six.</td>
+    <td>Metrics queries, up to the maximum of six. (wire: metricsQueries)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00Z)</td>
+    <td>Last modification timestamp in UTC. (example: 2018-10-16T09:10:00.000Z) (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="parentId" /></td>
-    <td><code>string</code></td>
-    <td>Identifier of the parent element in the content library, such as folder. (example: 0000000000007D2B)</td>
+    <td>Identifier of the user who last modified the resource. (example: 0000000006743FE8) (wire: modifiedBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="properties" /></td>
@@ -106,14 +107,14 @@ A metrics search object with metadata.
     <td>Chart properties, like line width, color palette, and the fill missing data method. Leave this field empty to use the defaults. This property contains JSON object encoded as a string.  (example: &#123; \"key\": \"value\" &#125;)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="timeRange" /></td>
+    <td><CopyableCode code="time_range" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: timeRange)</td>
 </tr>
 <tr>
     <td><CopyableCode code="title" /></td>
     <td><code>string</code></td>
-    <td>Item title in the content library. (pattern: <code>^[a-zA-Z0-9 +%-@.,_()]+$</code>, example: Short title)</td>
+    <td>Item title in the content library. (pattern: &lt;code&gt;^&#91;a-zA-Z0-9 +%-@.,_()&#93;+$&lt;/code&gt;, example: Short title)</td>
 </tr>
 </tbody>
 </table>
@@ -136,32 +137,32 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getMetricsSearch"><CopyableCode code="getMetricsSearch" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Returns a metrics search with the specified identifier.</td>
 </tr>
 <tr>
-    <td><a href="#createMetricsSearch"><CopyableCode code="createMetricsSearch" /></a></td>
+    <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-data__description"><code>data__description</code></a>, <a href="#parameter-data__metricsQueries"><code>data__metricsQueries</code></a>, <a href="#parameter-data__timeRange"><code>data__timeRange</code></a>, <a href="#parameter-data__title"><code>data__title</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-description"><code>description</code></a>, <a href="#parameter-metrics_queries"><code>metrics_queries</code></a>, <a href="#parameter-time_range"><code>time_range</code></a>, <a href="#parameter-title"><code>title</code></a>, <a href="#parameter-parent_id"><code>parent_id</code></a></td>
     <td></td>
     <td>Saves a metrics search in the content library. Metrics search consists of one or more queries, a time range, a quantization period and a set of chart properties like line width.</td>
 </tr>
 <tr>
-    <td><a href="#deleteMetricsSearch"><CopyableCode code="deleteMetricsSearch" /></a></td>
+    <td><a href="#update"><CopyableCode code="update" /></a></td>
+    <td><CopyableCode code="update" /></td>
+    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-description"><code>description</code></a>, <a href="#parameter-metrics_queries"><code>metrics_queries</code></a>, <a href="#parameter-time_range"><code>time_range</code></a>, <a href="#parameter-title"><code>title</code></a></td>
+    <td></td>
+    <td>Updates a metrics search with the specified identifier. Partial updates are not supported, you must provide values for all fields.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Deletes a metrics search from the content library.</td>
-</tr>
-<tr>
-    <td><a href="#updateMetricsSearch"><CopyableCode code="updateMetricsSearch" /></a></td>
-    <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-id"><code>id</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-description"><code>description</code></a>, <a href="#parameter-metricsQueries"><code>metricsQueries</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a>, <a href="#parameter-title"><code>title</code></a></td>
-    <td></td>
-    <td>Updates a metrics search with the specified identifier. Partial updates are not supported, you must provide values for all fields.</td>
 </tr>
 </tbody>
 </table>
@@ -187,7 +188,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -195,33 +196,33 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getMetricsSearch"
+    defaultValue="get"
     values={[
-        { label: 'getMetricsSearch', value: 'getMetricsSearch' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMetricsSearch">
+<TabItem value="get">
 
 Returns a metrics search with the specified identifier.
 
 ```sql
 SELECT
 id,
-createdAt,
-createdBy,
+parent_id,
+created_at,
+created_by,
 description,
-desiredQuantizationInSecs,
-logQuery,
-metricsQueries,
-modifiedAt,
-modifiedBy,
-parentId,
+desired_quantization_in_secs,
+log_query,
+metrics_queries,
+modified_at,
+modified_by,
 properties,
-timeRange,
+time_range,
 title
 FROM sumologic.metrics_searches.metrics_searches
 WHERE id = '{{ id }}' -- required
-AND region = '{{ region }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
@@ -231,96 +232,147 @@ AND region = '{{ region }}' -- required
 ## `INSERT` examples
 
 <Tabs
-    defaultValue="createMetricsSearch"
+    defaultValue="create"
     values={[
-        { label: 'createMetricsSearch', value: 'createMetricsSearch' },
+        { label: 'create', value: 'create' },
         { label: 'Manifest', value: 'manifest' }
     ]}
 >
-<TabItem value="createMetricsSearch">
+<TabItem value="create">
 
 Saves a metrics search in the content library. Metrics search consists of one or more queries, a time range, a quantization period and a set of chart properties like line width.
 
 ```sql
 INSERT INTO sumologic.metrics_searches.metrics_searches (
-data__title,
-data__description,
-data__timeRange,
-data__logQuery,
-data__metricsQueries,
-data__desiredQuantizationInSecs,
-data__properties,
-data__parentId,
+title,
+description,
+time_range,
+log_query,
+metrics_queries,
+desired_quantization_in_secs,
+properties,
+parent_id,
 region
 )
 SELECT 
 '{{ title }}' /* required */,
 '{{ description }}' /* required */,
-'{{ timeRange }}' /* required */,
-'{{ logQuery }}',
-'{{ metricsQueries }}' /* required */,
-{{ desiredQuantizationInSecs }},
+'{{ time_range }}' /* required */,
+'{{ log_query }}',
+'{{ metrics_queries }}' /* required */,
+{{ desired_quantization_in_secs }},
 '{{ properties }}',
-'{{ parentId }}',
+'{{ parent_id }}' /* required */,
 '{{ region }}'
 RETURNING
 id,
-createdAt,
-createdBy,
+parent_id,
+created_at,
+created_by,
 description,
-desiredQuantizationInSecs,
-logQuery,
-metricsQueries,
-modifiedAt,
-modifiedBy,
-parentId,
+desired_quantization_in_secs,
+log_query,
+metrics_queries,
+modified_at,
+modified_by,
 properties,
-timeRange,
+time_range,
 title
 ;
 ```
 </TabItem>
 <TabItem value="manifest">
 
-```yaml
-# Description fields are for documentation purposes
+<CodeBlock language="yaml">{`# Description fields are for documentation purposes
 - name: metrics_searches
   props:
     - name: region
-      value: string
+      value: "{{ region }}"
       description: Required parameter for the metrics_searches resource.
     - name: title
-      value: string
+      value: "{{ title }}"
       description: |
         Item title in the content library.
     - name: description
-      value: string
+      value: "{{ description }}"
       description: |
         Item description in the content library.
-    - name: timeRange
-      value: object
-    - name: logQuery
-      value: string
+    - name: time_range
+      value:
+        type: "{{ type }}"
+    - name: log_query
+      value: "{{ log_query }}"
       description: |
         Log query used to add an overlay to the chart.
-    - name: metricsQueries
-      value: array
+    - name: metrics_queries
       description: |
         Metrics queries, up to the maximum of six.
-    - name: desiredQuantizationInSecs
-      value: integer
+      value:
+        - rowId: "{{ rowId }}"
+          query: "{{ query }}"
+    - name: desired_quantization_in_secs
+      value: {{ desired_quantization_in_secs }}
       description: |
         Desired quantization in seconds.
       default: 0
     - name: properties
-      value: string
+      value: "{{ properties }}"
       description: |
         Chart properties, like line width, color palette, and the fill missing data method. Leave this field empty to use the defaults.
         This property contains JSON object encoded as a string.
-    - name: parentId
-      value: string
+    - name: parent_id
+      value: "{{ parent_id }}"
       description: |
         Identifier of a folder to which the metrics search should be added.
+`}</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+
+## `UPDATE` examples
+
+<Tabs
+    defaultValue="update"
+    values={[
+        { label: 'update', value: 'update' }
+    ]}
+>
+<TabItem value="update">
+
+Updates a metrics search with the specified identifier. Partial updates are not supported, you must provide values for all fields.
+
+```sql
+UPDATE sumologic.metrics_searches.metrics_searches
+SET 
+title = '{{ title }}',
+description = '{{ description }}',
+time_range = '{{ time_range }}',
+log_query = '{{ log_query }}',
+metrics_queries = '{{ metrics_queries }}',
+desired_quantization_in_secs = {{ desired_quantization_in_secs }},
+properties = '{{ properties }}'
+WHERE 
+id = '{{ id }}' --required
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND description = '{{ description }}' --required
+AND metrics_queries = '{{ metrics_queries }}' --required
+AND time_range = '{{ time_range }}' --required
+AND title = '{{ title }}' --required
+RETURNING
+id,
+parent_id,
+created_at,
+created_by,
+description,
+desired_quantization_in_secs,
+log_query,
+metrics_queries,
+modified_at,
+modified_by,
+properties,
+time_range,
+title;
 ```
 </TabItem>
 </Tabs>
@@ -329,51 +381,19 @@ title
 ## `DELETE` examples
 
 <Tabs
-    defaultValue="deleteMetricsSearch"
+    defaultValue="delete"
     values={[
-        { label: 'deleteMetricsSearch', value: 'deleteMetricsSearch' }
+        { label: 'delete', value: 'delete' }
     ]}
 >
-<TabItem value="deleteMetricsSearch">
+<TabItem value="delete">
 
 Deletes a metrics search from the content library.
 
 ```sql
 DELETE FROM sumologic.metrics_searches.metrics_searches
 WHERE id = '{{ id }}' --required
-AND region = '{{ region }}' --required
-;
-```
-</TabItem>
-</Tabs>
-
-
-## Lifecycle Methods
-
-<Tabs
-    defaultValue="updateMetricsSearch"
-    values={[
-        { label: 'updateMetricsSearch', value: 'updateMetricsSearch' }
-    ]}
->
-<TabItem value="updateMetricsSearch">
-
-Updates a metrics search with the specified identifier. Partial updates are not supported, you must provide values for all fields.
-
-```sql
-EXEC sumologic.metrics_searches.metrics_searches.updateMetricsSearch 
-@id='{{ id }}' --required, 
-@region='{{ region }}' --required 
-@@json=
-'{
-"title": "{{ title }}", 
-"description": "{{ description }}", 
-"timeRange": "{{ timeRange }}", 
-"logQuery": "{{ logQuery }}", 
-"metricsQueries": "{{ metricsQueries }}", 
-"desiredQuantizationInSecs": {{ desiredQuantizationInSecs }}, 
-"properties": "{{ properties }}"
-}'
+AND region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>offline_collectors</code> reso
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>offline_collectors</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="offline_collectors" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.collectors.offline_collectors" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists an <code>offline_collectors</code> reso
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="list_offline_collectors"
+    defaultValue="list"
     values={[
-        { label: 'list_offline_collectors', value: 'list_offline_collectors' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="list_offline_collectors">
+<TabItem value="list">
 
 <table>
 <thead>
@@ -51,7 +52,7 @@ The following fields are returned by `SELECT` queries:
 <tr>
     <td><CopyableCode code="id" /></td>
     <td><code>integer</code></td>
-    <td>Identifier</td>
+    <td>Unique identifier of the Collector.</td>
 </tr>
 <tr>
     <td><CopyableCode code="name" /></td>
@@ -59,34 +60,44 @@ The following fields are returned by `SELECT` queries:
     <td>Name of the Collector. It must be unique on your account.</td>
 </tr>
 <tr>
+    <td><CopyableCode code="host_name" /></td>
+    <td><code>string</code></td>
+    <td>Host name of the Collector. (wire: hostName)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="os_name" /></td>
+    <td><code>string</code></td>
+    <td>Name of the OS the Collector is installed on (Installed Collectors only). (wire: osName)</td>
+</tr>
+<tr>
     <td><CopyableCode code="alive" /></td>
     <td><code>boolean</code></td>
-    <td>When a Collector is running it sends Sumo a heartbeat message every 15 seconds. If no heartbeat message is received after 30 minutes this becomes false.</td>
+    <td>When a Collector is running it sends a heartbeat every 15 seconds. If no heartbeat is received for 30 minutes this becomes false.</td>
 </tr>
 <tr>
     <td><CopyableCode code="category" /></td>
     <td><code>string</code></td>
-    <td>The Category of the Collector, used as metadata when searching data.</td>
+    <td>The category of the Collector, used as metadata when searching data.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="collectorType" /></td>
+    <td><CopyableCode code="collector_type" /></td>
     <td><code>string</code></td>
-    <td>The Collector type: Installable or Hosted</td>
+    <td>The Collector type: Installable or Hosted. (wire: collectorType)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="collectorVersion" /></td>
+    <td><CopyableCode code="collector_version" /></td>
     <td><code>string</code></td>
-    <td>Version of the Collector software installed.</td>
+    <td>Version of the Collector software installed. (wire: collectorVersion)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="cutoffRelativeTime" /></td>
+    <td><CopyableCode code="cutoff_relative_time" /></td>
     <td><code>string</code></td>
-    <td>Can be specified instead of cutoffTimestamp to provide a relative offset with respect to the current time. Example: use "-1h", "-1d", or "-1w" to collect data thats less than one hour, one day, or one week old, respectively.</td>
+    <td>Can be specified instead of cutoffTimestamp to provide a relative offset with respect to the current time, for example -1h, -1d or -1w. (wire: cutoffRelativeTime)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="cutoffTimestamp" /></td>
-    <td><code>integer</code></td>
-    <td>0 (collects all data)|Only collect data from files with a modified date more recent than this timestamp, specified as milliseconds since epoch</td>
+    <td><CopyableCode code="cutoff_timestamp" /></td>
+    <td><code>integer (int64)</code></td>
+    <td>Only collect data from files with a modified date more recent than this timestamp, in milliseconds since epoch (0 collects all data). (wire: cutoffTimestamp)</td>
 </tr>
 <tr>
     <td><CopyableCode code="description" /></td>
@@ -96,62 +107,52 @@ The following fields are returned by `SELECT` queries:
 <tr>
     <td><CopyableCode code="ephemeral" /></td>
     <td><code>boolean</code></td>
-    <td>When true, the collector will be deleted after 12 hours of inactivity. For more information, see Setting a Collector as Ephemeral.</td>
+    <td>When true, the Collector is deleted after 12 hours of inactivity.</td>
 </tr>
 <tr>
     <td><CopyableCode code="fields" /></td>
-    <td><code>object</code></td>
-    <td>JSON map of key-value fields (metadata) to apply to the Collector.</td>
-</tr>
-<tr>
-    <td><CopyableCode code="hostName" /></td>
     <td><code>string</code></td>
-    <td>Host name of the Collector. The hostname can be a maximum of 128 characters.</td>
+    <td>JSON map of key-value fields (metadata) applied to the Collector. (opaque JSON object)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="lastSeenAlive" /></td>
-    <td><code>integer</code></td>
-    <td>The last time the Sumo Logic service received an active heartbeat from the Collector, specified as milliseconds since epoch.</td>
+    <td><CopyableCode code="last_seen_alive" /></td>
+    <td><code>integer (int64)</code></td>
+    <td>The last time the Sumo Logic service received an active heartbeat from the Collector, in milliseconds since epoch. (wire: lastSeenAlive)</td>
 </tr>
 <tr>
     <td><CopyableCode code="links" /></td>
     <td><code>array</code></td>
-    <td></td>
+    <td>Related links.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="osArch" /></td>
+    <td><CopyableCode code="os_arch" /></td>
     <td><code>string</code></td>
-    <td>Architecture of the OS that Collector is installed on. [Installed Collectors only]</td>
+    <td>Architecture of the OS the Collector is installed on (Installed Collectors only). (wire: osArch)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="osName" /></td>
+    <td><CopyableCode code="os_time" /></td>
+    <td><code>integer (int64)</code></td>
+    <td>Time that the Collector has been running, in milliseconds (Installed Collectors only). (wire: osTime)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="os_version" /></td>
     <td><code>string</code></td>
-    <td>Name of OS that Collector is installed on. [Installed Collectors only]</td>
+    <td>Version of the OS the Collector is installed on (Installed Collectors only). (wire: osVersion)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="osTime" /></td>
+    <td><CopyableCode code="source_sync_mode" /></td>
+    <td><code>string</code></td>
+    <td>For Installed Collectors, whether Sources are managed locally from a JSON file (Json) or from the cloud (UI). (wire: sourceSyncMode)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="target_cpu" /></td>
     <td><code>integer</code></td>
-    <td>Time that the Collector has been running, in milliseconds. [Installed Collectors only]</td>
+    <td>When CPU utilization exceeds this threshold the Collector slows its rate of ingestion. (wire: targetCpu)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="osVersion" /></td>
+    <td><CopyableCode code="time_zone" /></td>
     <td><code>string</code></td>
-    <td>Version of the OS that Collector is installed on. [Installed Collectors only]</td>
-</tr>
-<tr>
-    <td><CopyableCode code="sourceSyncMode" /></td>
-    <td><code>string</code></td>
-    <td>For installed Collectors, whether the Collector is using local source configuration management (using a JSON file), or cloud management (using the UI)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="targetCpu" /></td>
-    <td><code>integer</code></td>
-    <td>When CPU utilization exceeds this threshold, the Collector will slow down its rate of ingestion to lower its CPU utilization.</td>
-</tr>
-<tr>
-    <td><CopyableCode code="timeZone" /></td>
-    <td><code>string</code></td>
-    <td>Time zone of the Collector. For a list of possible values, refer to the "TZ" column in this Wikipedia article.</td>
+    <td>Time zone of the Collector (TZ database name). (wire: timeZone)</td>
 </tr>
 </tbody>
 </table>
@@ -174,11 +175,18 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#list_offline_collectors"><CopyableCode code="list_offline_collectors" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
-    <td><a href="#parameter-aliveBeforeDays"><code>aliveBeforeDays</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-offset"><code>offset</code></a></td>
+    <td><a href="#parameter-alive_before_days"><code>alive_before_days</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-offset"><code>offset</code></a></td>
     <td>Get a list of Installed Collectors last seen alive before a specified number of days with an optional limit and offset.</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
+    <td><CopyableCode code="delete" /></td>
+    <td><a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-alive_before_days"><code>alive_before_days</code></a></td>
+    <td>Delete Installed Collectors last seen alive before a specified number of days. The delete task is initiated asynchronously.</td>
 </tr>
 </tbody>
 </table>
@@ -199,22 +207,22 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
-<tr id="parameter-aliveBeforeDays">
-    <td><CopyableCode code="aliveBeforeDays" /></td>
+<tr id="parameter-alive_before_days">
+    <td><CopyableCode code="alive_before_days" /></td>
     <td><code>integer</code></td>
-    <td>Filter the Collectors returned using one of the available filter types:installed, hosted, dead, or alive.</td>
+    <td>Minimum number of days the Collectors have been offline (default 100, minimum 1). (wire: aliveBeforeDays)</td>
 </tr>
 <tr id="parameter-limit">
     <td><CopyableCode code="limit" /></td>
     <td><code>integer</code></td>
-    <td>Minimum number of days the Collectors have been offline, must be at least 1 day.</td>
+    <td>Maximum number of Collectors to return (default 1000).</td>
 </tr>
 <tr id="parameter-offset">
     <td><CopyableCode code="offset" /></td>
     <td><code>integer</code></td>
-    <td>Offset into the list of Collectors.</td>
+    <td>Offset into the list of Collectors (default 0).</td>
 </tr>
 </tbody>
 </table>
@@ -222,12 +230,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="list_offline_collectors"
+    defaultValue="list"
     values={[
-        { label: 'list_offline_collectors', value: 'list_offline_collectors' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="list_offline_collectors">
+<TabItem value="list">
 
 Get a list of Installed Collectors last seen alive before a specified number of days with an optional limit and offset.
 
@@ -235,30 +243,52 @@ Get a list of Installed Collectors last seen alive before a specified number of 
 SELECT
 id,
 name,
+host_name,
+os_name,
 alive,
 category,
-collectorType,
-collectorVersion,
-cutoffRelativeTime,
-cutoffTimestamp,
+collector_type,
+collector_version,
+cutoff_relative_time,
+cutoff_timestamp,
 description,
 ephemeral,
 fields,
-hostName,
-lastSeenAlive,
+last_seen_alive,
 links,
-osArch,
-osName,
-osTime,
-osVersion,
-sourceSyncMode,
-targetCpu,
-timeZone
+os_arch,
+os_time,
+os_version,
+source_sync_mode,
+target_cpu,
+time_zone
 FROM sumologic.collectors.offline_collectors
-WHERE region = '{{ region }}' -- required
-AND aliveBeforeDays = '{{ aliveBeforeDays }}'
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+AND alive_before_days = '{{ alive_before_days }}'
 AND limit = '{{ limit }}'
 AND offset = '{{ offset }}'
+;
+```
+</TabItem>
+</Tabs>
+
+
+## `DELETE` examples
+
+<Tabs
+    defaultValue="delete"
+    values={[
+        { label: 'delete', value: 'delete' }
+    ]}
+>
+<TabItem value="delete">
+
+Delete Installed Collectors last seen alive before a specified number of days. The delete task is initiated asynchronously.
+
+```sql
+DELETE FROM sumologic.collectors.offline_collectors
+WHERE region = '{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set
+AND alive_before_days = '{{ alive_before_days }}'
 ;
 ```
 </TabItem>

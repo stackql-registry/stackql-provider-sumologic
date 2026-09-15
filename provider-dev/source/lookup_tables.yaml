@@ -1,0 +1,740 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Lookup Tables API
+  description: Lookup tables, their rows, file uploads and the asynchronous lookup jobs.
+  version: 1.0.0
+paths:
+  /v1/lookupTables:
+    post:
+      tags:
+        - lookupManagement
+      summary: Create a lookup table.
+      description: |-
+        Create a new lookup table by providing a schema and specifying its configuration. Providing parentFolderId
+         is mandatory. Use the getItemByPath endpoint to get content id of a path.
+        Please check Content management API and Folder management API for all available options.
+      operationId: createTable
+      parameters: []
+      requestBody:
+        description: The schema and configuration for the lookup table.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LookupTableDefinition'
+        required: true
+      responses:
+        '200':
+          description: Lookup table created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupTable'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/{id}:
+    get:
+      tags:
+        - lookupManagement
+      summary: Get a lookup table.
+      description: Get a lookup table for the given identifier.
+      operationId: lookupTableById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      responses:
+        '200':
+          description: Definition of the lookup table.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupTable'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - lookupManagement
+      summary: Edit a lookup table.
+      description: Edit the lookup table data. All the fields are mandatory in the request.
+      operationId: updateTable
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      requestBody:
+        description: The configuration changes for the lookup table.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LookupUpdateDefinition'
+        required: true
+      responses:
+        '200':
+          description: Configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupTable'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - lookupManagement
+      summary: Delete a lookup table.
+      description: Delete a lookup table completely. <br> **Warning:** `This operation cannot be undone`.
+      operationId: deleteTable
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      responses:
+        '204':
+          description: Deletion successful.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/{id}/upload:
+    post:
+      tags:
+        - lookupManagement
+      summary: Upload a CSV file.
+      description: Create a request to populate a lookup table with a CSV file.
+      operationId: uploadFile
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table to populate.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+        - name: merge
+          in: query
+          description: This indicates whether the file contents will be merged with existing data in the lookup table or not. If this is true then data with the same primary keys will be updated while the rest of the rows will be appended. By default, merge is false. The response includes a request identifier that you need to use in the Request Status API to track the status of the upload request.
+          schema:
+            type: boolean
+            example: true
+            default: false
+        - name: fileEncoding
+          in: query
+          description: File encoding of file being uploaded.
+          schema:
+            type: string
+            example: UTF-16
+            default: UTF-8
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: |-
+                    The CSV file to upload.
+                      - The size limit for the CSV file is 100MB.
+                      - Use Unix format, with newlines ("\n") separating rows.
+                      - The first row should contain headers that match the lookup table schema. Matching is
+                        case-insensitive.
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: The upload request was accepted. Use the provided token in a status request to track the status of the upload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupRequestToken'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/jobs/{jobId}/status:
+    get:
+      tags:
+        - lookupManagement
+      summary: Get the status of an async job.
+      description: Retrieve the status of a previously made request. If the request was successful, the status of the response object will be `Success`.
+      operationId: requestJobStatus
+      parameters:
+        - name: jobId
+          in: path
+          description: An identifier returned in response to an asynchronous request.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41AA3
+      responses:
+        '200':
+          description: The status of async job with given identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupAsyncJobStatus'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/{id}/truncate:
+    post:
+      tags:
+        - lookupManagement
+      summary: Empty a lookup table.
+      description: Delete all data from a lookup table.
+      operationId: truncateTable
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the table to clear.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      responses:
+        '200':
+          description: The delete data request was accepted. Use the provided token in a status request to track the status of the delete.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupRequestToken'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/{id}/row:
+    put:
+      tags:
+        - lookupManagement
+      summary: Insert or Update a lookup table row.
+      description: Insert or update a row of a lookup table with the given identifier. A new row is inserted if the primary key does not exist already, otherwise the existing row with the specified primary key is updated. All the fields of the lookup table are required and will be updated to the given values. In case a field is not specified then it will be assumed to be set to null. If the table size exceeds the maximum limit of 100MB then based on the size limit action of the table the update will be processed or discarded.
+      operationId: updateTableRow
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      requestBody:
+        description: Lookup table row update definition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RowUpdateDefinition'
+        required: true
+      responses:
+        '204':
+          description: Row updated successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/lookupTables/{id}/deleteTableRow:
+    put:
+      tags:
+        - lookupManagement
+      summary: Delete a lookup table row.
+      description: Delete a row from lookup table by providing the row's primary keys' values. The complete set of primary key fields of the lookup table should be provided.
+      operationId: deleteTableRow
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the lookup table.
+          required: true
+          schema:
+            type: string
+            example: 0000000001C41EE4
+      requestBody:
+        description: Lookup table row delete definition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RowDeleteDefinition'
+        required: true
+      responses:
+        '204':
+          description: Row deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    LookupTableDefinition:
+      required:
+        - name
+        - parentFolderId
+        - description
+        - fields
+        - primaryKeys
+      type: object
+      description: Definition of the lookup table.
+      properties:
+        description:
+          maxLength: 1000
+          type: string
+          description: The description of the lookup table.
+          example: This is a sample lookup table description.
+        fields:
+          minItems: 1
+          type: array
+          description: The list of fields in the lookup table.
+          items:
+            $ref: '#/components/schemas/LookupTableField'
+        primaryKeys:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: The names of the fields that make up the primary key for the lookup table. These will be a subset of the fields that the table will contain.
+          example:
+            - FieldName1
+          items:
+            type: string
+        ttl:
+          maximum: 525600
+          minimum: 0
+          type: integer
+          description: A time to live for each entry in the lookup table (in minutes). 365 days is the maximum time to live for each entry that you can specify. Setting it to 0 means that the records will not expire automatically.
+          format: int32
+          example: 100
+          default: 0
+        sizeLimitAction:
+          pattern: ^(StopIncomingMessages|DeleteOldData)$
+          type: string
+          description: The action that needs to be taken when the size limit is reached for the table. The possible values can be `StopIncomingMessages` or `DeleteOldData`. DeleteOldData will start deleting old data once size limit is reached whereas StopIncomingMessages will discard all the updates made to the lookup table once size limit is reached.
+          example: DeleteOldData
+          default: StopIncomingMessages
+          x-pattern-message: must be either `StopIncomingMessages` or `DeleteOldData`
+        name:
+          maxLength: 255
+          type: string
+          description: The name of the lookup table.
+          example: SampleLookupTable
+        parentFolderId:
+          type: string
+          description: The parent-folder-path identifier of the lookup table in the Library.
+          example: 0000000001C41EE4
+    LookupTable:
+      required:
+        - id
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentFolderId
+        - description
+        - fields
+        - primaryKeys
+      type: object
+      description: Lookup table definition and metadata.
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        description:
+          maxLength: 1000
+          type: string
+          description: The description of the lookup table.
+          example: This is a sample lookup table description.
+        fields:
+          minItems: 1
+          type: array
+          description: The list of fields in the lookup table.
+          items:
+            $ref: '#/components/schemas/LookupTableField'
+        primaryKeys:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: The names of the fields that make up the primary key for the lookup table. These will be a subset of the fields that the table will contain.
+          example:
+            - FieldName1
+          items:
+            type: string
+        ttl:
+          maximum: 525600
+          minimum: 0
+          type: integer
+          description: A time to live for each entry in the lookup table (in minutes). 365 days is the maximum time to live for each entry that you can specify. Setting it to 0 means that the records will not expire automatically.
+          format: int32
+          example: 100
+          default: 0
+        sizeLimitAction:
+          pattern: ^(StopIncomingMessages|DeleteOldData)$
+          type: string
+          description: The action that needs to be taken when the size limit is reached for the table. The possible values can be `StopIncomingMessages` or `DeleteOldData`. DeleteOldData will start deleting old data once size limit is reached whereas StopIncomingMessages will discard all the updates made to the lookup table once size limit is reached.
+          example: DeleteOldData
+          default: StopIncomingMessages
+          x-pattern-message: must be either `StopIncomingMessages` or `DeleteOldData`
+        name:
+          maxLength: 255
+          type: string
+          description: The name of the lookup table.
+          example: SampleLookupTable
+        parentFolderId:
+          type: string
+          description: The parent-folder-path identifier of the lookup table in the Library.
+          example: 0000000001C41EE4
+        id:
+          type: string
+          description: Identifier of the lookup table as a content item.
+          example: 0000000001C41EE4
+        contentPath:
+          type: string
+          description: 'Address/path of the parent folder of this lookup table in content library. For example, a lookup table existing  in the personal/lookupTable folder for user johndoe would be: /Library/Users/johndoe@acme.com/lookupTable'
+          example: /Library/Users/johndoe@acme.com/lookupTable
+        size:
+          type: integer
+          description: The current size of the lookup table in bytes
+          format: int64
+          example: 100
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    LookupUpdateDefinition:
+      required:
+        - description
+        - ttl
+      type: object
+      properties:
+        ttl:
+          maximum: 525600
+          minimum: 0
+          type: integer
+          description: A time to live for each entry in the lookup table (in minutes). 0 is a special value. A TTL of 0 implies entry will never be deleted from the table.
+          format: int32
+          example: 100
+          default: 0
+        description:
+          maxLength: 1000
+          type: string
+          description: The description of the lookup table. The description cannot be blank.
+          example: This is a sample lookup table description.
+        sizeLimitAction:
+          type: string
+          description: The action that needs to be taken when the size limit is reached for the table. The possible values can be `StopIncomingMessages` or `DeleteOldData`. DeleteOldData will starting deleting old data once size limit is reached whereas StopIncomingMessages will discard all the updates made to the lookup table once size limit is reached.
+          example: DeleteOldData
+          default: StopIncomingMessages
+      description: The updated lookup table parameters.
+    LookupRequestToken:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier used to track the request.
+          example: 0000000001C41EF2
+      description: Allows you to track the status of an upload or export request.
+    LookupAsyncJobStatus:
+      required:
+        - createdAt
+        - eventType
+        - jobId
+        - lookupContentId
+        - lookupContentPath
+        - lookupName
+        - modifiedAt
+        - status
+        - userId
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: An identifier returned in response to an asynchronous request.
+          example: 0000000001C41EF2
+        status:
+          type: string
+          description: Whether or not the request is pending (`Pending`), in progress (`InProgress`), has completed successfully (`Success`), has completed partially with warnings (`PartialSuccess`) or has completed with an error (`Failed`).
+        statusMessages:
+          type: array
+          description: Additional status messages generated if any if the status is `Success`.
+          items:
+            type: string
+        errors:
+          type: array
+          description: More information about the failures, if the status is `Failed`.
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+        warnings:
+          type: array
+          description: More information about the warnings, if the status is `PartialSuccess`.
+          items:
+            $ref: '#/components/schemas/warningDescription'
+        lookupContentId:
+          type: string
+          description: Content id of lookup table on which this operation was performed.
+          example: 0000000001C41EE4
+        lookupName:
+          type: string
+          description: Name of lookup table on which this operation was performed.
+          example: sampleLookup
+        lookupContentPath:
+          type: string
+          description: Content path of lookup table on which this operation was performed.
+          example: /Library/Users/xyz@demo.com/sampleLookup
+        requestType:
+          type: string
+          description: |-
+            Type of asynchronous request made:
+              - `BulkMerge`
+              - `BulkReplace`
+              - `Truncate`
+          example: BulkMerge
+        userId:
+          type: string
+          description: User id of user who initiated this operation.
+          example: 0000000006743FDD
+        createdAt:
+          type: string
+          description: Creation time of this job in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedAt:
+          type: string
+          description: Timestamp in UTC when status was last updated.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+      description: Lookup table async job status.
+    RowUpdateDefinition:
+      required:
+        - row
+      type: object
+      properties:
+        row:
+          maxItems: 1000
+          type: array
+          description: A list of all the field identifiers and their corresponding values.
+          items:
+            $ref: '#/components/schemas/TableRow'
+      description: Lookup table data to be uploaded.
+    RowDeleteDefinition:
+      required:
+        - primaryKey
+      type: object
+      properties:
+        primaryKey:
+          maxItems: 1000
+          type: array
+          description: A list of all the primary key field identifiers and their corresponding values which defines the row to delete.
+          items:
+            $ref: '#/components/schemas/TableRow'
+      description: Lookup table primary key of the row to be deleted.
+    ExportableLookupTableInfo:
+      required:
+        - description
+        - fields
+        - primaryKeys
+      type: object
+      properties:
+        description:
+          maxLength: 1000
+          type: string
+          description: The description of the lookup table.
+          example: This is a sample lookup table description.
+        fields:
+          minItems: 1
+          type: array
+          description: The list of fields in the lookup table.
+          items:
+            $ref: '#/components/schemas/LookupTableField'
+        primaryKeys:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: The names of the fields that make up the primary key for the lookup table. These will be a subset of the fields that the table will contain.
+          example:
+            - FieldName1
+          items:
+            type: string
+        ttl:
+          maximum: 525600
+          minimum: 0
+          type: integer
+          description: A time to live for each entry in the lookup table (in minutes). 365 days is the maximum time to live for each entry that you can specify. Setting it to 0 means that the records will not expire automatically.
+          format: int32
+          example: 100
+          default: 0
+        sizeLimitAction:
+          pattern: ^(StopIncomingMessages|DeleteOldData)$
+          type: string
+          description: The action that needs to be taken when the size limit is reached for the table. The possible values can be `StopIncomingMessages` or `DeleteOldData`. DeleteOldData will start deleting old data once size limit is reached whereas StopIncomingMessages will discard all the updates made to the lookup table once size limit is reached.
+          example: DeleteOldData
+          default: StopIncomingMessages
+          x-pattern-message: must be either `StopIncomingMessages` or `DeleteOldData`
+      description: The lookup table definition independent of its location in the Library and name.
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    warningDescription:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the warning.
+          example: 60 rows were dropped.
+        cause:
+          type: string
+          description: An optional cause of this warning.
+          example: Primary key values were duplicate.
+      description: Warning description
+    TableRow:
+      required:
+        - columnName
+        - columnValue
+      type: object
+      properties:
+        columnName:
+          type: string
+          description: Name of the column of the table.
+          example: user_id
+        columnValue:
+          type: string
+          description: Value of the specified column.
+          example: user1
+      description: Lookup table row column and column value.
+    LookupTableField:
+      required:
+        - fieldName
+        - fieldType
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: The name of the field.
+          example: FieldName1
+        fieldType:
+          pattern: ^(boolean|int|long|double|string)$
+          type: string
+          description: |-
+            The data type of the field. Supported types:
+              - `boolean`
+              - `int`
+              - `long`
+              - `double`
+              - `string`
+          example: boolean
+          x-pattern-message: 'must be one of the following: `boolean`, `int`, `long`, `double`, `string`'
+      description: The definition of the field.

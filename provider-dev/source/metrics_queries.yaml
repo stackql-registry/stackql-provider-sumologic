@@ -1,0 +1,305 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Metrics Queries API
+  description: Ad hoc metrics queries.
+  version: 1.0.0
+paths:
+  /v1/metricsQueries:
+    post:
+      tags:
+        - metricsQuery
+      summary: Run metrics queries
+      description: Execute multiple metrics queries. Limits of this API are described in [Metrics Query Error Messages](https://help.sumologic.com/docs/metrics/metrics-queries/metric-query-error-messages/). For general information about Metrics Queries see [Metrics Queries](https://help.sumologic.com/docs/metrics/metrics-queries/).
+      operationId: runMetricsQueries
+      parameters: []
+      requestBody:
+        description: The parameters for the metrics query.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: A set of time series grouped by the query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsQueryResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MetricsQueryRequest:
+      required:
+        - queries
+        - timeRange
+      type: object
+      properties:
+        queries:
+          minItems: 1
+          type: array
+          description: A list of metrics queries.
+          items:
+            $ref: '#/components/schemas/MetricsQueryRow'
+        timeRange:
+          $ref: '#/components/schemas/ResolvableTimeRange'
+      description: A list of metrics queries to run along with the time range for the query.
+    MetricsQueryResponse:
+      required:
+        - errors
+        - queryResults
+      type: object
+      properties:
+        queryResult:
+          type: array
+          description: A list of the time series returned by metric query.
+          items:
+            $ref: '#/components/schemas/TimeSeriesRow'
+        errors:
+          type: object
+          description: Errors, warnings, and information logged for the query.
+          example:
+            id: AXDUI-DGH5I-TJ045
+            errors:
+              - code: metrics:incomplete_results
+                message: Incomplete results
+          required:
+            - errors
+            - id
+          properties:
+            id:
+              type: string
+              description: An identifier for the error; this is unique to the specific API request.
+              example: IUUQI-DGH5I-TJ045
+            errors:
+              type: array
+              description: A list of one or more causes of the error.
+              example:
+                - code: auth:password_too_short
+                  message: Your password was too short.
+                - code: auth:password_character_classes
+                  message: Your password did not contain any non-alphanumeric characters
+              items:
+                $ref: '#/components/schemas/ErrorDescription'
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    MetricsQueryRow:
+      required:
+        - query
+        - rowId
+      type: object
+      properties:
+        rowId:
+          pattern: '[A-Z]'
+          type: string
+          description: Row id for the query row, A to Z letter.
+          example: A
+          x-pattern-message: Row id must be one character long and must be an upper case letter between A and Z
+        query:
+          maxLength: 3000
+          minLength: 3
+          type: string
+          description: |-
+            A metric query consists of a metric, one or more filters and optionally, one or more [Metrics Operators](https://help.sumologic.com/?cid=10144). Strictly speaking, both filters and operators are optional.
+
+            Most of the [Metrics Operators](https://help.sumologic.com/?cid=10144) are allowed in the query string except `fillmissing`, `outlier`, `quantize` and `timeshift`.
+
+              * `fillmissing`: Not supported in API.
+              * `outlier`: Not supported in API.
+              * `quantize`: Only supported through `quantization` param.
+              * `timeshift`: Only supported through `timeshift` param.
+
+
+            In practice, your metric queries will almost always contain filters that narrow the scope of your query. For more information about the query language see [Metrics Queries](https://help.sumologic.com/?cid=1079).
+          example: metric=CPU_Idle
+        quantization:
+          minimum: 1
+          type: integer
+          description: Segregates time series data by time period. This allows you to create aggregated results in buckets of fixed intervals (for example, 5-minute intervals). The value is in milliseconds.
+          format: int64
+          example: 60000
+        rollup:
+          pattern: ^(Count|Min|Max|Sum|Avg|None)$|^$
+          type: string
+          description: We use the term rollup to refer to the aggregation function Sumo Logic uses when quantizing metrics. Can be `Avg`, `Sum`, `Min`, `Max`, `Count` or `None`.
+          example: Avg
+          x-pattern-message: Must be `Avg`, `Sum`, `Min`, `Max`, `Count` or `None`
+        timeshift:
+          type: integer
+          description: Shifts the time series from your metrics query by the specified amount of time. This can help when comparing a time series across multiple time periods. Specified as a signed duration in milliseconds.
+          format: int64
+          example: -3600000
+    ResolvableTimeRange:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the time range. Value must be either `CompleteLiteralTimeRange` or `BeginBoundedTimeRange`.
+      example:
+        type: BeginBoundedTimeRange
+        from:
+          type: RelativeTimeRangeBoundary
+          relativeTime: '-15m'
+      discriminator:
+        propertyName: type
+    TimeSeriesRow:
+      required:
+        - rowId
+        - timeSeriesList
+      type: object
+      properties:
+        rowId:
+          type: string
+          description: Row id for the query row as specified in the request.
+          example: A
+        timeSeriesList:
+          $ref: '#/components/schemas/TimeSeriesList'
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    TimeSeriesList:
+      required:
+        - timeSeries
+      type: object
+      properties:
+        timeSeries:
+          type: array
+          description: A list of timeseries returned by corresponding query.
+          items:
+            $ref: '#/components/schemas/TimeSeries'
+        unit:
+          type: string
+          description: Unit of the query.
+          example: 1/second
+        timeShiftLabel:
+          type: string
+          description: Time shift value if specified in request in human readable format.
+          example: '-1h'
+        resultContext:
+          $ref: '#/components/schemas/MetricsQueryResultContext'
+    TimeSeries:
+      required:
+        - metricDefinition
+        - points
+      type: object
+      properties:
+        metricDefinition:
+          $ref: '#/components/schemas/MetricDefinition'
+        points:
+          $ref: '#/components/schemas/Points'
+    MetricsQueryResultContext:
+      type: object
+      properties:
+        quantizationGranularity:
+          type: integer
+          description: Quantization granularity. Size of the quantization bucket/quant in milliseconds.
+          format: int64
+          example: 30000
+        rollup:
+          pattern: ^(Avg|Sum|Min|Max|Count|Rate)$|^$
+          type: string
+          description: We use the term rollup to refer to the aggregation function Sumo Logic uses when quantizing metrics. Can be `Avg`, `Sum`, `Min`, `Max`, `Count` or `Rate`.
+          example: Avg
+        actualQueryTimeRange:
+          $ref: '#/components/schemas/Iso8601TimeRange'
+    MetricDefinition:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Name of the metric returning the timeseries.
+          example: CPU_Total
+        dimensions:
+          maxProperties: 1000
+          type: object
+          additionalProperties:
+            type: string
+          description: Metric dimensions / metadata related to each timeseries.
+          example:
+            _sourceHost: us2-alert-1
+            _sourceCategory: alert
+    Points:
+      required:
+        - timestamps
+        - values
+      type: object
+      properties:
+        timestamps:
+          type: array
+          description: Array of timestamps of datapoints in milliseconds.
+          items:
+            type: integer
+            format: int64
+            example: 1623258710000
+        values:
+          type: array
+          description: Array of values of datapoints corresponding to timestamp array.
+          items:
+            type: number
+            format: double
+            example: 1.5
+      description: The `values` and `timestamps` are of the same length, and points are sorted by time ascending.
+    Iso8601TimeRange:
+      required:
+        - end
+        - start
+      type: object
+      properties:
+        start:
+          type: string
+          description: Start time in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        end:
+          type: string
+          description: End time in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format
+          format: date-time
+          example: '2018-10-16T09:20:00.000Z'
+      description: |
+        A simple time range class, where the start and end points are specified in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format

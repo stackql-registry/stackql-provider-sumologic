@@ -18,7 +18,7 @@ dashboards service documentation.
 
 :::info[Service Summary]
 
-total resources: __4__  
+total resources: __5__  
 
 :::
 
@@ -26,10 +26,11 @@ total resources: __4__
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/dashboards/dashboards/">dashboards</a><br />
-<a href="/services/dashboards/report_jobs/">report_jobs</a>
+<a href="/services/dashboards/migration_results/">migration_results</a><br />
+<a href="/services/dashboards/migrations/">migrations</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/dashboards/report_jobs_result/">report_jobs_result</a><br />
-<a href="/services/dashboards/report_jobs_status/">report_jobs_status</a>
+<a href="/services/dashboards/report_jobs/">report_jobs</a><br />
+<a href="/services/dashboards/report_schedules/">report_schedules</a>
 </div>
 </div>

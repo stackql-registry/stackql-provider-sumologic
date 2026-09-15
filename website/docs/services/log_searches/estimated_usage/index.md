@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>estimated_usage</code> resourc
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>estimated_usage</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="estimated_usage" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.log_searches.estimated_usage" /></td></tr>
 </tbody></table>
@@ -50,11 +51,32 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getLogSearchEstimatedUsage"><CopyableCode code="getLogSearchEstimatedUsage" /></a></td>
+    <td><a href="#estimate"><CopyableCode code="estimate" /></a></td>
     <td><CopyableCode code="exec" /></td>
-    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queryString"><code>queryString</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queryString"><code>queryString</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
     <td></td>
-    <td>Gets the estimated volume of data that would be scanned for a given log search in the Infrequent data tier.<br /></td>
+    <td>Gets the estimated volume of data that would be scanned for a given log search in the Infrequent data tier.&lt;br /&gt;</td>
+</tr>
+<tr>
+    <td><a href="#estimate_by_tier"><CopyableCode code="estimate_by_tier" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queryString"><code>queryString</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
+    <td></td>
+    <td>Gets the estimated volume of data that would be scanned for a given log search per data tier.&lt;br /&gt;</td>
+</tr>
+<tr>
+    <td><a href="#estimate_by_metering_type"><CopyableCode code="estimate_by_metering_type" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queryString"><code>queryString</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
+    <td></td>
+    <td>Gets the estimated volume of data, per metering type,  that would be scanned for running a given log search for a given timerange.&lt;br /&gt;</td>
+</tr>
+<tr>
+    <td><a href="#estimate_by_view"><CopyableCode code="estimate_by_view" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-region"><code>region</code></a>, <a href="#parameter-queryString"><code>queryString</code></a>, <a href="#parameter-timeRange"><code>timeRange</code></a>, <a href="#parameter-timezone"><code>timezone</code></a></td>
+    <td></td>
+    <td>Gets the estimated volume of data, per view,  that would be scanned for running a given log search for a given timerange.&lt;br /&gt;</td>
 </tr>
 </tbody>
 </table>
@@ -75,34 +97,99 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
 
 ## Lifecycle Methods
 
+EXEC variables use wire (API) names.
+
 <Tabs
-    defaultValue="getLogSearchEstimatedUsage"
+    defaultValue="estimate"
     values={[
-        { label: 'getLogSearchEstimatedUsage', value: 'getLogSearchEstimatedUsage' }
+        { label: 'estimate', value: 'estimate' },
+        { label: 'estimate_by_tier', value: 'estimate_by_tier' },
+        { label: 'estimate_by_metering_type', value: 'estimate_by_metering_type' },
+        { label: 'estimate_by_view', value: 'estimate_by_view' }
     ]}
 >
-<TabItem value="getLogSearchEstimatedUsage">
+<TabItem value="estimate">
 
-Gets the estimated volume of data that would be scanned for a given log search in the Infrequent data tier.<br />
+Gets the estimated volume of data that would be scanned for a given log search in the Infrequent data tier.&lt;br /&gt;
 
 ```sql
-EXEC sumologic.log_searches.estimated_usage.getLogSearchEstimatedUsage 
-@region='{{ region }}' --required 
+EXEC sumologic.log_searches.estimated_usage.estimate 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
 @@json=
 '{
 "queryString": "{{ queryString }}", 
 "timeRange": "{{ timeRange }}", 
 "runByReceiptTime": {{ runByReceiptTime }}, 
 "queryParameters": "{{ queryParameters }}", 
+"intervalTimeType": "{{ intervalTimeType }}", 
 "parsingMode": "{{ parsingMode }}", 
 "timezone": "{{ timezone }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="estimate_by_tier">
+
+Gets the estimated volume of data that would be scanned for a given log search per data tier.&lt;br /&gt;
+
+```sql
+EXEC sumologic.log_searches.estimated_usage.estimate_by_tier 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"queryString": "{{ queryString }}", 
+"timeRange": "{{ timeRange }}", 
+"runByReceiptTime": {{ runByReceiptTime }}, 
+"queryParameters": "{{ queryParameters }}", 
+"intervalTimeType": "{{ intervalTimeType }}", 
+"timezone": "{{ timezone }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="estimate_by_metering_type">
+
+Gets the estimated volume of data, per metering type,  that would be scanned for running a given log search for a given timerange.&lt;br /&gt;
+
+```sql
+EXEC sumologic.log_searches.estimated_usage.estimate_by_metering_type 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"queryString": "{{ queryString }}", 
+"timeRange": "{{ timeRange }}", 
+"queryParameters": "{{ queryParameters }}", 
+"intervalTimeType": "{{ intervalTimeType }}", 
+"runByReceiptTime": {{ runByReceiptTime }}, 
+"timezone": "{{ timezone }}", 
+"emulateSearchContext": "{{ emulateSearchContext }}"
+}'
+;
+```
+</TabItem>
+<TabItem value="estimate_by_view">
+
+Gets the estimated volume of data, per view,  that would be scanned for running a given log search for a given timerange.&lt;br /&gt;
+
+```sql
+EXEC sumologic.log_searches.estimated_usage.estimate_by_view 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"queryString": "{{ queryString }}", 
+"timeRange": "{{ timeRange }}", 
+"queryParameters": "{{ queryParameters }}", 
+"intervalTimeType": "{{ intervalTimeType }}", 
+"runByReceiptTime": {{ runByReceiptTime }}, 
+"timezone": "{{ timezone }}", 
+"emulateSearchContext": "{{ emulateSearchContext }}"
 }'
 ;
 ```

@@ -1,0 +1,382 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Extraction Rules API
+  description: Field extraction rules and their quota.
+  version: 1.0.0
+paths:
+  /v1/extractionRules:
+    get:
+      tags:
+        - extractionRuleManagement
+      summary: Get a list of field extraction rules.
+      description: Get a list of all field extraction rules. The response is paginated with a default limit of 100 field extraction rules per page.
+      operationId: listExtractionRules
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of field extraction rules returned in the response. The number of field extraction rules returned may be less than the `limit`.
+          required: false
+          schema:
+            maximum: 1000
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: token
+          in: query
+          description: Continuation token to get the next page of results. A page object with the next continuation token is returned in the response body. Subsequent GET requests should specify the continuation token to get the next page of results.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of field extraction rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListExtractionRulesResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - extractionRuleManagement
+      summary: Create a new field extraction rule.
+      description: Create a new field extraction rule.
+      operationId: createExtractionRule
+      parameters: []
+      requestBody:
+        description: Information about the new field extraction rule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractionRuleDefinition'
+        required: true
+      responses:
+        '200':
+          description: The field extraction rule has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionRule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-create: createExtractionRule
+  /v1/extractionRules/{id}:
+    get:
+      tags:
+        - extractionRuleManagement
+      summary: Get a field extraction rule.
+      description: Get a field extraction rule with the given identifier.
+      operationId: getExtractionRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of field extraction rule to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Extraction rule object that was requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionRule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-read: getExtractionRule
+    put:
+      tags:
+        - extractionRuleManagement
+      summary: Update a field extraction rule.
+      description: Update an existing field extraction rule. All properties specified in the request are replaced. Missing properties are set to their default values.
+      operationId: updateExtractionRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the field extraction rule to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Information to update about the field extraction rule.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExtractionRuleDefinition'
+        required: true
+      responses:
+        '200':
+          description: The field extraction rule was successfully modified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionRule'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-update: updateExtractionRule
+    delete:
+      tags:
+        - extractionRuleManagement
+      summary: Delete a field extraction rule.
+      description: Delete a field extraction rule with the given identifier.
+      operationId: deleteExtractionRule
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the field extraction rule to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Extraction rule was deleted successfully.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-tf-delete: deleteExtractionRule
+components:
+  schemas:
+    ListExtractionRulesResponse:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          description: List of field extraction rules.
+          items:
+            $ref: '#/components/schemas/ExtractionRule'
+        next:
+          type: string
+          description: Next continuation token.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    ExtractionRuleDefinition:
+      required:
+        - name
+        - parseExpression
+        - scope
+      type: object
+      properties:
+        name:
+          maxLength: 256
+          minLength: 1
+          type: string
+          description: Name of the field extraction rule. Use a name that makes it easy to identify the rule.
+          example: ExtractionRule123
+        scope:
+          maxLength: 2048
+          minLength: 0
+          type: string
+          description: Scope of the field extraction rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule.
+          example: _sourceHost=127.0.0.1
+        parseExpression:
+          maxLength: 16384
+          type: string
+          description: Describes the fields to be parsed.
+          example: csv _raw extract 1 as f1
+        enabled:
+          type: boolean
+          description: Is the field extraction rule enabled.
+          default: true
+    ExtractionRule:
+      type: object
+      x-tf-generated-properties: id,name,scope,parseExpression,enabled
+      x-tf-resource-name: ExtractionRule
+      required:
+        - name
+        - parseExpression
+        - scope
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - id
+      properties:
+        name:
+          maxLength: 256
+          minLength: 1
+          type: string
+          description: Name of the field extraction rule. Use a name that makes it easy to identify the rule.
+          example: ExtractionRule123
+        scope:
+          maxLength: 2048
+          minLength: 0
+          type: string
+          description: Scope of the field extraction rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule.
+          example: _sourceHost=127.0.0.1
+        parseExpression:
+          maxLength: 16384
+          type: string
+          description: Describes the fields to be parsed.
+          example: csv _raw extract 1 as f1
+        enabled:
+          type: boolean
+          description: Is the field extraction rule enabled.
+          default: true
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8
+        id:
+          type: string
+          description: Unique identifier for the field extraction rule.
+        fieldNames:
+          type: array
+          description: List of extracted fields from "parseExpression".
+          items:
+            type: string
+    UpdateExtractionRuleDefinition:
+      required:
+        - name
+        - parseExpression
+        - scope
+        - enabled
+      type: object
+      properties:
+        name:
+          maxLength: 256
+          minLength: 1
+          type: string
+          description: Name of the field extraction rule. Use a name that makes it easy to identify the rule.
+          example: ExtractionRule123
+        scope:
+          maxLength: 2048
+          minLength: 0
+          type: string
+          description: Scope of the field extraction rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule.
+          example: _sourceHost=127.0.0.1
+        parseExpression:
+          maxLength: 16384
+          type: string
+          description: Describes the fields to be parsed.
+          example: csv _raw extract 1 as f1
+        enabled:
+          type: boolean
+          description: Is the field extraction rule enabled.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    BaseExtractionRuleDefinition:
+      required:
+        - name
+        - parseExpression
+        - scope
+      type: object
+      properties:
+        name:
+          maxLength: 256
+          minLength: 1
+          type: string
+          description: Name of the field extraction rule. Use a name that makes it easy to identify the rule.
+          example: ExtractionRule123
+        scope:
+          maxLength: 2048
+          minLength: 0
+          type: string
+          description: Scope of the field extraction rule. This could be a sourceCategory, sourceHost, or any other metadata that describes the data you want to extract from. Think of the Scope as the first portion of an ad hoc search, before the first pipe ( | ). You'll use the Scope to run a search against the rule.
+          example: _sourceHost=127.0.0.1
+        parseExpression:
+          maxLength: 16384
+          type: string
+          description: Describes the fields to be parsed.
+          example: csv _raw extract 1 as f1
+    MetadataModel:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+          example: 0000000006743FDD
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+          example: '2018-10-16T09:10:00.000Z'
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+          example: 0000000006743FE8

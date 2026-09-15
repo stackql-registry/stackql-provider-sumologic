@@ -18,7 +18,7 @@ collectors service documentation.
 
 :::info[Service Summary]
 
-total resources: __3__  
+total resources: __7__  
 
 :::
 
@@ -26,9 +26,13 @@ total resources: __3__
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/collectors/collectors/">collectors</a><br />
-<a href="/services/collectors/offline_collectors/">offline_collectors</a>
+<a href="/services/collectors/offline_collectors/">offline_collectors</a><br />
+<a href="/services/collectors/overview/">overview</a><br />
+<a href="/services/collectors/sources/">sources</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/collectors/sources/">sources</a>
+<a href="/services/collectors/upgradable_collectors/">upgradable_collectors</a><br />
+<a href="/services/collectors/upgrade_targets/">upgrade_targets</a><br />
+<a href="/services/collectors/upgrades/">upgrades</a>
 </div>
 </div>

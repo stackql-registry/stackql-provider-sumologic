@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>usage_info</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>usage_info</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="usage_info" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.slos.usage_info" /></td></tr>
 </tbody></table>
@@ -32,14 +33,14 @@ Creates, updates, deletes, gets or lists a <code>usage_info</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getSloUsageInfo"
+    defaultValue="list"
     values={[
-        { label: 'getSloUsageInfo', value: 'getSloUsageInfo' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getSloUsageInfo">
+<TabItem value="list">
 
-SLO Usage Info has been retrieved successfully.
+The usage info of SLOs.
 
 <table>
 <thead>
@@ -56,9 +57,9 @@ SLO Usage Info has been retrieved successfully.
     <td>The limit of active Logs/Metrics/Monitors SLOs.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="sliType" /></td>
+    <td><CopyableCode code="sli_type" /></td>
     <td><code>string</code></td>
-    <td>The type of SLO usage info (Logs/Metrics/Monitor based). (pattern: <code>^(Logs|Metrics|Monitors)$</code>, example: Logs, x-pattern-message: Either `Logs` or `Metrics` or `Monitors`.)</td>
+    <td>The type of SLO usage info (Logs/Metrics/Monitor based). (pattern: &lt;code&gt;^(Logs|Metrics|Monitors)$&lt;/code&gt;, example: Logs, x-pattern-message: Either `Logs` or `Metrics` or `Monitors`.) (wire: sliType)</td>
 </tr>
 <tr>
     <td><CopyableCode code="usage" /></td>
@@ -86,7 +87,7 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getSloUsageInfo"><CopyableCode code="getSloUsageInfo" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
@@ -111,7 +112,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -119,22 +120,22 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getSloUsageInfo"
+    defaultValue="list"
     values={[
-        { label: 'getSloUsageInfo', value: 'getSloUsageInfo' }
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getSloUsageInfo">
+<TabItem value="list">
 
 Get the current number and the allowed number of log and metrics SLOs.
 
 ```sql
 SELECT
 limit,
-sliType,
+sli_type,
 usage
 FROM sumologic.slos.usage_info
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

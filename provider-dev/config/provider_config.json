@@ -1,0 +1,8 @@
+{
+  "auth": {
+    "type": "basic",
+    "username_var": "SUMOLOGIC_ACCESSID",
+    "password_var": "SUMOLOGIC_ACCESSKEY"
+  },
+  "snake_case_aliases": true
+}

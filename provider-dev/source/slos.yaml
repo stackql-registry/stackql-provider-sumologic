@@ -1,0 +1,915 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Slos API
+  description: SLOs and SLO folders in the SLO library, service level indicators and usage.
+  version: 1.0.0
+paths:
+  /v1/slos/sli:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Bulk fetch SLI values, error budget remaining and SLI computation status for the current compliance period.
+      description: Bulk fetch SLI values, error budget remaining and SLI computation status for the current compliance period.
+      operationId: sli
+      parameters:
+        - name: ids
+          in: query
+          description: The identifiers of the SLOs.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: 000000000000000A,000000000000000B
+      responses:
+        '200':
+          description: A map containing current status, SLI value and error budget remaining corresponding to each SLO id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdToSliStatusMap'
+        default:
+          description: Error getting SLI metrics for the SLO ids.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/usageInfo:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Usage info of SLOs.
+      description: Get the current number and the allowed number of log and metrics SLOs.
+      operationId: getSloUsageInfo
+      responses:
+        '200':
+          description: SLO Usage Info has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSloUsageInfoResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: slo_usage_info
+        wrapperName: GetSloUsageInfoResponse
+        mediaType: application/json
+        scalar: false
+  /v1/slos:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Bulk read a slo or folder.
+      description: Bulk read a slo or folder by the given identifiers from the slos library.
+      operationId: slosReadByIds
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of identifiers.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: 0000000000000001,0000000000000002,0000000000000003
+        - name: skipChildren
+          in: query
+          description: a boolean parameter to control skipping fetching children of requested folder(s)
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A map between an identifier and its definition (slo or folder).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdToSlosLibraryBaseResponseMap'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - slosLibraryManagement
+      summary: |
+        Create a slo or folder.
+      description: Create a slo or folder in the slos library.
+      operationId: slosCreate
+      parameters:
+        - name: parentId
+          in: query
+          description: Identifier of the parent folder in which to create the slo or folder.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The slo or folder to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlosLibraryBase'
+        required: true
+      responses:
+        '200':
+          description: The slo or folder was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - slosLibraryManagement
+      summary: |
+        Bulk delete a slo or folder.
+      description: Bulk delete a slo or folder by the given identifiers in the slos library.
+      operationId: slosDeleteByIds
+      parameters:
+        - name: ids
+          in: query
+          description: A comma-separated list of identifiers.
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: 0000000000000001,0000000000000002,0000000000000003
+      responses:
+        '200':
+          description: A map between the deleted identifier and its metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdToSlosLibraryBaseResponseMap'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/root:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Get the root slos folder.
+      description: Get the root folder in the slos library.
+      operationId: getSlosLibraryRoot
+      responses:
+        '200':
+          description: Root folder of the slos library.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryFolderResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/path:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Read a slo or folder by its path.
+      description: Read a slo or folder by its path in the slos library structure.
+      operationId: slosGetByPath
+      parameters:
+        - name: path
+          in: query
+          description: The path of the slo or folder.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested slo or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/search:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Search for a slo or folder.
+      description: Search for a slo or folder in the slos library structure.
+      operationId: slosSearch
+      parameters:
+        - name: query
+          in: query
+          description: |-
+            The search query to find slo or folder. Below is the list of different filters with examples:
+              - **createdBy** : Filter by the user's identifier who created the content. Example: `createdBy:000000000000968B`.
+              - **createdBefore** : Filter by the content objects created before the given timestamp(in milliseconds). Example: `createdBefore:1457997222`.
+              - **createdAfter** : Filter by the content objects created after the given timestamp(in milliseconds). Example: `createdAfter:1457997111`.
+              - **modifiedBefore** : Filter by the content objects modified before the given timestamp(in milliseconds). Example: `modifiedBefore:1457997222`.
+              - **modifiedAfter** : Filter by the content objects modified after the given timestamp(in milliseconds). Example: `modifiedAfter:1457997111`.
+              - **type** : Filter by the type of the content object. Example: `type:folder`.
+
+            You can also use multiple filters in one query. For example to search for all content objects created by user with identifier 000000000000968B with creation timestamp after 1457997222 containing the text Test, the query would look like:
+
+              `createdBy:000000000000968B createdAfter:1457997222 Test`
+          required: true
+          schema:
+            type: string
+          example: createdBy:000000000000968B Test
+        - name: limit
+          in: query
+          description: Maximum number of items you want in the response.
+          required: false
+          schema:
+            maximum: 5000
+            type: integer
+            format: int32
+            default: 1000
+          example: 10
+        - name: offset
+          in: query
+          description: The position or row from where to start the search operation.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+          example: 5
+        - name: skipChildren
+          in: query
+          description: a boolean parameter to control skipping fetching children of requested folder(s)
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of folders and slos matching the search query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosSearchResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stackql-bare-array-wrap:
+        wrapperKey: slos_search
+        wrapperName: SlosSearchResponse
+        mediaType: application/json
+        scalar: false
+  /v1/slos/{id}:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Get a slo or folder.
+      description: Get a slo or folder from the slos library.
+      operationId: slosReadById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to read.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested slo or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - slosLibraryManagement
+      summary: |
+        Update a slo or folder.
+      description: Update a slo or folder in the slos library.
+      operationId: slosUpdateById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The slo or folder to update. The content version must match its latest version number in the slos library. If the version does not match it will not be updated.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlosLibraryBaseUpdate'
+        required: true
+      responses:
+        '200':
+          description: The slo or folder was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - slosLibraryManagement
+      summary: |
+        Delete a slo or folder.
+      description: Delete a slo or folder from the slos library.
+      operationId: slosDeleteById
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The slo or folder was successfully deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/{id}/path:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Get the path of a slo or folder.
+      description: Get the full path of the slo or folder in the slos library.
+      operationId: getSlosFullPath
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full path of the slo or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Path'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/{id}/move:
+    post:
+      tags:
+        - slosLibraryManagement
+      summary: Move a slo or folder.
+      description: Move a slo or folder to a different location in the slos library.
+      operationId: slosMove
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to move.
+          required: true
+          schema:
+            type: string
+        - name: parentId
+          in: query
+          description: Identifier of the parent folder to move the slo or folder to.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Moved slo or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/{id}/copy:
+    post:
+      tags:
+        - slosLibraryManagement
+      summary: Copy a slo or folder.
+      description: Copy a slo or folder in the slos library.
+      operationId: slosCopy
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to copy.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: |-
+          Fields include:
+            1) Identifier of the parent folder to copy to.
+            2) Optionally provide a new name.
+            3) Optionally provide a new description.
+            4) Optionally set to true if you want to copy and preserve the locked status. Requires `LockSlos` capability.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentCopyParams'
+        required: true
+      responses:
+        '200':
+          description: The slo or folder was copied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/{id}/export:
+    get:
+      tags:
+        - slosLibraryManagement
+      summary: Export a slo or folder.
+      description: Export a slo or folder. If the given identifier is a folder, everything under the folder is exported recursively with folder as the root.
+      operationId: slosExportItem
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of the slo or folder to export.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exported slo or folder.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseExport'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/slos/{parentId}/import:
+    post:
+      tags:
+        - slosLibraryManagement
+      summary: Import a slo or folder.
+      description: Import a slo or folder.
+      operationId: slosImportItem
+      parameters:
+        - name: parentId
+          in: path
+          description: Identifier of the parent folder in which to import the slo or folder.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The slo or folder to be imported.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlosLibraryBaseExport'
+        required: true
+      responses:
+        '200':
+          description: 'Newly imported slo or folder. NOTE: Permissions field will not be filled (empty list).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    IdToSliStatusMap:
+      maxProperties: 1000
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SliStatus'
+      description: Map of SLO identifier to SliStatus object.
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    SloUsageInfo:
+      type: array
+      description: The usage info of logs and metrics SLOs.
+      items:
+        $ref: '#/components/schemas/SloUsage'
+    IdToSlosLibraryBaseResponseMap:
+      maxProperties: 1000
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/SlosLibraryBaseResponse'
+    SlosLibraryBase:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the slo or folder.
+        description:
+          type: string
+          description: Description of the slo or folder.
+          default: ''
+        type:
+          type: string
+          description: |-
+            Type of the object model. Valid values:
+              1) SlosLibrarySlo
+              2) SlosLibraryFolder
+      discriminator:
+        propertyName: type
+    SlosLibraryBaseResponse:
+      required:
+        - contentType
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - isMutable
+        - isSystem
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentId
+        - type
+        - version
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the slo or folder.
+        name:
+          type: string
+          description: Identifier of the slo or folder.
+        description:
+          type: string
+          description: Description of the slo or folder.
+        version:
+          type: integer
+          description: Version of the slo or folder.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        parentId:
+          type: string
+          description: Identifier of the parent folder.
+        contentType:
+          type: string
+          description: |-
+            Type of the content. Valid values:
+              1) Slo
+              2) Folder
+        type:
+          type: string
+          description: Type of the object model.
+        isSystem:
+          type: boolean
+          description: System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.
+        isMutable:
+          type: boolean
+          description: Immutable objects are "READ-ONLY".
+        permissions:
+          type: array
+          description: Aggregated permission summary for the calling user. If detailed permission statements are required, please call list permissions endpoint.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+      discriminator:
+        propertyName: type
+    SlosLibraryFolderResponse:
+      required:
+        - contentType
+        - createdAt
+        - createdBy
+        - description
+        - id
+        - isMutable
+        - isSystem
+        - modifiedAt
+        - modifiedBy
+        - name
+        - parentId
+        - type
+        - version
+        - children
+        - permissions
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the slo or folder.
+        name:
+          type: string
+          description: Identifier of the slo or folder.
+        description:
+          type: string
+          description: Description of the slo or folder.
+        version:
+          type: integer
+          description: Version of the slo or folder.
+          format: int64
+        createdAt:
+          type: string
+          description: Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        parentId:
+          type: string
+          description: Identifier of the parent folder.
+        contentType:
+          type: string
+          description: |-
+            Type of the content. Valid values:
+              1) Slo
+              2) Folder
+        type:
+          type: string
+          description: Type of the object model.
+        isSystem:
+          type: boolean
+          description: System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.
+        isMutable:
+          type: boolean
+          description: Immutable objects are "READ-ONLY".
+        permissions:
+          type: array
+          description: Aggregated permission summary for the calling user. If detailed permission statements are required, please call list permissions endpoint.
+          example:
+            - Read
+            - Delete
+          items:
+            type: string
+        children:
+          type: array
+          description: 'Children of the folder. NOTE: Permissions field will not be filled (empty list) for children.'
+          items:
+            $ref: '#/components/schemas/SlosLibraryBaseResponse'
+      discriminator:
+        propertyName: type
+    ListSlosLibraryItemWithPath:
+      type: array
+      description: Multi-type list of types slo or folder.
+      items:
+        $ref: '#/components/schemas/SlosLibraryItemWithPath'
+    SlosLibraryBaseUpdate:
+      required:
+        - name
+        - type
+        - version
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the slo or folder.
+        description:
+          type: string
+          description: The description of the slo or folder.
+          default: ''
+        version:
+          type: integer
+          description: The version of the slo or folder.
+          format: int64
+        type:
+          type: string
+          description: Type of the object model.
+      discriminator:
+        propertyName: type
+    Path:
+      required:
+        - path
+        - pathItems
+      type: object
+      properties:
+        pathItems:
+          type: array
+          description: Elements of the path.
+          items:
+            $ref: '#/components/schemas/PathItem'
+        path:
+          type: string
+          description: String representation of the path.
+    ContentCopyParams:
+      required:
+        - parentId
+      type: object
+      properties:
+        parentId:
+          type: string
+          description: Identifier of the parent folder to copy to.
+        name:
+          type: string
+          description: Optionally provide a new name.
+        description:
+          type: string
+          description: Optionally provide a new description.
+    SlosLibraryBaseExport:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the slo or folder.
+        description:
+          type: string
+          description: Description of the slo or folder.
+        type:
+          type: string
+          description: Type of the object model.
+      discriminator:
+        propertyName: type
+    SliStatus:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          pattern: ^(Success|Error|InProgress)$
+          type: string
+          description: Whether the SLI computation is complete / had an error / is in progress.
+          example: Success
+        sliPercentage:
+          type: number
+          description: SLI percentage for the compliance period. Available if `status` is `Success`.
+          format: double
+          example: 95.14
+        errorBudgetRemainingPercentage:
+          type: number
+          description: Percentage of error budget remaining for the compliance period. Available if `status` is `Success`.
+          format: double
+        absoluteErrorBudgetRemaining:
+          type: string
+          description: Formatted string for the absolute error budget remaining (time duration for window-based SLIs, request count for request-based SLIs). Available if `status` is `Success`.
+          example: 1h56m, -3h45m, -241.3k req, 1.5k req
+        progressPercentage:
+          type: number
+          description: SLI computation progress.
+          format: double
+      description: Status of the SLI computation. If the status is successful, also contains the SLI value and error budget remaining for the current compliance period.
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    SloUsage:
+      properties:
+        sliType:
+          pattern: ^(Logs|Metrics|Monitors)$
+          type: string
+          description: The type of SLO usage info (Logs/Metrics/Monitor based).
+          example: Logs
+          x-pattern-message: Either `Logs` or `Metrics` or `Monitors`.
+        usage:
+          type: integer
+          description: Current number of active Logs/Metrics/Monitors SLOs.
+          example: 100
+        limit:
+          type: integer
+          description: The limit of active Logs/Metrics/Monitors SLOs.
+          example: 100
+      description: The usage info of SLOs.
+      type: object
+    SlosLibraryItemWithPath:
+      required:
+        - item
+        - path
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/SlosLibraryBaseResponse'
+        path:
+          type: string
+          description: Path of the slo or folder.
+          example: /Slos/SampleFolder/TestSlo
+    PathItem:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the path element.
+        name:
+          type: string
+          description: Name of the path element.
+        description:
+          type: string
+          description: Description of the path element.
+    GetSloUsageInfoResponse:
+      type: object
+      properties:
+        slo_usage_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/SloUsage'
+    SlosSearchResponse:
+      type: object
+      properties:
+        slos_search:
+          type: array
+          items:
+            $ref: '#/components/schemas/SlosLibraryItemWithPath'

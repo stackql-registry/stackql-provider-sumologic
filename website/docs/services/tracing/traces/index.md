@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>traces</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>traces</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="traces" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.tracing.traces" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>traces</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getTrace"
+    defaultValue="get"
     values={[
-        { label: 'getTrace', value: 'getTrace' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getTrace">
+<TabItem value="get">
 
 Details of the trace with the given identifier.
 
@@ -56,9 +57,14 @@ Details of the trace with the given identifier.
     <td>Trace identifier. (example: 00000000000120CB)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="criticalPathServiceBreakdownSummary" /></td>
+    <td><CopyableCode code="root_operation_name" /></td>
+    <td><code>string</code></td>
+    <td>The name of the operation given to the root span. (example: retrieveAccount) (wire: rootOperationName)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="critical_path_service_breakdown_summary" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: criticalPathServiceBreakdownSummary)</td>
 </tr>
 <tr>
     <td><CopyableCode code="metrics" /></td>
@@ -66,29 +72,24 @@ Details of the trace with the given identifier.
     <td>Calculated trace metrics.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="rootOperationName" /></td>
+    <td><CopyableCode code="root_resource" /></td>
     <td><code>string</code></td>
-    <td>The name of the operation given to the root span. (example: retrieveAccount)</td>
+    <td>Root resource on which the trace was started. Examples: `db.query`, `http.request`, `rpc.call`, `container` (example: http.request) (wire: rootResource)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="rootResource" /></td>
+    <td><CopyableCode code="root_service" /></td>
     <td><code>string</code></td>
-    <td>Root resource on which the trace was started. Examples: `db.query`, `http.request`, `rpc.call`, `container` (example: http.request)</td>
+    <td>Root service which started the trace. Examples: `user-service`, `authentication-service`, `payment-service`, `/shopping-cart` (example: user-service) (wire: rootService)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="rootService" /></td>
-    <td><code>string</code></td>
-    <td>Root service which started the trace. Examples: `user-service`, `authentication-service`, `payment-service`, `/shopping-cart` (example: user-service)</td>
-</tr>
-<tr>
-    <td><CopyableCode code="rootStatus" /></td>
+    <td><CopyableCode code="root_status" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: rootStatus)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="startedAt" /></td>
+    <td><CopyableCode code="started_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Date and time the trace was started in [ISO 8601 / RFC3339](https://tools.ietf.org/html/rfc3339) format. (example: 2019-11-22T09:00:00Z)</td>
+    <td>Date and time the trace was started in &#91;ISO 8601 / RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (example: 2019-11-22T09:00:00.000Z) (wire: startedAt)</td>
 </tr>
 </tbody>
 </table>
@@ -111,9 +112,9 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getTrace"><CopyableCode code="getTrace" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
-    <td><a href="#parameter-traceId"><code>traceId</code></a>, <a href="#parameter-region"><code>region</code></a></td>
+    <td><a href="#parameter-trace_id"><code>trace_id</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Get details of a trace with the given identifier.</td>
 </tr>
@@ -136,12 +137,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
-<tr id="parameter-traceId">
-    <td><CopyableCode code="traceId" /></td>
+<tr id="parameter-trace_id">
+    <td><CopyableCode code="trace_id" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the trace to get the details.</td>
+    <td>Identifier of the trace to get the details. (wire: traceId)</td>
 </tr>
 </tbody>
 </table>
@@ -149,28 +150,28 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getTrace"
+    defaultValue="get"
     values={[
-        { label: 'getTrace', value: 'getTrace' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getTrace">
+<TabItem value="get">
 
 Get details of a trace with the given identifier.
 
 ```sql
 SELECT
 id,
-criticalPathServiceBreakdownSummary,
+root_operation_name,
+critical_path_service_breakdown_summary,
 metrics,
-rootOperationName,
-rootResource,
-rootService,
-rootStatus,
-startedAt
+root_resource,
+root_service,
+root_status,
+started_at
 FROM sumologic.tracing.traces
-WHERE traceId = '{{ traceId }}' -- required
-AND region = '{{ region }}' -- required
+WHERE trace_id = '{{ trace_id }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>

@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists an <code>apps</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>apps</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="apps" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.apps.apps" /></td></tr>
 </tbody></table>
@@ -32,13 +33,13 @@ Creates, updates, deletes, gets or lists an <code>apps</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getApp"
+    defaultValue="get"
     values={[
-        { label: 'getApp', value: 'getApp' },
-        { label: 'listApps', value: 'listApps' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getApp">
+<TabItem value="get">
 
 The retrieved app.
 
@@ -52,19 +53,19 @@ The retrieved app.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="appDefinition" /></td>
+    <td><CopyableCode code="app_definition" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: appDefinition)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="appManifest" /></td>
+    <td><CopyableCode code="app_manifest" /></td>
     <td><code>object</code></td>
-    <td></td>
+    <td> (wire: appManifest)</td>
 </tr>
 </tbody>
 </table>
 </TabItem>
-<TabItem value="listApps">
+<TabItem value="list">
 
 List of all available apps.
 
@@ -78,9 +79,14 @@ List of all available apps.
 </thead>
 <tbody>
 <tr>
-    <td><CopyableCode code="apps" /></td>
-    <td><code>array</code></td>
-    <td>An array of Apps</td>
+    <td><CopyableCode code="app_definition" /></td>
+    <td><code>object</code></td>
+    <td> (wire: appDefinition)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="app_manifest" /></td>
+    <td><code>object</code></td>
+    <td> (wire: appManifest)</td>
 </tr>
 </tbody>
 </table>
@@ -103,18 +109,25 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getApp"><CopyableCode code="getApp" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-uuid"><code>uuid</code></a>, <a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Gets the app with the given universally unique identifier (UUID).</td>
 </tr>
 <tr>
-    <td><a href="#listApps"><CopyableCode code="listApps" /></a></td>
+    <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
     <td>Lists all available apps from the App Catalog.</td>
+</tr>
+<tr>
+    <td><a href="#install"><CopyableCode code="install" /></a></td>
+    <td><CopyableCode code="exec" /></td>
+    <td><a href="#parameter-uuid"><code>uuid</code></a>, <a href="#parameter-region"><code>region</code></a>, <a href="#parameter-description"><code>description</code></a>, <a href="#parameter-destinationFolderId"><code>destinationFolderId</code></a>, <a href="#parameter-name"><code>name</code></a></td>
+    <td></td>
+    <td>Installs the app with given UUID in the folder specified using destinationFolderId.</td>
 </tr>
 </tbody>
 </table>
@@ -135,12 +148,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 <tr id="parameter-uuid">
     <td><CopyableCode code="uuid" /></td>
     <td><code>string (uuid)</code></td>
-    <td>The identifier of the app to retrieve.</td>
+    <td>UUID of the app to install.</td>
 </tr>
 </tbody>
 </table>
@@ -148,35 +161,67 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getApp"
+    defaultValue="get"
     values={[
-        { label: 'getApp', value: 'getApp' },
-        { label: 'listApps', value: 'listApps' }
+        { label: 'get', value: 'get' },
+        { label: 'list', value: 'list' }
     ]}
 >
-<TabItem value="getApp">
+<TabItem value="get">
 
 Gets the app with the given universally unique identifier (UUID).
 
 ```sql
 SELECT
-appDefinition,
-appManifest
+app_definition,
+app_manifest
 FROM sumologic.apps.apps
 WHERE uuid = '{{ uuid }}' -- required
-AND region = '{{ region }}' -- required
+AND region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
-<TabItem value="listApps">
+<TabItem value="list">
 
 Lists all available apps from the App Catalog.
 
 ```sql
 SELECT
-apps
+app_definition,
+app_manifest
 FROM sumologic.apps.apps
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
+;
+```
+</TabItem>
+</Tabs>
+
+
+## Lifecycle Methods
+
+EXEC variables use wire (API) names.
+
+<Tabs
+    defaultValue="install"
+    values={[
+        { label: 'install', value: 'install' }
+    ]}
+>
+<TabItem value="install">
+
+Installs the app with given UUID in the folder specified using destinationFolderId.
+
+```sql
+EXEC sumologic.apps.apps.install 
+@uuid='{{ uuid }}' --required, 
+@region='{{ region }}' --required unless SUMOLOGIC_ENVIRONMENT is set 
+@@json=
+'{
+"name": "{{ name }}", 
+"description": "{{ description }}", 
+"destinationFolderId": "{{ destinationFolderId }}", 
+"dataSourceValues": "{{ dataSourceValues }}"
+}'
 ;
 ```
 </TabItem>

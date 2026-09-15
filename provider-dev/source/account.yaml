@@ -1,0 +1,807 @@
+openapi: 3.0.0
+info:
+  title: Sumo Logic Account API
+  description: Account status, owner, subdomain, plan update requests, usage reports and usage forecasts.
+  version: 1.0.0
+paths:
+  /v1/account/accountOwner:
+    get:
+      tags:
+        - accountManagement
+      summary: Get the owner of an account.
+      description: Returns the user identifier of the account owner.
+      operationId: getAccountOwner
+      responses:
+        '200':
+          description: User identifier of the account owner.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 10000000
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/status:
+    get:
+      tags:
+        - accountManagement
+      summary: Get overview of the account status.
+      description: Get information related to the account's plan, pricing model, expiration and payment status.
+      operationId: getStatus
+      responses:
+        '200':
+          description: Overview of the account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountStatusResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/subdomain:
+    get:
+      tags:
+        - accountManagement
+      summary: Get the configured subdomain.
+      description: Get the configured subdomain.
+      operationId: getSubdomain
+      responses:
+        '200':
+          description: The subdomain's definition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdomainDefinitionResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - accountManagement
+      summary: Update account subdomain.
+      description: Update a subdomain. Only the Account Owner can update the subdomain.
+      operationId: updateSubdomain
+      requestBody:
+        description: The new subdomain.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureSubdomainRequest'
+        required: true
+      responses:
+        '200':
+          description: The updated subdomain's definition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdomainDefinitionResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - accountManagement
+      summary: Create account subdomain.
+      description: Create a subdomain. Only the Account Owner can create a subdomain.
+      operationId: createSubdomain
+      requestBody:
+        description: The new subdomain.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureSubdomainRequest'
+        required: true
+      responses:
+        '200':
+          description: Created a new subdomain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubdomainDefinitionResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - accountManagement
+      summary: Delete the configured subdomain.
+      description: Delete the configured subdomain.
+      operationId: deleteSubdomain
+      responses:
+        '204':
+          description: The subdomain was successfully deleted.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/subdomain/recover:
+    post:
+      tags:
+        - accountManagement
+      summary: Recover subdomains for a user.
+      description: Send an email with the subdomain information for a user with the given email address.
+      operationId: recoverSubdomains
+      parameters:
+        - name: email
+          in: query
+          description: Email address of the user to get subdomain information.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: An email containing information about associated subdomains for the given email was sent.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/usage/report:
+    post:
+      tags:
+        - accountManagement
+      summary: Export credits usage details as CSV.
+      description: Export the credit usage details as csv for the specific period of time given as input in the form of a start and end date with a specific grouping according to `day`, `week`, `month`, Note that this API will work only for credits plan customers.
+      operationId: exportUsageReport
+      requestBody:
+        description: Export Usage Report Request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageReportRequest'
+        required: true
+      responses:
+        '200':
+          description: Export Response with Job Id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageReportResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/usage/report/{jobId}/status:
+    get:
+      tags:
+        - accountManagement
+      summary: Get report generation status.
+      description: Get the report download URL and status using Job Id.
+      operationId: getStatusForReport
+      parameters:
+        - name: jobId
+          in: path
+          description: Job Id for the report to be exported.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status response containing status and downloadURL if successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageReportStatusResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/account/usageForecast:
+    get:
+      tags:
+        - accountManagement
+      summary: Get usage forecast with respect to last number of days specified.
+      description: Get usage forecast with respect to last number of days specified. If nothing is provided for  last number of days, the average of term period will be taken to do the forecast.
+      operationId: getUsageForecast
+      parameters:
+        - name: numberOfDays
+          in: query
+          description: Number of days to use for calculating average usage and forecast.
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Usage Forecast.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageForecastResponse'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/plan/pendingUpdateRequest:
+    get:
+      tags:
+        - accountManagement
+      summary: Get the pending plan update request, if any.
+      description: Get the pending plan update request which will be applicable from next billing cycle.
+      operationId: getPendingUpdateRequest
+      responses:
+        '200':
+          description: Pending plan update request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingUpdateRequest'
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - accountManagement
+      summary: Delete the pending plan update request, if any.
+      description: Delete the pending plan update request which would be applicable from next billing cycle.
+      operationId: deletePendingUpdateRequest
+      responses:
+        '204':
+          description: Deleted the pending update request.
+        default:
+          description: Operation failed with an error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      required:
+        - errors
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: An identifier for the error; this is unique to the specific API request.
+          example: IUUQI-DGH5I-TJ045
+        errors:
+          type: array
+          description: A list of one or more causes of the error.
+          example:
+            - code: auth:password_too_short
+              message: Your password was too short.
+            - code: auth:password_character_classes
+              message: Your password did not contain any non-alphanumeric characters
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    AccountStatusResponse:
+      required:
+        - applicationUse
+        - canUpdatePlan
+        - planType
+        - pricingModel
+      type: object
+      properties:
+        pricingModel:
+          pattern: ^(credits|cloudflex)$
+          type: string
+          description: Whether the account is `cloudflex` or `credits`
+          example: credits
+        canUpdatePlan:
+          type: boolean
+          description: If the plan can be updated by the given user
+          example: true
+        planType:
+          pattern: ^(Free|Trial|Paid)$
+          type: string
+          description: Whether the account is `Free`/`Trial`/`Paid`
+          example: Free
+        planExpirationDays:
+          type: integer
+          description: The number of days in which the plan will expire
+          example: 20
+        applicationUse:
+          pattern: ^(ALLOWED|ALLOWED_WITH_WARNING|THROTTLED|RESTRICTED)$
+          type: string
+          description: The current usage of the application.
+          example: ALLOWED
+        accountActivated:
+          type: boolean
+          description: If the account is activated or not
+          example: true
+        totalCredits:
+          type: integer
+          description: Total amount of credits assigned to the account
+          example: 400
+        logModel:
+          pattern: ^(Flex|Tiered|FlexPlusTiered)$
+          type: string
+          description: The log model of the account
+          example: Flex
+        isSubscriptionV2:
+          type: boolean
+          description: Indicates whether the account has v2 subscription enabled.
+          example: false
+      description: Information about the account's plan and payment.
+    SubdomainDefinitionResponse:
+      required:
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - modifiedBy
+        - subdomain
+        - url
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: |
+            Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.
+          format: date-time
+        createdBy:
+          type: string
+          description: Identifier of the user who created the resource.
+        modifiedAt:
+          type: string
+          description: Last modification timestamp in UTC.
+          format: date-time
+        modifiedBy:
+          type: string
+          description: Identifier of the user who last modified the resource.
+        subdomain:
+          type: string
+          description: The new subdomain.
+          example: my-company
+        url:
+          type: string
+          description: Login URL corresponding to the subdomain.
+          example: https://your-company.sumologic.com
+    ConfigureSubdomainRequest:
+      required:
+        - subdomain
+      type: object
+      properties:
+        subdomain:
+          maxLength: 63
+          minLength: 4
+          pattern: ^(?!xn--)[a-z0-9]([a-z0-9-]*[a-z0-9])?$
+          type: string
+          description: The new subdomain.
+          example: my-company
+    UsageReportRequest:
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Start date, without the time, of the usage data to fetch. If no value is provided startDate is used as the start of the subscription. The start date cannot be before the start of the subscription.
+          example: '2019-07-20T00:00:00.000Z'
+        endDate:
+          type: string
+          description: End date, without the time, of usage data to fetch. If no value is provided endDate is used as the end of the subscription. The end date cannot be after the end of the subscription.
+          example: '2019-08-20T00:00:00.000Z'
+        groupBy:
+          pattern: ^(day|week|month)$
+          type: string
+          description: 'Perform a groupBy operation on the usage details. If no value is provided data is grouped by `Day` - `day`: Aggregate the data by day - `week`: Aggregate the data by week. Week starts at Monday and ends at sunday night. - `month`: Aggregate the data by calendar month.'
+          example: day
+          default: day
+        reportType:
+          pattern: ^(standard|detailed|childDetailed)$
+          type: string
+          description: Specifies the type of report to be exported. Available types are `standard` and `detailed`. An additional `childDetailed` type is available for Sumo Orgs parents. Detailed report will have raw consumption along with the credits breakdown. If no value is provided Standard reports will be exported.
+          example: standard
+          default: standard
+        includeDeploymentCharge:
+          type: boolean
+          description: Deployment charges will be applied to the returned usages csv if this is set to true and the organization  is a part of Sumo Organizations as a child organization.
+          example: false
+          default: false
+      description: Usage Export Report Request
+    UsageReportResponse:
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: Job Id for export
+          example: '12345678'
+      description: Export Usage response containing the jobId
+    UsageReportStatusResponse:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+        status:
+          pattern: ^(Success|InProgress|Failed)$
+          type: string
+          description: Status export
+          example: Success
+        statusMessage:
+          type: string
+          description: Status message export
+          example: Successful request
+        reportDownloadURL:
+          type: string
+          description: S3 presigned download URL for the report. It is valid for 10 minutes.
+          example: www.example.com
+      description: Status response containing status and downloadURL if successful
+    UsageForecastResponse:
+      type: object
+      properties:
+        averageUsage:
+          type: number
+          description: Average credit usage per day till now.
+          format: double
+          example: 4
+        usagePercentage:
+          type: number
+          description: Percentage of total credits used till date.
+          format: double
+          example: 7
+        forecastedUsage:
+          type: number
+          description: Total expected usage by the end of contract period.
+          format: double
+          example: 10
+        forecastedUsagePercentage:
+          type: number
+          description: Percentage of allocated credits that will be used in the contract period.
+          format: double
+          example: 5
+        remainingDays:
+          type: number
+          description: Days remaining till all the credits are consumed.
+          format: double
+          example: 10
+      description: Usage forecast for the organization.
+    PendingUpdateRequest:
+      required:
+        - createdOn
+        - plan
+      type: object
+      properties:
+        createdOn:
+          type: string
+          description: The date on which the update request was created.
+          format: date
+        plan:
+          $ref: '#/components/schemas/CurrentPlan'
+      description: The pending plan update request for the account
+    ErrorDescription:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: An error code describing the type of error.
+          example: auth:password_too_short
+        message:
+          type: string
+          description: A short English-language description of the error.
+          example: Your password was too short.
+        detail:
+          type: string
+          description: An optional fuller English-language description of the error.
+          example: Your password was 5 characters long, the minimum length is 12 characters. See http://example.com/password for more information.
+        meta:
+          type: string
+          description: An optional list of metadata about the error. (opaque JSON object)
+          example:
+            minLength: 12
+            actualLength: 5
+    CurrentPlan:
+      required:
+        - billingFrequency
+        - planCost
+        - productId
+      type: object
+      properties:
+        productId:
+          pattern: ^(Essentials|Trial|Free|EnterpriseOps|EnterpriseSec|EnterpriseSuite)$
+          type: string
+          description: |
+            Unique identifier of the product in current plan. Valid values are: 1. `Free` 2. `Trial` 3. `Essentials` 4. `EnterpriseOps` 5. `EnterpriseSec` 6. `EnterpriseSuite`
+          example: Essentials
+          x-pattern-message: 'must be one of the following: `Essentials`, `Trial`, `Free`, `EnterpriseOps`, `EnterpriseSec`, `EnterpriseSuite`'
+        planCost:
+          type: number
+          description: Cost incurred for the current plan.
+          format: double
+          example: 725.46
+        billingFrequency:
+          pattern: ^(Monthly|Annually)$
+          type: string
+          description: |
+            Billing frequency for the current plan. Valid values are: 1. `Monthly` 2. `Annually`
+          example: Monthly
+          x-pattern-message: 'must be one of the following: `Monthly` or `Annually`'
+        consumables:
+          type: array
+          description: Consumables in the current plan.
+          items:
+            $ref: '#/components/schemas/Consumable'
+        planType:
+          pattern: ^(Free|Trial|Paid)$
+          type: string
+          description: Whether the account is `Free`/`Trial`/`Paid`
+          example: Free
+          x-pattern-message: 'must be one of the following: `Free`, `Trial` or `Paid`'
+        planName:
+          type: string
+          description: The plan name for the product being used.
+        discountAmount:
+          type: integer
+          description: The discount offered for the given contract period.
+        contractPeriod:
+          $ref: '#/components/schemas/ContractPeriod'
+        currentBillingPeriod:
+          $ref: '#/components/schemas/CurrentBillingPeriod'
+        credits:
+          type: integer
+          description: Numerical value of the amount of credits
+          format: int64
+          example: 300
+        baselines:
+          $ref: '#/components/schemas/Baselines'
+        pendingUpdateRequest:
+          type: boolean
+          description: True if there is a pending update request
+        prorationDetails:
+          $ref: '#/components/schemas/ProrationDetails'
+      description: Current plan of the account.
+    Consumable:
+      required:
+        - consumableId
+        - quantity
+      type: object
+      properties:
+        consumableId:
+          pattern: ^(Storage|Metrics|Continuous|Credits)$
+          type: string
+          description: |
+            Unique identifier of the consumable. Valid values are: 1. `Storage` 2. `Metrics` 3. `Continuous` 4. `Credits`
+          example: Metrics
+          x-pattern-message: 'must be one of the following: `Storage`, `Metrics`, `Continuous`, `Credits`'
+        quantity:
+          $ref: '#/components/schemas/Quantity'
+      description: Details of consumable and its quantity.
+    ContractPeriod:
+      required:
+        - endDate
+        - startDate
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Start date of the contract.
+          format: date
+        endDate:
+          type: string
+          description: End date of the contract.
+          format: date
+    CurrentBillingPeriod:
+      required:
+        - endDate
+        - startDate
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Start date of the current billing period.
+          format: date
+          example: '2012-02-02T00:00:00.000Z'
+        endDate:
+          type: string
+          description: End date of the current billing period.
+          format: date
+          example: '2012-02-02T00:00:00.000Z'
+    Baselines:
+      type: object
+      properties:
+        continuousIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of continuous logs ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        continuousStorage:
+          maximum: 30
+          minimum: 30
+          type: integer
+          description: Number of days of continuous logs storage to allocate to the organization, in Days.
+          format: int64
+          example: 30
+          default: 30
+        frequentIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of frequent logs ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        frequentStorage:
+          maximum: 30
+          minimum: 30
+          type: integer
+          description: Number of days of frequent logs storage to allocate to the organization, in Days.
+          format: int64
+          example: 30
+          default: 30
+        infrequentIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of infrequent logs ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        infrequentStorage:
+          maximum: 30
+          minimum: 30
+          type: integer
+          description: The amount of infrequent logs storage to allocate to the organization, in Days.
+          format: int64
+          example: 30
+          default: 30
+        infrequentScan:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of infrequent logs scan to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        metrics:
+          maximum: 5000000
+          minimum: 0
+          type: integer
+          description: The amount of Metrics usage to allocate to the organization, in DPMs (Data Points per Minute).
+          format: int64
+          example: 50000
+          default: 0
+        cseIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of CSE ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        cseStorage:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of CSE storage to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        tracingIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of tracing data ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 50000
+          default: 0
+        flexIngest:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of flex logs ingest to allocate to the organization, in GBs.
+          format: int64
+          example: 5
+          default: 0
+        flexStorage:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: Number of days of flex logs storage to allocate to the organization, in Days.
+          format: int64
+          example: 30
+          default: 0
+        flexScanRatio:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of flex logs ingest scan ratio.
+          format: int64
+          example: 5
+          default: 0
+        aiInvestigation:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The amount of AI Investigations needed to allocate to the organization.
+          format: int64
+          example: 5
+          default: 0
+        socAiAgentDailyLimit:
+          maximum: 1000000
+          minimum: 0
+          type: integer
+          description: The daily investigation limit for SOC AI Agent.
+          format: int32
+          example: 100
+          default: 0
+      description: Details of consumable and its quantity.
+    ProrationDetails:
+      required:
+        - proratedCost
+        - proratedCredits
+        - remainingDays
+      type: object
+      properties:
+        remainingDays:
+          type: integer
+          description: Remaining days in the billing cycle for which the new plan is prorated.
+          format: int32
+        proratedCredits:
+          type: integer
+          description: Total prorated credits that get added to the bucket based on the remaining billing period.
+          format: int32
+        proratedCost:
+          type: number
+          description: Cost of the total prorated credits.
+          format: double
+      description: Details about the prorated credits and prorated cost in case of immediate monthly to monthly cycle upgrades.
+    Quantity:
+      required:
+        - unit
+        - value
+      type: object
+      properties:
+        value:
+          type: integer
+          description: The value of the consumable in units.
+          format: int64
+          example: 61425
+        unit:
+          pattern: ^(GB|DPM|Credits|Days)$
+          type: string
+          description: |
+            The unit of the consumable. Units are provided in: 1. `GB` 2. `DPM`(Data Points Per Minute) 3. `Credits` 4. `Days`
+          example: GB
+          x-pattern-message: 'must be one of the following: `GB`, `DPM`, `Credits`, `Days`'
+      description: Details of unit of consumption and its value.

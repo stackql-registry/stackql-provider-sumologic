@@ -18,7 +18,7 @@ health_events service documentation.
 
 :::info[Service Summary]
 
-total resources: __2__  
+total resources: __1__  
 
 :::
 
@@ -28,6 +28,6 @@ total resources: __2__
 <a href="/services/health_events/health_events/">health_events</a>
 </div>
 <div class="providerDocColumn">
-<a href="/services/health_events/resources/">resources</a>
+
 </div>
 </div>

@@ -15,6 +15,7 @@ image: /img/stackql-sumologic-provider-featured-image.png
 ---
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -22,7 +23,7 @@ Creates, updates, deletes, gets or lists a <code>root</code> resource.
 
 ## Overview
 <table><tbody>
-<tr><td><b>Name</b></td><td><code>root</code></td></tr>
+<tr><td><b>Name</b></td><td><CopyableCode code="root" /></td></tr>
 <tr><td><b>Type</b></td><td>Resource</td></tr>
 <tr><td><b>Id</b></td><td><CopyableCode code="sumologic.monitors.root" /></td></tr>
 </tbody></table>
@@ -32,12 +33,12 @@ Creates, updates, deletes, gets or lists a <code>root</code> resource.
 The following fields are returned by `SELECT` queries:
 
 <Tabs
-    defaultValue="getMonitorsLibraryRoot"
+    defaultValue="get"
     values={[
-        { label: 'getMonitorsLibraryRoot', value: 'getMonitorsLibraryRoot' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMonitorsLibraryRoot">
+<TabItem value="get">
 
 Root folder of the monitors library.
 
@@ -61,24 +62,29 @@ Root folder of the monitors library.
     <td>Identifier of the monitor or folder.</td>
 </tr>
 <tr>
+    <td><CopyableCode code="parent_id" /></td>
+    <td><code>string</code></td>
+    <td>Identifier of the parent folder. (wire: parentId)</td>
+</tr>
+<tr>
     <td><CopyableCode code="children" /></td>
     <td><code>array</code></td>
     <td>Children of the folder. NOTE: Permissions field will not be filled (empty list) for children.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="contentType" /></td>
+    <td><CopyableCode code="content_type" /></td>
     <td><code>string</code></td>
-    <td>Type of the content. Valid values:   1) Monitor   2) Folder</td>
+    <td>Type of the content. Valid values:   1) Monitor   2) Folder (wire: contentType)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdAt" /></td>
+    <td><CopyableCode code="created_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Creation timestamp in UTC in [RFC3339](https://tools.ietf.org/html/rfc3339) format.</td>
+    <td>Creation timestamp in UTC in &#91;RFC3339&#93;(https:​//tools.ietf.org/html/rfc3339) format. (wire: createdAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="createdBy" /></td>
+    <td><CopyableCode code="created_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who created the resource.</td>
+    <td>Identifier of the user who created the resource. (wire: createdBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="description" /></td>
@@ -86,29 +92,24 @@ Root folder of the monitors library.
     <td>Description of the monitor or folder.</td>
 </tr>
 <tr>
-    <td><CopyableCode code="isMutable" /></td>
+    <td><CopyableCode code="is_mutable" /></td>
     <td><code>boolean</code></td>
-    <td>Immutable objects are "READ-ONLY".</td>
+    <td>Immutable objects are "READ-ONLY". (wire: isMutable)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="isSystem" /></td>
+    <td><CopyableCode code="is_system" /></td>
     <td><code>boolean</code></td>
-    <td>System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated.</td>
+    <td>System objects are objects provided by Sumo Logic. System objects can only be localized. Non-local fields can't be updated. (wire: isSystem)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedAt" /></td>
+    <td><CopyableCode code="modified_at" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Last modification timestamp in UTC.</td>
+    <td>Last modification timestamp in UTC. (wire: modifiedAt)</td>
 </tr>
 <tr>
-    <td><CopyableCode code="modifiedBy" /></td>
+    <td><CopyableCode code="modified_by" /></td>
     <td><code>string</code></td>
-    <td>Identifier of the user who last modified the resource.</td>
-</tr>
-<tr>
-    <td><CopyableCode code="parentId" /></td>
-    <td><code>string</code></td>
-    <td>Identifier of the parent folder.</td>
+    <td>Identifier of the user who last modified the resource. (wire: modifiedBy)</td>
 </tr>
 <tr>
     <td><CopyableCode code="permissions" /></td>
@@ -146,7 +147,7 @@ The following methods are available for this resource:
 </thead>
 <tbody>
 <tr>
-    <td><a href="#getMonitorsLibraryRoot"><CopyableCode code="getMonitorsLibraryRoot" /></a></td>
+    <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-region"><code>region</code></a></td>
     <td></td>
@@ -171,7 +172,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-region">
     <td><CopyableCode code="region" /></td>
     <td><code>string</code></td>
-    <td>SumoLogic region (enum: [us2, au, ca, de, eu, fed, in, jp], default: us2)</td>
+    <td>Sumo Logic deployment (au, ca, ch, de, eu, fed, in, jp, kr, us1, us2). Resolved from the SUMOLOGIC_ENVIRONMENT environment variable when it is set (x-stackQL-envVar, the same variable the Terraform provider reads); otherwise defaults to us2. A WHERE region = '...' value always takes precedence. (enum: &#91;au, ca, ch, de, eu, fed, in, jp, kr, us1, us2&#93;, default: us2, x-stackQL-envVar: SUMOLOGIC_ENVIRONMENT)</td>
 </tr>
 </tbody>
 </table>
@@ -179,12 +180,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 ## `SELECT` examples
 
 <Tabs
-    defaultValue="getMonitorsLibraryRoot"
+    defaultValue="get"
     values={[
-        { label: 'getMonitorsLibraryRoot', value: 'getMonitorsLibraryRoot' }
+        { label: 'get', value: 'get' }
     ]}
 >
-<TabItem value="getMonitorsLibraryRoot">
+<TabItem value="get">
 
 Get the root folder in the monitors library.
 
@@ -192,21 +193,21 @@ Get the root folder in the monitors library.
 SELECT
 id,
 name,
+parent_id,
 children,
-contentType,
-createdAt,
-createdBy,
+content_type,
+created_at,
+created_by,
 description,
-isMutable,
-isSystem,
-modifiedAt,
-modifiedBy,
-parentId,
+is_mutable,
+is_system,
+modified_at,
+modified_by,
 permissions,
 type,
 version
 FROM sumologic.monitors.root
-WHERE region = '{{ region }}' -- required
+WHERE region = '{{ region }}' -- required unless SUMOLOGIC_ENVIRONMENT is set
 ;
 ```
 </TabItem>
