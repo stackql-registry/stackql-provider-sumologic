@@ -120,7 +120,11 @@ SELECT id, name, category FROM sumologic.collectors.collectors WHERE filter = 'h
 SELECT json_extract(item, '$.name') AS name, path FROM sumologic.monitors.search WHERE query = 'type:monitor';
 ```
 
-## Users and roles
+## Example Queries
+
+Try the following queries using `stackql shell`, or run them from a script or CI pipeline with `stackql exec`.
+
+### Users and roles
 
 Users with their state and role assignment:
 
@@ -138,7 +142,7 @@ SELECT id, name, description, system_defined, json_array_length(capabilities) AS
 FROM sumologic.roles.roles;
 ```
 
-## Collectors and sources
+### Collectors and sources
 
 The collector estate - type, liveness and version:
 
@@ -164,7 +168,7 @@ FROM sumologic.collectors.offline_collectors
 WHERE alive_before_days = 30;
 ```
 
-## Content library, monitors and dashboards
+### Content library, monitors and dashboards
 
 The personal folder and its children:
 
@@ -191,7 +195,7 @@ FROM sumologic.monitors.search
 WHERE query = 'type:monitor';
 ```
 
-## Data tiers, partitions and budgets
+### Data tiers, partitions and budgets
 
 Partitions with tier and retention:
 
@@ -208,7 +212,7 @@ SELECT id, name, capacity_bytes, usage_bytes, usage_status, action, reset_time, 
 FROM sumologic.ingest_budgets.ingest_budgets;
 ```
 
-## Provision, mutate and tear down
+### Provision, mutate and tear down
 
 Mutations use the same SQL grammar - `INSERT` creates a resource, `UPDATE` replaces it (Sumo Logic updates are `PUT`s, so supply every required field), `EXEC` invokes lifecycle actions and `DELETE` removes it. Structured values (arrays, objects) are passed as JSON strings, and booleans are quoted (`is_active = 'false'`) - a bare `true` / `false` on the right-hand side of `SET` is not accepted. A hosted collector with an HTTP source end to end (the Collector Management API wraps its bodies in `collector` / `source` objects, passed as JSON values):
 
@@ -252,7 +256,7 @@ SET first_name = 'Ada', last_name = 'Lovelace', is_active = 'false', role_ids = 
 WHERE id = '000000000000ABCD';
 ```
 
-## Lifecycle operations
+### Lifecycle operations
 
 State transitions are `EXEC` methods on the resource they act on, addressed with the wire-cased parameter names:
 
