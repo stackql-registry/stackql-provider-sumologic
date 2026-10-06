@@ -25,6 +25,7 @@ Query, provision and operate the Sumo Logic platform using SQL - collectors and 
 
 total services: __50__  
 total resources: __213__  
+source project: __[stackql-provider-sumologic](https://github.com/stackql-registry/stackql-provider-sumologic)__  
 
 :::
 

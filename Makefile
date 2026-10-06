@@ -46,6 +46,7 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 PROVIDER      := sumologic
+SOURCE_PROJECT ?= https://github.com/stackql-registry/stackql-provider-$(PROVIDER)
 VERSION       := v00.00.00000
 SOURCE_DIR    := provider-dev/source
 CONFIG_DIR    := provider-dev/config
@@ -165,7 +166,8 @@ docs: ## generate website/docs (snake_case surface) and sanitize for MDX
 	  --provider-dir ./$(PROVIDER_DIR) \
 	  --output-dir ./$(WEBSITE_DIR) \
 	  --provider-data-dir ./provider-dev/docgen/provider-data \
-	  --snake-case-aliases > /dev/null
+	  --snake-case-aliases \
+	  --source-project $(SOURCE_PROJECT) > /dev/null
 	node $(WEBSITE_DIR)/scripts/sanitize-docs.mjs
 
 docs-build: ## yarn install && yarn build in website/ (vendors the shared Docusaurus config)
